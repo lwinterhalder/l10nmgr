@@ -66,6 +66,7 @@ class Module2
 	</frameset>
 	</html>
 	';
+        // @extensionScannerIgnoreLine
         $this->printContent();
     }
 
