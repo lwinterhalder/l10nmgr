@@ -226,9 +226,9 @@ class Tools
             }
             // Look for diff-value inside the XML (new way):
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['BE']['flexFormXMLincludeDiffBase'])) {
-                $diffDefaultValue = (string)$pObj->getArrayValueByPath(
-                    $structurePath . '.vDEFbase',
-                    $pObj->traverseFlexFormXMLData_Data
+                $diffDefaultValue = (string)ArrayUtility::getValueByPath(
+                    $pObj->traverseFlexFormXMLData_Data,
+                    $structurePath . '.vDEFbase'
                 );
             } else {
                 // Set diff-value from l10n-cfg record (deprecated)
