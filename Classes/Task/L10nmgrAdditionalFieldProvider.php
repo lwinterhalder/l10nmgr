@@ -129,6 +129,7 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider imp
             )
         ) {
             $result = false;
+            // @extensionScannerIgnoreLine
             $this->addMessage(
                 $this->getLanguageService()->sL(
                     'LLL:EXT:l10nmgr/Resources/Private/Language/Task/locallang.xlf:fileGarbageCollection.invalidAge'
