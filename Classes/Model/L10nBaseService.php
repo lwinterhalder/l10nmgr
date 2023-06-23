@@ -209,6 +209,7 @@ class L10nBaseService implements LoggerAwareInterface
         $gridElementsInstalled = ExtensionManagementUtility::isLoaded('gridelements');
         if ($gridElementsInstalled) {
             // find all tt_content elements in the default language of this page that are NOT inside a grid element
+            // @extensionScannerIgnoreLine
             $recordsInOriginalLanguage = $this->getRecordsByField(
                 'tt_content',
                 'pid',
@@ -227,6 +228,7 @@ class L10nBaseService implements LoggerAwareInterface
                 }
             }
             // find all tt_content elements in the default language of this page that ARE inside a grid element
+            // @extensionScannerIgnoreLine
             $recordsInOriginalLanguage = $this->getRecordsByField(
                 'tt_content',
                 'pid',
@@ -236,6 +238,7 @@ class L10nBaseService implements LoggerAwareInterface
             );
         } elseif (ExtensionManagementUtility::isLoaded('container')) {
             // do not try to translate container children
+            // @extensionScannerIgnoreLine
             $recordsInOriginalLanguage = $this->getRecordsByField(
                 'tt_content',
                 'pid',
@@ -245,6 +248,7 @@ class L10nBaseService implements LoggerAwareInterface
             );
         } else {
             // find all tt_content elements in the default language of this page
+            // @extensionScannerIgnoreLine
             $recordsInOriginalLanguage = $this->getRecordsByField(
                 'tt_content',
                 'pid',
