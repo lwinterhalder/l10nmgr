@@ -149,13 +149,16 @@ class ConfigurationManager extends BaseModule
 
         // The page will show only if there is a valid page and if this page
         // may be viewed by the user
+        // @extensionScannerIgnoreLine
         $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
         if ($this->pageinfo) {
             $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($this->pageinfo);
         }
 
         $access = is_array($this->pageinfo);
+        // @extensionScannerIgnoreLine
         if (($this->id && $access) || ($backendUser->isAdmin() && ! $this->id)) {
+            // @extensionScannerIgnoreLine
             if (!$this->id && $backendUser->isAdmin()) {
                 $this->pageinfo = ['title' => '[root-level]', 'uid' => 0, 'pid' => 0];
             }
@@ -178,6 +181,7 @@ class ConfigurationManager extends BaseModule
         foreach ($l10nConfigurations as $key => $l10nConfiguation) {
             $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute('LocalizationManager', [
                     'id' => $l10nConfiguation['pid'] ?? 0,
+                    // @extensionScannerIgnoreLine
                     'srcPID' => $this->id,
                     'exportUID' => $l10nConfiguation['uid'] ?? 0,
                 ]);

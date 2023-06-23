@@ -219,16 +219,20 @@ return false;
         $l10nConfiguration = $this->getL10NConfiguration();
         if ($l10nConfiguration->isLoaded()) {
             // Setting page id
+            // @extensionScannerIgnoreLine
             $this->id = $l10nConfiguration->getPid();
             $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
+            // @extensionScannerIgnoreLine
             $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
             $access = is_array($this->pageinfo);
+            // @extensionScannerIgnoreLine
             if ($this->id && $access) {
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action] ?? '';
 
                 $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getId());
                 $selectMenus = [];
+                // @extensionScannerIgnoreLine
                 $selectMenus[] = self::getFuncMenuNew(
                     $this->id,
                     'SET[action]',
@@ -239,6 +243,7 @@ return false;
                     $this->getLanguageService()->getLL('general.export.choose.action.title')
                 );
 
+                // @extensionScannerIgnoreLine
                 $selectMenus[] = self::getFuncMenuNew(
                     $this->id,
                     'SET[lang]',
@@ -250,6 +255,7 @@ return false;
                 );
 
                 $checkBoxes = [];
+                // @extensionScannerIgnoreLine
                 $checkBoxes[] = self::getFuncCheckNew(
                     $this->id,
                     'SET[onlyChangedContent]',
@@ -259,6 +265,7 @@ return false;
                     '',
                     $this->getLanguageService()->getLL('export.xml.new.title')
                 );
+                // @extensionScannerIgnoreLine
                 $checkBoxes[] = self::getFuncCheckNew(
                     $this->id,
                     'SET[noHidden]',
@@ -327,6 +334,7 @@ return false;
         $L10nConfiguration = $this->getL10NConfiguration();
         if ($L10nConfiguration->isLoaded()) {
             // Setting page id
+            // @extensionScannerIgnoreLine
             $this->id = (int)$L10nConfiguration->getData('pid');
             $forcedSourceLanguage = (int)$L10nConfiguration->getData('forcedSourceLanguage');
             if ($forcedSourceLanguage > 0) {
@@ -335,6 +343,7 @@ return false;
             $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
             $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
             $access = is_array($this->pageinfo);
+            // @extensionScannerIgnoreLine
             if ($this->id && $access) {
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action];
@@ -352,6 +361,7 @@ return false;
     <div class="col-md-6">
         <div class="form">
             <div class="form-section">' .
+                    // @extensionScannerIgnoreLine
                     self::getFuncMenu(
                         $this->id,
                         'SET[action]',
@@ -361,6 +371,7 @@ return false;
                         '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
                         $this->getLanguageService()->getLL('general.export.choose.action.title')
                     ) .
+                    // @extensionScannerIgnoreLine
                     self::getFuncMenu(
                         $this->id,
                         'SET[lang]',
@@ -372,6 +383,7 @@ return false;
                         (string)$this->previewLanguage
                     ) .
                     '</div><div class="form-section">' .
+                    // @extensionScannerIgnoreLine
                     self::getFuncCheck(
                         $this->id,
                         'SET[onlyChangedContent]',
@@ -381,6 +393,7 @@ return false;
                         '',
                         $this->getLanguageService()->getLL('export.xml.new.title')
                     ) .
+                    // @extensionScannerIgnoreLine
                     self::getFuncCheck(
                         $this->id,
                         'SET[noHidden]',
@@ -731,6 +744,7 @@ return false;
         $_selectOptions = ['0' => '-default-'];
         $_selectOptions = $_selectOptions + $this->MOD_MENU['lang'];
         $info = '<div class="form-section">' .
+            // @extensionScannerIgnoreLine
             static::getFuncCheck(
                 $this->id,
                 'SET[check_exports]',

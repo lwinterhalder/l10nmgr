@@ -160,6 +160,7 @@ class BaseModule
         if (empty($this->MCONF['name'])) {
             $this->MCONF = $GLOBALS['MCONF'] ?? [];
         }
+        // @extensionScannerIgnoreLine
         $this->id = (int)GeneralUtility::_GP('id');
         $this->CMD = (string)GeneralUtility::_GP('CMD');
         $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
@@ -177,6 +178,7 @@ class BaseModule
     public function menuConfig(): void
     {
         // Page / user TSconfig settings and blinding of menu-items
+        // @extensionScannerIgnoreLine
         $this->modTSconfig['properties'] = BackendUtility::getPagesTSconfig($this->id)['mod.'][$this->MCONF['name'] . '.'] ?? [];
         $this->MOD_MENU['function'] = $this->mergeExternalItems(
             $this->MCONF['name'],
