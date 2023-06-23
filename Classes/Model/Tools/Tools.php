@@ -47,6 +47,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\DiffUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -198,14 +199,14 @@ class Tools
             // So, find translated value:
             $baseStructPath = substr($structurePath, 0, -3);
             $structurePath = $baseStructPath . ($this->detailsOutput['ISOcode'] ?? '');
-            $translValue = (string)$pObj->getArrayValueByPath($structurePath, $pObj->traverseFlexFormXMLData_Data);
+            $translValue = (string)ArrayUtility::getValueByPath($pObj->traverseFlexFormXMLData_Data, $structurePath);
             // Generate preview values:
             $previewLanguageValues = [];
             foreach ($this->previewLanguages as $prevSysUid) {
                 $sysLanguages = $this->sysLanguages[$prevSysUid] ?? [];
-                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
-                    $baseStructPath . ($sysLanguages['ISOcode'] ?? ''),
-                    $pObj->traverseFlexFormXMLData_Data
+                $previewLanguageValues[$prevSysUid] = ArrayUtility::getValueByPath(
+                    $pObj->traverseFlexFormXMLData_Data,
+                    $baseStructPath . ($sysLanguages['ISOcode'] ?? '')
                 );
             }
             $table = $PA['table'] ?? '';
@@ -510,17 +511,17 @@ class Tools
     {
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
-        $translValue = (string)$pObj->getArrayValueByPath($structurePath, $this->_callBackParams_translationXMLArray);
-        $diffDefaultValue = (string)$pObj->getArrayValueByPath(
-            $structurePath,
-            $this->_callBackParams_translationDiffsourceXMLArray
+        $translValue = (string)ArrayUtility::getValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
+        $diffDefaultValue = (string)ArrayUtility::getValueByPath(
+            $this->_callBackParams_translationDiffsourceXMLArray,
+            $structurePath
         );
         $previewLanguageValues = [];
         foreach ($this->previewLanguages as $prevSysUid) {
             if (!empty($this->_callBackParams_previewLanguageXMLArrays[$prevSysUid])) {
-                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
-                    $structurePath,
-                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid]
+                $previewLanguageValues[$prevSysUid] = ArrayUtility::getValueByPath(
+                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid],
+                    $structurePath
                 );
             }
         }
@@ -1719,9 +1720,9 @@ class Tools
                                                 if (empty($TCEmain_data[$tt][$rUid][$pp[2]])) {
                                                     $TCEmain_data[$tt][$rUid][$pp[2]] = [];
                                                 }
-                                                $flexToolObj->setArrayValueByPath(
-                                                    $pp[3],
+                                                ArrayUtility::setValueByPath(
                                                     $TCEmain_data[$tt][$rUid][$pp[2]],
+                                                    $pp[3],
                                                     ''
                                                 );
                                             }

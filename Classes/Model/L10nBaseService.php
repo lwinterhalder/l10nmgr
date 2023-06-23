@@ -34,6 +34,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\Database\RelationHandler;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -480,9 +481,9 @@ class L10nBaseService implements LoggerAwareInterface
                                                 $TCEmain_data[$Ttable][$elementUid][$Tfield] = [];
                                             }
                                             //TCEMAINDATA is passed as reference here:
-                                            $flexToolObj->setArrayValueByPath(
-                                                $Tpath,
+                                            ArrayUtility::setValueByPath(
                                                 $TCEmain_data[$Ttable][$elementUid][$Tfield],
+                                                $Tpath,
                                                 $inputArray[$table][$elementUid][$key] ?? ''
                                             );
                                             $_flexFormDiffArray[$key] = [
@@ -793,9 +794,9 @@ class L10nBaseService implements LoggerAwareInterface
                                                 $TCEmain_data[$Ttable][$TuidString][$Tfield] = [];
                                             }
                                             //TCEMAINDATA is passed as reference here:
-                                            $flexToolObj->setArrayValueByPath(
-                                                $Tpath,
+                                            ArrayUtility::setValueByPath(
                                                 $TCEmain_data[$Ttable][$TuidString][$Tfield],
+                                                $Tpath,
                                                 $inputArray[$table][$elementUid][$key] ?? ''
                                             );
                                             $_flexFormDiffArray[$key] = [
