@@ -883,6 +883,7 @@ class Tools
                 if (!empty($objArray[0])) {
                     $instance = GeneralUtility::makeInstance($objArray[0]);
                     $this->indexFilterObjects[$pageId][$c] = &$instance;
+                    // @extensionScannerIgnoreLine
                     $this->indexFilterObjects[$pageId][$c]->init($pageId);
                     $c++;
                 }

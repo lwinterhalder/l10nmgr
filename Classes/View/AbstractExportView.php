@@ -409,6 +409,7 @@ abstract class AbstractExportView
         $this->languageService = $GLOBALS['LANG'];
         $this->languageService->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
         if ($this->getBackendUser()) {
+            // @extensionScannerIgnoreLine
             $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
         }
         return $this->languageService;

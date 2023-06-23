@@ -133,6 +133,7 @@ class L10nConfiguration
             foreach ($treeStartingPoints as $treeStartingPoint) {
                 $treeStartingRecords[] = BackendUtility::getRecordWSOL('pages', $treeStartingPoint);
             }
+            // @extensionScannerIgnoreLine
             $tree->init('AND ' . $this->getBackendUser()->getPagePermsClause(1));
             $tree->addField('l18n_cfg');
             $tree->addField('l10nmgr_configuration');

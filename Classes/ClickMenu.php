@@ -168,6 +168,7 @@ class ClickMenu
     protected function getLanguageService(): LanguageService
     {
         if ($this->getBackendUser()) {
+            // @extensionScannerIgnoreLine
             $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
         }
         return $this->languageService;

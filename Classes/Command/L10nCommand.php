@@ -63,6 +63,7 @@ class L10nCommand extends Command
         $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
         $fileRef = 'EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xlf';
         $this->languageService->includeLLFile($fileRef);
+        // @extensionScannerIgnoreLine
         $this->languageService->init('');
 
         return $this->languageService;

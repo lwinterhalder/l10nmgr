@@ -65,6 +65,7 @@ class TranslationTasks extends BaseModule
      */
     public function mainAction(): HtmlResponse
     {
+        // @extensionScannerIgnoreLine
         $this->init();
         // $this->main();
         return new HtmlResponse($this->getContent());

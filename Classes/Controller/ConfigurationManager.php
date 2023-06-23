@@ -115,6 +115,7 @@ class ConfigurationManager extends BaseModule
      */
     public function mainAction(ServerRequestInterface $request): ResponseInterface
     {
+        // @extensionScannerIgnoreLine
         $this->init();
 
         // Checking for first level external objects
