@@ -27,6 +27,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  * @author Kasper Skaarhoj <kasperYYYY@typo3.com>
  */
 use Doctrine\DBAL\DBALException;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
@@ -675,7 +676,7 @@ class Tools
      * @param int $previewLanguage
      * @return mixed Record array if found, otherwise FALSE
      * @throws DBALException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+     * @throws NoSuchCacheException
      */
     protected function getSingleRecordToTranslate(string $table, int $uid, int $previewLanguage = 0)
     {
@@ -758,7 +759,7 @@ class Tools
      *
      * @param string $table
      * @return string[]
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+     * @throws NoSuchCacheException
      */
     public function getAllowedFieldsForTable(string $table): array
     {
@@ -811,7 +812,7 @@ class Tools
      * @param string $tableName
      * @param array $record
      * @return bool
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+     * @throws NoSuchCacheException
      */
     public function canUserEditRecord(string $tableName, array $record): bool
     {
@@ -1500,7 +1501,7 @@ class Tools
      * @param bool $noHidden
      * @return array Array of records from table (with all fields selected)
      * @throws DBALException
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+     * @throws NoSuchCacheException
      */
     public function getRecordsToTranslateFromTable(
         string $table,
