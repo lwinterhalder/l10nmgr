@@ -23,13 +23,12 @@ namespace Localizationteam\L10nmgr\Hooks;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Updating translation index - hook for tcemain
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Model\L10nBaseService;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
@@ -130,7 +129,7 @@ class Tcemain
      * @param array $languageList
      * @param bool $noLink
      * @return string
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function calcStat(array $p, array $languageList, bool $noLink = false): string
     {

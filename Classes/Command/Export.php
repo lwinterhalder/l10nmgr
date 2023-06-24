@@ -22,7 +22,7 @@ namespace Localizationteam\L10nmgr\Command;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\View\CatXmlView;
 use Localizationteam\L10nmgr\View\ExcelXmlView;
@@ -324,7 +324,7 @@ class Export extends L10nCommand
     /**
      * @param int $sourceLangStaticId
      * @return int
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function getStaticLangUid(int $sourceLangStaticId): int
     {

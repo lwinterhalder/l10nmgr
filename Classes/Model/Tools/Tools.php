@@ -21,13 +21,12 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Contains translation tools
  *
  * @author Kasper Skaarhoj <kasperYYYY@typo3.com>
  */
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
@@ -171,7 +170,7 @@ class Tools
     /**
      * Constructor
      * Setting up internal variable ->t8Tools
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function __construct()
     {
@@ -675,7 +674,7 @@ class Tools
      * @param int $uid Record uid
      * @param int $previewLanguage
      * @return mixed Record array if found, otherwise FALSE
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
      */
     protected function getSingleRecordToTranslate(string $table, int $uid, int $previewLanguage = 0)
@@ -1095,7 +1094,7 @@ class Tools
      * @param string $selFieldList Select fields for the query which fetches the translations of the current record
      * @param int $previewLanguage
      * @return mixed Array with information. Errors will return string with message.
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @todo Define visibility
      */
     public function translationInfo(
@@ -1500,7 +1499,7 @@ class Tools
      * @param bool $sortexports
      * @param bool $noHidden
      * @return array Array of records from table (with all fields selected)
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
      */
     public function getRecordsToTranslateFromTable(
@@ -1658,7 +1657,7 @@ class Tools
      * Flush Index Of Workspace - removes all index records for workspace - useful to nightly build-up of the index.
      *
      * @param int $ws Workspace ID
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function flushIndexOfWorkspace(int $ws): void
     {

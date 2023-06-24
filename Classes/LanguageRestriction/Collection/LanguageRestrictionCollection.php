@@ -16,7 +16,7 @@ namespace Localizationteam\L10nmgr\LanguageRestriction\Collection;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Constants;
 use PDO;
 use RuntimeException;
@@ -79,7 +79,7 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
      * @param string $tableName Name of table from which entries should be loaded
      * @param string $fieldName Name of the language restrictions relation field
      * @return CollectionInterface
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public static function load($id, $fillItems = false, string $tableName = '', string $fieldName = ''): CollectionInterface
     {
@@ -148,7 +148,7 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
      * using <getCollectedRecordsQueryBuilder>.
      *
      * @return array
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function getCollectedRecords(): array
     {

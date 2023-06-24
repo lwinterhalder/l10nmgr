@@ -21,13 +21,12 @@ namespace Localizationteam\L10nmgr\Controller;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Module 'L10N Manager' for the 'l10nmgr' extension.
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -172,7 +171,7 @@ class ConfigurationManager extends BaseModule
     /**
      * Generates and returns the content of the module
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     protected function moduleContent(): void
@@ -196,7 +195,7 @@ class ConfigurationManager extends BaseModule
      * Returns all l10nmgr configurations to which the current user has access, based on page permissions
      *
      * @return array List of l10nmgr configurations
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function getAllConfigurations(): array
     {

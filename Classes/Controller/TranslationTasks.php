@@ -21,13 +21,12 @@ namespace Localizationteam\L10nmgr\Controller;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Module 'Workspace Tasks' for the 'l10nmgr' extension.
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Hooks\Tcemain;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
@@ -118,7 +117,7 @@ class TranslationTasks extends BaseModule
 
     /**
      * Generates the module content
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function moduleContent()
     {

@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;
 use Localizationteam\L10nmgr\LanguageRestriction\Collection\LanguageRestrictionCollection;
@@ -156,7 +156,7 @@ class L10nAccumulatedInformation
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
      */
     protected function process(): void
@@ -176,7 +176,7 @@ class L10nAccumulatedInformation
      *
      *
      * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function _calculateInternalAccumulatedInformationsArray(): void
     {
@@ -423,7 +423,7 @@ class L10nAccumulatedInformation
     /**
      * @param string $indexList
      * @param string $excludeList
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function addPagesMarkedAsIncluded(string $indexList, string $excludeList): void
     {
@@ -483,7 +483,7 @@ class L10nAccumulatedInformation
      * Will ignore pages with explicit l10nmgr_configuration settings but still walk through their subpages
      * @param int $uid
      * @param int $level
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function addSubPagesRecursively(int $uid, int $level = 0): void
     {

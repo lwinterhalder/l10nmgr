@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Model\Dto\EmConfiguration;
 use Localizationteam\L10nmgr\Model\Tools\FlexFormTools;
 use PDO;
@@ -296,7 +296,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param string $whereClause
      * @param string $orderBy
      * @return array
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function getRecordsByField(
         string $theTable,
@@ -565,7 +565,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param array $inputArray Array with incoming translation. Must match what is found in $accum
      *
      * @return mixed False if error - else flexFormDiffArray (if $inputArray was an array and processing was performed.)
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function _submitContentAsTranslatedLanguageAndGetFlexFormDiff(array $accum, array $inputArray)
     {
@@ -984,7 +984,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param string $table
      * @param int $elementUid
      * @return array
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function getRawRecord(string $table, int $elementUid): array
     {
@@ -1012,7 +1012,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param int $Tlang
      * @param string $parentField
      * @param string $childrenField
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function recursivelyCheckForRelationParents(array $element, int $Tlang, string $parentField, string $childrenField)
     {

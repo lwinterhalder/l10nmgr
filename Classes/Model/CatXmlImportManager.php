@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Event\XmlImportFileIsParsed;
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
@@ -329,7 +329,7 @@ class CatXmlImportManager
      * @param array $delL10NData table:id combinations to be deleted
      *
      * @return int Number of deleted elements
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function delL10N(array $delL10NData): int
     {

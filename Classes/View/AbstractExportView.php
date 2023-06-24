@@ -24,6 +24,7 @@ namespace Localizationteam\L10nmgr\View;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
@@ -280,7 +281,7 @@ abstract class AbstractExportView
      * Checks if an export exists
      *
      * @return bool
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function checkExports(): bool
     {
@@ -370,7 +371,7 @@ abstract class AbstractExportView
      * Fetches saved exports based on configuration, export format and target language.
      *
      * @return array Information about exports.
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      * @author Andreas Otto <andreas.otto@dkd.de>
      */
     protected function fetchExports(): array

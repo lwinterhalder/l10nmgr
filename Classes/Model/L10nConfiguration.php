@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
 use TYPO3\CMS\Backend\Tree\View\PageTreeView;
@@ -176,7 +176,7 @@ class L10nConfiguration
     /**
      * @param int $sysLang
      * @param array $flexFormDiffArray
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function updateFlexFormDiff(int $sysLang, array $flexFormDiffArray): void
     {
