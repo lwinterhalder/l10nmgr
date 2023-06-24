@@ -764,7 +764,7 @@ class Tools
      */
     public function getAllowedFieldsForTable(string $table): array
     {
-        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
+        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('runtime');
         $key = 'l10nmgr-allowed-fields-' . $table;
         if ($cache->has($key)) {
             $allowedFields = $cache->get($key);
@@ -825,7 +825,7 @@ class Tools
             return true;
         }
 
-        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('cache_runtime');
+        $cache = GeneralUtility::makeInstance(CacheManager::class)->getCache('runtime');
         $keyFormat = 'l10nmgr-allowed-state-%s-%d';
         $key = sprintf($keyFormat, $tableName, $record['uid'] ?? 0);
 
