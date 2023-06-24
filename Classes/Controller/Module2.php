@@ -21,13 +21,12 @@ namespace Localizationteam\L10nmgr\Controller;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
 /**
  * Module 'Workspace Tasks' for the 'l10nmgr' extension.
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -38,21 +37,26 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class Module2
 {
-    // Internal, static:
+
     /**
+     * @static
+     * @internal
      * @var int
      */
     protected int $defaultWidth = 300; // Default width of the navigation frame. Can be overridden from $TBE_STYLES['dims']['navFrameWidth'] (alternative default value) AND from User TSconfig
-
-    // Internal, dynamic:
+    
     /**
+     * Content accumulation.
+     * @dynamic
+     * @internal
      * @var string
      */
-    protected string $content; // Content accumulation.
+    protected string $content;
 
     /**
      * Creates the header and frameset for the module/submodules
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     *
+     * @throws RouteNotFoundException
      */
     public function main(): void
     {

@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\View;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
@@ -311,7 +311,7 @@ class L10nHtmlListView extends AbstractExportView
      * @param int $sysLang
      * @param string $table
      * @return string
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function getEditLink(array $data, int $sysLang, string $table): string
     {
@@ -401,7 +401,7 @@ class L10nHtmlListView extends AbstractExportView
      * @param array $externalPlugins
      * @param array $urlParameters
      * @return array
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function getExtraPlugins(array $externalPlugins, array $urlParameters): array
     {

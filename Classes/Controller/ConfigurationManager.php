@@ -27,6 +27,7 @@ namespace Localizationteam\L10nmgr\Controller;
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 use Doctrine\DBAL\DBALException;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use Doctrine\DBAL\Driver\Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -172,7 +173,7 @@ class ConfigurationManager extends BaseModule
      * Generates and returns the content of the module
      *
      * @throws DBALException
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function moduleContent(): void
     {
