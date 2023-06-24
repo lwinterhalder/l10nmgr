@@ -355,7 +355,11 @@ class Export extends L10nCommand
         // If at least a recipient is indeed defined, proceed with sending the mail
         $recipients = GeneralUtility::trimExplode(',', $this->getExtConf()->getEmailRecipient());
         if (count($recipients) > 0) {
-            $fullFilename = Environment::getPublicPath() . '/' . 'uploads/tx_l10nmgr/jobs/out/' . $xmlFileName;
+            $jobsOutPath = Environment::getPublicPath() . '/uploads/tx_l10nmgr/jobs/out/';
+            if (!is_dir(GeneralUtility::getFileAbsFileName($jobsOutPath))) {
+                GeneralUtility::mkdir_deep($jobsOutPath);
+            }
+            $fullFilename = $jobsOutPath . $xmlFileName;
             // Get source & target language ISO codes
             $sourceStaticLangArr = BackendUtility::getRecord(
                 'static_languages',

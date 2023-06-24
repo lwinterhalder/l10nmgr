@@ -526,8 +526,7 @@ class Import extends L10nCommand
             // If there are any files, loop on them
             if ($filesToDownload) {
                 // Check that download directory exists
-                $downloadFolder = 'uploads/tx_l10nmgr/jobs/in/';
-                $downloadPath = Environment::getPublicPath() . '/' . $downloadFolder;
+                $downloadPath = Environment::getPublicPath() . '/uploads/tx_l10nmgr/jobs/in/';
                 if (!is_dir(GeneralUtility::getFileAbsFileName($downloadPath))) {
                     GeneralUtility::mkdir_deep($downloadPath);
                 }
