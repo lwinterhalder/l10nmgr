@@ -25,7 +25,6 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
-use TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface;
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
@@ -36,7 +35,7 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
  *
  * @author 2011 Francois Suter <typo3@cobweb.ch>
  */
-class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider implements AdditionalFieldProviderInterface
+class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
 {
     use BackendUserTrait;
 
