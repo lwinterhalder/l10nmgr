@@ -1,7 +1,8 @@
 <?php
 
-if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns(
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
+    ExtensionManagementUtility::addTCAcolumns(
         'tx_l10nmgr_cfg',
         [
             'sourceLangStaticId' => [
@@ -22,5 +23,5 @@ if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_ta
             ],
         ]
     );
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tx_l10nmgr_cfg', 'sourceLangStaticId', '', 'after:pages');
+    ExtensionManagementUtility::addToAllTCAtypes('tx_l10nmgr_cfg', 'sourceLangStaticId', '', 'after:pages');
 }
