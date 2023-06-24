@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Context\Context;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -112,8 +112,8 @@ class MkPreviewLinkService
         }
         $fieldData = [
             'keyword' => md5(uniqid(microtime(), true)),
-            'tstamp' => $GLOBALS['EXEC_TIME'],
-            'endtime' => $GLOBALS['EXEC_TIME'] + $ttl,
+            'tstamp' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp'),
+            'endtime' => GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') + $ttl,
             'config' => serialize([
                 'fullWorkspace' => $fullWorkspace,
                 'getVars' => $getVarsStr,

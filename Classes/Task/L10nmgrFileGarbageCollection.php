@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\Task;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Context\Context;
 use DirectoryIterator;
 use Exception;
 use RuntimeException;
@@ -73,7 +73,7 @@ class L10nmgrFileGarbageCollection extends AbstractTask
         }
         // Calculate a reference timestamp, based on age of files to delete
         $seconds = (60 * 60 * 24 * $this->age);
-        $timestamp = (($GLOBALS['EXEC_TIME'] ?? 0) - $seconds);
+        $timestamp = ((GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp') ?? 0) - $seconds);
         // Loop on all target directories
         $globalResult = true;
         foreach (self::$targetDirectories as $directory) {

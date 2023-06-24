@@ -24,6 +24,7 @@ namespace Localizationteam\L10nmgr\Command;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Doctrine\DBAL\DBALException;
+use TYPO3\CMS\Core\Context\Context;
 use Localizationteam\L10nmgr\Model\CatXmlImportManager;
 use Localizationteam\L10nmgr\Model\L10nBaseService;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
@@ -683,7 +684,7 @@ class Import extends L10nCommand
                 // Start assembling the mail message
                 $message = sprintf(
                     $this->getLanguageService()->getLL('import.mail.intro'),
-                    date('d.m.Y H:i:s', $GLOBALS['EXEC_TIME']),
+                    date('d.m.Y H:i:s', GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp')),
                     $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename']
                 ) . "\n\n";
                 foreach ($this->filesImported as $file => $fileInformation) {
