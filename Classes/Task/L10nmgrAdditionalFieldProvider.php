@@ -19,7 +19,7 @@ namespace Localizationteam\L10nmgr\Task;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Scheduler\Controller\SchedulerModuleController;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -65,11 +65,11 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider imp
      *
      * @param array $taskInfo Values of the fields from the add/edit task form
      * @param mixed $task The task object being edited. Null when adding a task!
-     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject Reference to the scheduler backend module
+     * @param SchedulerModuleController $parentObject Reference to the scheduler backend module
      *
      * @return array A two dimensional array: array('fieldId' => array('code' => '', 'label' => '', 'cshKey' => '', 'cshLabel' => ''))
      */
-    public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject): array
+    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
     {
         // Initialize selected fields
         if (!isset($taskInfo['l10nmgr_fileGarbageCollection_age'])) {
@@ -113,11 +113,11 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider imp
      * Validates the additional fields' values
      *
      * @param array $submittedData An array containing the data submitted by the add/edit task form
-     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject Reference to the scheduler backend module
+     * @param SchedulerModuleController $parentObject Reference to the scheduler backend module
      *
      * @return bool TRUE if validation was ok (or selected class is not relevant), FALSE otherwise
      */
-    public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject): bool
+    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject): bool
     {
         $result = true;
         // Check if number of days is indeed a number and greater than 0
