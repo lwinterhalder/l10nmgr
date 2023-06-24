@@ -62,7 +62,6 @@ return [
             'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_priorities.element',
             'config' => [
                 'type' => 'group',
-                'internal_type' => 'db',
                 'allowed' => '*',
                 'prepend_tname' => true,
                 'size' => 10,

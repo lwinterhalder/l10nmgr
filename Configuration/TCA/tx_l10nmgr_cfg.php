@@ -55,7 +55,6 @@ return [
             'displayCond' => 'FIELD:depth:<=:-2',
             'config' => [
                 'type' => 'group',
-                'internal_type' => 'db',
                 'allowed' => 'pages',
                 'size' => 5,
                 'maxitems' => 100,
