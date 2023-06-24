@@ -28,6 +28,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  */
 use Doctrine\DBAL\DBALException;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
+use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidIdentifierException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
@@ -1316,7 +1317,7 @@ class Tools
      * @param string $field Name of the field
      * @param array $row Current row of data
      * @return mixed Flexform structure (or false, if not found)
-     * @throws \TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidIdentifierException
+     * @throws InvalidIdentifierException
      */
     protected function _getFlexFormMetaDataForContentElement(string $table, string $field, array $row)
     {
@@ -1351,7 +1352,7 @@ class Tools
      *
      * @param string $table Table name
      * @param array $row Table row
-     * @throws \TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidIdentifierException
+     * @throws InvalidIdentifierException
      */
     protected function _lookForFlexFormFieldAndAddToInternalTranslationDetails(string $table, array $row): void
     {
