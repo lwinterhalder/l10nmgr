@@ -378,7 +378,7 @@
 				<source>Documentation</source>
 				<target></target>
 			</trans-unit>
-			<trans-unit id="email.suject.msg" xml:space="preserve" approved="yes">
+			<trans-unit id="email.subject.msg" xml:space="preserve" approved="yes">
 				<source>Translation job (%1$s-%2$s) from TYPO3 site: %3$s</source>
 				<target></target>
 			</trans-unit>

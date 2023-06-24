@@ -1313,7 +1313,7 @@ return false;
             $fromMail = $this->emConfiguration->getEmailSender();
             $fromName = $this->emConfiguration->getEmailSenderName();
             $subject = sprintf(
-                $this->getLanguageService()->getLL('email.suject.msg'),
+                $this->getLanguageService()->getLL('email.subject.msg'),
                 $sourceLang,
                 $targetLang,
                 $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''

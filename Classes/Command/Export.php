@@ -378,7 +378,7 @@ class Export extends L10nCommand
             $fromMail = $this->getExtConf()->getEmailSender();
             $fromName = $this->getExtConf()->getEmailSenderName();
             $subject = sprintf(
-                $this->getLanguageService()->getLL('email.suject.msg'),
+                $this->getLanguageService()->getLL('email.subject.msg'),
                 $sourceLang,
                 $targetLang,
                 $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''

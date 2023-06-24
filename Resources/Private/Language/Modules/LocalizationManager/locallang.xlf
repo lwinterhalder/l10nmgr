@@ -291,7 +291,7 @@
 			<trans-unit id="l10nmgr.documentation.title" xml:space="preserve">
 				<source>Documentation</source>
 			</trans-unit>
-			<trans-unit id="email.suject.msg" xml:space="preserve">
+			<trans-unit id="email.subject.msg" xml:space="preserve">
 				<source>Translation job (%1$s-%2$s) from TYPO3 site: %3$s</source>
 			</trans-unit>
 			<trans-unit id="email.greeting.msg" xml:space="preserve">
