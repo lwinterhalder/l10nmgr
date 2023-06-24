@@ -21,7 +21,7 @@ namespace Localizationteam\L10nmgr\View;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use Localizationteam\L10nmgr\Model\Tools\Utf8Tools;
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -72,7 +72,7 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
      * Render the simple XML export
      *
      * @return string Filename
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function render(): string
     {

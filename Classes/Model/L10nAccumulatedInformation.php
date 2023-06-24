@@ -22,6 +22,7 @@ namespace Localizationteam\L10nmgr\Model;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 use Doctrine\DBAL\DBALException;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;
 use Localizationteam\L10nmgr\LanguageRestriction\Collection\LanguageRestrictionCollection;
@@ -157,7 +158,7 @@ class L10nAccumulatedInformation
 
     /**
      * @throws DBALException
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     protected function process(): void
     {
@@ -175,7 +176,7 @@ class L10nAccumulatedInformation
      * Is called from constructor and uses the given tree, lang and l10ncfg
      *
      *
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      * @throws DBALException
      */
     protected function _calculateInternalAccumulatedInformationsArray(): void

@@ -23,7 +23,7 @@ namespace Localizationteam\L10nmgr\View;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use Doctrine\DBAL\DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
@@ -123,7 +123,7 @@ abstract class AbstractExportView
      *
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
     {
