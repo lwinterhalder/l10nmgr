@@ -32,6 +32,7 @@ use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -75,7 +76,7 @@ class ClickMenu
             // Returns directly, because the clicked item was not from the pages table
             if ($table == 'tx_l10nmgr_cfg') {
                 // Adds the regular item:
-                $LL = $this->includeLL();
+                $this->includeLL();
                 // Repeat this (below) for as many items you want to add!
                 // Remember to add entries in the localconf.php file for additional titles.
                 $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
@@ -161,16 +162,11 @@ class ClickMenu
     }
 
     /**
-     * setter for databaseConnection object
-     *
      * @return LanguageService $languageService
      */
     protected function getLanguageService(): LanguageService
     {
-        if ($this->getBackendUser()) {
-            // @extensionScannerIgnoreLine
-            $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
-        }
-        return $this->languageService;
+        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
+                        ->createFromUserPreferences($this->getBackendUser());
     }
 }

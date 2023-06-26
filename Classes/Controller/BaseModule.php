@@ -21,6 +21,7 @@ use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -239,7 +240,8 @@ class BaseModule
      */
     protected function getLanguageService(): LanguageService
     {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageService::class);
+        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
+                ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

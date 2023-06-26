@@ -22,6 +22,7 @@ namespace Localizationteam\L10nmgr\Task;
 use TYPO3\CMS\Scheduler\Controller\SchedulerModuleController;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
@@ -146,11 +147,8 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
      */
     protected function getLanguageService(): LanguageService
     {
-        if ($this->getBackendUser()) {
-            // @extensionScannerIgnoreLine
-            $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
-        }
-        return $this->languageService;
+        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
+                        ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

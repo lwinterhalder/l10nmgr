@@ -133,6 +133,8 @@ abstract class AbstractExportView
         /** @var SiteFinder $siteFinder */
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $this->site = $siteFinder->getSiteByPageId((int)$l10ncfgObj->getData('pid'));
+        $this->languageService = $GLOBALS['LANG'];
+        $this->languageService->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
     }
 
     /**
@@ -401,18 +403,10 @@ abstract class AbstractExportView
     }
 
     /**
-     * getter/setter for LanguageService object
-     *
      * @return LanguageService $languageService
      */
     protected function getLanguageService(): LanguageService
     {
-        $this->languageService = $GLOBALS['LANG'];
-        $this->languageService->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
-        if ($this->getBackendUser()) {
-            // @extensionScannerIgnoreLine
-            $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
-        }
         return $this->languageService;
     }
 

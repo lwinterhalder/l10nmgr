@@ -33,6 +33,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -146,11 +147,8 @@ class CatXmlImportManager
      */
     protected function getLanguageService(): LanguageService
     {
-        if ($this->getBackendUser()) {
-            // @extensionScannerIgnoreLine
-            $this->languageService->init($this->getBackendUser()->uc['lang'] ?? ($this->getBackendUser()->user['lang'] ?? 'en'));
-        }
-        return $this->languageService;
+        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
+                        ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

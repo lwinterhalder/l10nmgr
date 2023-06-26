@@ -40,6 +40,15 @@ class L10nCommand extends Command
      */
     private LanguageService $languageService;
 
+    public function __construct()
+    {
+        $this->languageService = $GLOBALS['LANG'];
+        $fileRef = 'EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xlf';
+        $this->languageService->includeLLFile($fileRef);
+
+        parent::__construct();
+    }
+
     /**
      * The function loadExtConf loads the extension configuration.
      * Check for deprecated configuration throws false positive in extension scanner.
@@ -54,18 +63,10 @@ class L10nCommand extends Command
     }
 
     /**
-     * getter for LanguageService object
-     *
      * @return LanguageService $languageService
      */
     protected function getLanguageService(): LanguageService
     {
-        $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
-        $fileRef = 'EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xlf';
-        $this->languageService->includeLLFile($fileRef);
-        // @extensionScannerIgnoreLine
-        $this->languageService->init('');
-
         return $this->languageService;
     }
 }

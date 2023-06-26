@@ -12,9 +12,11 @@ namespace Localizationteam\L10nmgr\LanguageRestriction;
 
 use InvalidArgumentException;
 use Localizationteam\L10nmgr\Constants;
+use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use RuntimeException;
 use TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent;
 use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -22,6 +24,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LanguageRestrictionRegistry implements SingletonInterface
 {
+    use BackendUserTrait;
+
     /**
      * @var array
      */
@@ -412,6 +416,7 @@ class LanguageRestrictionRegistry implements SingletonInterface
      */
     protected function getLanguageService(): LanguageService
     {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageService::class);
+        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
+                        ->createFromUserPreferences($this->getBackendUser());
     }
 }
