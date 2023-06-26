@@ -22,7 +22,8 @@ namespace Localizationteam\L10nmgr\Command;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Doctrine\DBAL\DBALException;
+
+use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\View\CatXmlView;
 use Localizationteam\L10nmgr\View\ExcelXmlView;

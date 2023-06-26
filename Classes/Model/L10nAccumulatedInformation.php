@@ -21,7 +21,8 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
-use Doctrine\DBAL\DBALException;
+
+use Doctrine\DBAL\Exception as DBALException;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;

@@ -26,7 +26,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  *
  * @author Kasper Skaarhoj <kasperYYYY@typo3.com>
  */
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidIdentifierException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
