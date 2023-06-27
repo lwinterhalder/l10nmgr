@@ -23,7 +23,6 @@ namespace Localizationteam\L10nmgr\Model;
  ***************************************************************/
 
 use Doctrine\DBAL\Exception as DBALException;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;
 use Localizationteam\L10nmgr\LanguageRestriction\Collection\LanguageRestrictionCollection;
@@ -36,6 +35,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\RootlineUtility;

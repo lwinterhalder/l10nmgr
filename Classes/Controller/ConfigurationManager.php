@@ -26,11 +26,11 @@ namespace Localizationteam\L10nmgr\Controller;
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
-use Doctrine\DBAL\Exception as DBALException;
-use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception as DBALException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
