@@ -561,8 +561,8 @@ class Import extends L10nCommand
                                 if (!$result) {
                                     throw new Exception('Could not remove file ' . $aFile . 'from FTP server');
                                 }
-                            // If getting the file failed, register error message
-                            // (don't throw exception as this does not need to interrupt the process)
+                                // If getting the file failed, register error message
+                                // (don't throw exception as this does not need to interrupt the process)
                             } else {
                                 throw new Exception('Problem getting file ' . $aFile . 'from server or saving it locally');
                             }
@@ -662,7 +662,7 @@ class Import extends L10nCommand
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_workspace');
                 $records = $queryBuilder->select('uid', 'title')
                     ->from('sys_workspace')
-                    ->execute()
+                    ->executeQuery()
                     ->fetchAll();
                 $workspaces = [];
                 if (!empty($records)) {
@@ -673,7 +673,7 @@ class Import extends L10nCommand
                 $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_l10nmgr_cfg');
                 $records = $queryBuilder->select('uid', 'title')
                     ->from('tx_l10nmgr_cfg')
-                    ->execute()
+                    ->executeQuery()
                     ->fetchAll();
                 $l10nConfigurations = [];
                 if (!empty($records)) {

@@ -180,7 +180,7 @@ class Tools
         // Find all system languages:
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
-        $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->execute()->fetchAll();
+        $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAll();
     }
 
     /**
@@ -398,7 +398,7 @@ class Tools
             // Check if the RTE is explicitly declared in the defaultExtras configuration
             if (!empty($TCEformsCfg['config']['enableRichtext'])) {
                 $isRTE = true;
-            // If not, then we must check per type configuration
+                // If not, then we must check per type configuration
             } else {
                 if (
                     !empty($GLOBALS['TCA'][$table]['types'][$TCAtype]['columnsOverrides'][$field]['config']['enableRichtext'])
@@ -1212,7 +1212,7 @@ class Tools
         $translationsTemp = $queryBuilder->select(...$selectFields)
             ->from($table)
             ->where(...$constraints)
-            ->execute()
+            ->executeQuery()
             ->fetchAll();
 
         $translations = [];
@@ -1674,7 +1674,7 @@ class Tools
                     $queryBuilder->createNamedParameter((int)$ws, PDO::PARAM_INT)
                 )
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**

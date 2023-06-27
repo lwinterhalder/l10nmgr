@@ -208,7 +208,7 @@ class L10nConfiguration
                     $queryBuilder->createNamedParameter((int)$l10ncfg['uid'], PDO::PARAM_INT)
                 )
             )
-            ->execute();
+            ->executeStatement();
     }
 
     /**

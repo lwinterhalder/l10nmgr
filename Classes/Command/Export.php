@@ -339,7 +339,7 @@ class Export extends L10nCommand
                     $sourceLangStaticId
                 )
             )
-            ->execute()
+            ->executeQuery()
             ->fetch();
         return $result['uid'] ?? 0;
     }

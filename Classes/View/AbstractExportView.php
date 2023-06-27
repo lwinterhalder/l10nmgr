@@ -305,7 +305,7 @@ abstract class AbstractExportView
                     $queryBuilder->createNamedParameter($this->sysLang, PDO::PARAM_INT)
                 )
             )
-            ->execute()
+            ->executeQuery()
             ->fetchColumn();
 
         return $numRows > 0;
@@ -398,7 +398,7 @@ abstract class AbstractExportView
                 )
             )
             ->orderBy('crdate', 'DESC')
-            ->execute()
+            ->executeQuery()
             ->fetchAll();
     }
 

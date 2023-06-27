@@ -707,7 +707,7 @@ class L10nBaseService implements LoggerAwareInterface
                                                                         )
                                                                     )
                                                                 )
-                                                                ->execute()
+                                                                ->executeQuery()
                                                                 ->fetch();
                                                         }
                                                         if (isset($parent['uid']) && $parent['uid'] > 0) {
@@ -906,7 +906,7 @@ class L10nBaseService implements LoggerAwareInterface
                                                 $queryBuilder->createNamedParameter((int)$Tlang, PDO::PARAM_INT)
                                             )
                                         )
-                                        ->execute()
+                                        ->executeQuery()
                                         ->fetch();
 
                                     if (!empty($translatedRecordRaw['uid'])) {
@@ -1002,7 +1002,7 @@ class L10nBaseService implements LoggerAwareInterface
                     $queryBuilder->createNamedParameter($elementUid, PDO::PARAM_INT)
                 )
             )
-            ->execute()
+            ->executeQuery()
             ->fetch();
 
         return $row ?: [];
@@ -1041,7 +1041,7 @@ class L10nBaseService implements LoggerAwareInterface
                             $queryBuilder->createNamedParameter((int)$Tlang, PDO::PARAM_INT)
                         )
                     )
-                    ->execute()
+                    ->executeQuery()
                     ->fetch();
             }
             if (isset($translatedParent['uid']) && $translatedParent['uid'] > 0) {

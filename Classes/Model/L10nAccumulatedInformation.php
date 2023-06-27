@@ -401,7 +401,7 @@ class L10nAccumulatedInformation
                 )
             )
             ->orderBy('uid')
-            ->execute()
+            ->executeQuery()
             ->fetchAllAssociative();
 
         return array_column($metaData, 'uid');
@@ -445,7 +445,7 @@ class L10nAccumulatedInformation
                 )
             )
             ->orderBy('uid')
-            ->execute()
+            ->executeQuery()
             ->fetchAll();
 
         if (!empty($explicitlyIncludedPages)) {
@@ -470,7 +470,7 @@ class L10nAccumulatedInformation
                 )
             )
             ->orderBy('uid')
-            ->execute()
+            ->executeQuery()
             ->fetchAll();
 
         if (!empty($includingParentPages)) {
@@ -502,7 +502,7 @@ class L10nAccumulatedInformation
                     )
                 )
                 ->orderBy('uid')
-                ->execute()
+                ->executeQuery()
                 ->fetchAll();
 
             if (!empty($subPages)) {

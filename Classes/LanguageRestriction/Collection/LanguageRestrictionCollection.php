@@ -94,7 +94,7 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
                 $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($id, PDO::PARAM_INT))
             )
             ->setMaxResults(1)
-            ->execute()
+            ->executeQuery()
             ->fetch();
 
         $collectionRecord['table_name'] = $tableName;

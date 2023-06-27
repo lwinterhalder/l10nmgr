@@ -127,7 +127,7 @@ class TranslationTasks extends BaseModule
         $priorities = $queryBuilder->select('*')
             ->from('tx_l10nmgr_priorities')
             ->orderBy('sorting')
-            ->execute()
+            ->executeQuery()
             ->fetchAll();
         $tRows = [];
         $c = 0;
