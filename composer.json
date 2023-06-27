@@ -37,8 +37,8 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.1.0",
-    "friendsoftypo3/phpstan-typo3": "^0.8.1",
-    "phpstan/phpstan": "^0.12.99"
+    "friendsoftypo3/phpstan-typo3": "^0.9",
+    "phpstan/phpstan": "^1.10"
   },
   "autoload": {
     "psr-4": {
@@ -66,8 +66,8 @@
     "php:fix": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
     "ci:php:lint": "find *.php Classes Configuration Tests -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
     "ci:php:fixer": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
-    "ci:php:stan": ".Build/vendor/bin/phpstan --no-progress",
-    "phpstan:baseline": ".Build/vendor/bin/phpstan  --generate-baseline=phpstan-baseline.neon",
+    "ci:php:stan": ".Build/vendor/bin/phpstan analyze --no-progress -c phpstan.neon",
+    "phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
     "typo3:docs:render": [
       "docker compose run --rm t3docmake"
     ],
