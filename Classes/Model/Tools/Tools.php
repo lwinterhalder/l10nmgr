@@ -720,23 +720,23 @@ class Tools
             }
 
             $queryBuilder->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
                         $queryBuilder->createNamedParameter((int)$uid, PDO::PARAM_INT)
                     ),
-                    $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->or(
                         $queryBuilder->expr()->lte(
                             $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
                             $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
                         ),
-                        $queryBuilder->expr()->andX(...$constraints)
+                        $queryBuilder->expr()->and(...$constraints)
                     )
                 )
             );
         } else {
             $queryBuilder->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
                         $queryBuilder->createNamedParameter((int)$uid, PDO::PARAM_INT)
@@ -1201,9 +1201,9 @@ class Tools
                 );
             }
 
-            $constraints[] = $queryBuilder->expr()->orX(
-                $queryBuilder->expr()->andX(...$constraintsA),
-                $queryBuilder->expr()->andX(...$constraintsB)
+            $constraints[] = $queryBuilder->expr()->or(
+                $queryBuilder->expr()->and(...$constraintsA),
+                $queryBuilder->expr()->and(...$constraintsB)
             );
         } else {
             $constraints = $constraintsA;
@@ -1549,23 +1549,23 @@ class Tools
             }
 
             $queryBuilder->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'pid',
                         $queryBuilder->createNamedParameter($pageId, PDO::PARAM_INT)
                     ),
-                    $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->or(
                         $queryBuilder->expr()->lte(
                             $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
                             $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
                         ),
-                        $queryBuilder->expr()->andX(...$constraints)
+                        $queryBuilder->expr()->and(...$constraints)
                     )
                 )
             );
         } else {
             $queryBuilder->where(
-                $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'pid',
                         $queryBuilder->createNamedParameter($pageId, PDO::PARAM_INT)
