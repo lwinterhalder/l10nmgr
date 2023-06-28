@@ -1,6 +1,9 @@
 <?php
 
+defined('TYPO3') || die();
+
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 if (ExtensionManagementUtility::isLoaded('static_info_tables')) {
     ExtensionManagementUtility::addTCAcolumns(
         'tx_l10nmgr_cfg',

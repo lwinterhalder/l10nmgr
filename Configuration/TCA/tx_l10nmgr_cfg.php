@@ -1,5 +1,7 @@
 <?php
 
+defined('TYPO3') || die();
+
 return [
     'ctrl' => [
         'title' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg',

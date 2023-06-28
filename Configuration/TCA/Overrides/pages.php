@@ -1,5 +1,7 @@
 <?php
 
+defined('TYPO3') || die();
+
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Utility\L10nmgrExtensionManagementUtility;
