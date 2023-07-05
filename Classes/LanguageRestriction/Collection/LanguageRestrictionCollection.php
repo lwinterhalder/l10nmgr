@@ -113,7 +113,7 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
                     Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME,
                     $queryBuilder->createNamedParameter($this->uid, PDO::PARAM_INT)
                 )
-            )->execute();
+            )->executeQuery();
 
         return $result->fetchAllAssociative();
     }
