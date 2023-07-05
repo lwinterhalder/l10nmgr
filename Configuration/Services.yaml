@@ -1,4 +1,12 @@
 services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Localizationteam\L10nmgr\:
+    resource: '../Classes/*'
+
   Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry:
     tags:
       - name: event.listener

@@ -17,7 +17,9 @@ namespace Localizationteam\L10nmgr\Backend\ItemsProcFuncs;
  * The TYPO3 project - inspiring people to share!
  */
 
+use TYPO3\CMS\Core\Hooks\TcaItemsProcessorFunctions;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class/Function which manipulates the item-array for table/field tx_l10nmgr_cfg tablelist.
@@ -26,21 +28,29 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class Tablelist implements SingletonInterface
 {
+    public function __construct(readonly TcaItemsProcessorFunctions $tcaItemsProcessor) {}
+
     /**
      * ItemProcFunc for colpos items
      *
      * @param array $params The array of parameters that is used to render the item list
      */
-    public function itemsProcFunc(array &$params)
+    public function populateAvailableTables(array &$params)
     {
+        $this->tcaItemsProcessor->populateAvailableTables($params);
+
         $items = [];
-        if (!empty($params['items'])) {
-            foreach ($params['items'] as $item) {
-                if (!empty($item[1]) && isset($GLOBALS['TCA'][$item[1]]['ctrl']['languageField']) && !empty($GLOBALS['TCA'][$item[1]]['ctrl']['languageField'])) {
-                    $items[] = $item;
-                }
+        foreach ($params['items'] as $item) {
+            if (empty($item['value'])) {
+                continue;
+            }
+
+            $tableName = $item['value'];
+            if (isset($GLOBALS['TCA'][$tableName]['ctrl']['languageField']) && !empty($GLOBALS['TCA'][$tableName]['ctrl']['languageField'])) {
+                $items[] = $item;
             }
         }
+
         $params['items'] = $items;
     }
 }

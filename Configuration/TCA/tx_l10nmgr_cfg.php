@@ -1,5 +1,7 @@
 <?php
 
+use Localizationteam\L10nmgr\Backend\ItemsProcFuncs\Tablelist;
+
 defined('TYPO3') || die();
 
 return [
@@ -83,11 +85,10 @@ return [
             'config' => [
                 'type' => 'select',
                 'renderType' => 'selectMultipleSideBySide',
-                'special' => 'tables',
                 'size' => 5,
                 'autoSizeMax' => 50,
                 'maxitems' => 100,
-                'itemsProcFunc' => 'Localizationteam\L10nmgr\Backend\ItemsProcFuncs\Tablelist->itemsProcFunc',
+                'itemsProcFunc' => Tablelist::class . '->populateAvailableTables',
             ],
         ],
         'exclude' => [
