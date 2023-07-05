@@ -21,6 +21,7 @@ namespace Localizationteam\L10nmgr\Model;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;

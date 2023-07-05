@@ -28,6 +28,7 @@ namespace Localizationteam\L10nmgr\Hooks;
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
+
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Model\L10nBaseService;
 use Localizationteam\L10nmgr\Model\Tools\Tools;

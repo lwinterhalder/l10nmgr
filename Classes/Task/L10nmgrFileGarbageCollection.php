@@ -21,6 +21,7 @@ namespace Localizationteam\L10nmgr\Task;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 use DirectoryIterator;
 use Exception;
 use RuntimeException;

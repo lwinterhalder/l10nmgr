@@ -26,6 +26,7 @@ namespace Localizationteam\L10nmgr\Controller;
  *
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
+
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Hooks\Tcemain;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
@@ -99,6 +100,7 @@ class TranslationTasks extends BaseModule
 	</script>
 	';
         // Setting up the context sensitive menu:
+        // TODO: Remove loadRequireJsModule()
         $this->getPageRenderer()->loadRequireJsModule('TYPO3/CMS/Backend/ClickMenu');
         $this->content .= $this->module->startPage($this->getLanguageService()->getLL('title'));
         $this->content .= '<div class="topspace5"></div>';

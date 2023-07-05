@@ -1,4 +1,5 @@
 <?php
+
 /***************************************************************
  * Extension Manager/Repository config file for ext "l10nmgr".
  * Auto generated 10-03-2015 18:54
