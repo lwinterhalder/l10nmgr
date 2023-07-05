@@ -362,7 +362,7 @@ class L10nAccumulatedInformation
 
         $this->addPagesMarkedAsIncluded($l10ncfg['include'] ?? '', $l10ncfg['exclude'] ?? '');
         foreach ($this->includeIndex as $recId => $rec) {
-            list($table, $uid) = explode(':', $recId);
+            [$table, $uid] = explode(':', $recId);
             $row = BackendUtility::getRecordWSOL($table, $uid);
             if (!empty($row)) {
                 $rowUid = $row['uid'] ?? 0;

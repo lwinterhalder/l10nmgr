@@ -174,7 +174,7 @@ class TranslationDataFactory implements LoggerAwareInterface
         if (!empty($xmlNodes['Workbook'][0]['ch'][$worksheetIdentifier][0]['ch']['Table'][0]['ch']['Row'])) {
             foreach ($xmlNodes['Workbook'][0]['ch'][$worksheetIdentifier][0]['ch']['Table'][0]['ch']['Row'] as $row) {
                 if (!isset($row['ch']['Cell'][0]['attrs']['ss:Index'])) {
-                    list($Ttable, $Tuid, $Tkey) = explode(
+                    [$Ttable, $Tuid, $Tkey] = explode(
                         '][',
                         substr(trim($row['ch']['Cell'][0]['ch']['Data'][0]['values'][0]), 12, -1)
                     );

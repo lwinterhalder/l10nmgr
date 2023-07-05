@@ -338,7 +338,7 @@ class CatXmlImportManager
         $dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $dataHandler->start([], []);
         foreach ($delL10NData as $element) {
-            list($table, $elementUid) = explode(':', $element);
+            [$table, $elementUid] = explode(':', $element);
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
 

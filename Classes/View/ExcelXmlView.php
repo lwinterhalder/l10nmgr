@@ -106,8 +106,8 @@ class ExcelXmlView extends AbstractExportView implements ExportViewInterface
                             $sourceColState = '';
                             $altSourceColState = '';
                             if (is_array($tData)) {
-                                list(, $uidString, $fieldName) = explode(':', $key);
-                                list($uidValue) = explode('/', $uidString);
+                                [, $uidString, $fieldName] = explode(':', $key);
+                                [$uidValue] = explode('/', $uidString);
                                 //DZ
                                 if (($this->forcedSourceLanguage && isset($tData['previewLanguageValues'][$this->forcedSourceLanguage])) || !$this->forcedSourceLanguage) {
                                     //DZ

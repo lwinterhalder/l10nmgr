@@ -274,7 +274,7 @@ class Tools
         array $contentRow = []
     ): void {
         $msg = '';
-        list($kTableName, , $kFieldName) = explode(':', $key);
+        [$kTableName, , $kFieldName] = explode(':', $key);
         if (!empty($TCEformsCfg['config']['type']) && $TCEformsCfg['config']['type'] !== 'flex') {
             if (($TCEformsCfg['l10n_mode'] ?? null) !== 'exclude') {
                 if ((
@@ -393,7 +393,7 @@ class Tools
     {
         $isRTE = false;
         if (is_array($contentRow)) {
-            list($table, , $field) = explode(':', $key);
+            [$table, , $field] = explode(':', $key);
             $TCAtype = BackendUtility::getTCAtypeValue($table, $contentRow);
             // Check if the RTE is explicitly declared in the defaultExtras configuration
             if (!empty($TCEformsCfg['config']['enableRichtext'])) {
