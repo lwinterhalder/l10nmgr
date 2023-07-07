@@ -24,9 +24,7 @@ namespace Localizationteam\L10nmgr\View;
 
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 
 /**
  * l10nmgr detail view:
@@ -39,6 +37,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class L10nConfigurationDetailView
 {
     use BackendUserTrait;
+    use LanguageServiceTrait;
 
     /**
      * @var L10nConfiguration
@@ -88,14 +87,5 @@ class L10nConfigurationDetailView
     protected function hasValidConfig(): bool
     {
         return is_object($this->l10ncfgObj) && $this->l10ncfgObj->isLoaded();
-    }
-
-    /**
-     * @return LanguageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                        ->createFromUserPreferences($this->getBackendUser());
     }
 }

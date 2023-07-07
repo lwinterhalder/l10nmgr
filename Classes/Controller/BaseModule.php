@@ -18,10 +18,9 @@ namespace Localizationteam\L10nmgr\Controller;
  */
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Exception;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
@@ -35,6 +34,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class BaseModule
 {
     use BackendUserTrait;
+    use LanguageServiceTrait;
 
     /**
      * Loaded with the global array $MCONF which holds some module configuration from the conf.php file of backend modules.
@@ -232,16 +232,6 @@ class BaseModule
             }
         }
         return $menuArr;
-    }
-
-    /**
-     * Returns the Language Service
-     * @return LanguageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

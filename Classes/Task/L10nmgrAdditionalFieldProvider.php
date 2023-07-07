@@ -21,10 +21,8 @@ namespace Localizationteam\L10nmgr\Task;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
 use TYPO3\CMS\Scheduler\Controller\SchedulerModuleController;
 use TYPO3\CMS\Scheduler\Task\AbstractTask;
@@ -40,11 +38,7 @@ use TYPO3\CMS\Scheduler\Task\AbstractTask;
 class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
 {
     use BackendUserTrait;
-
-    /**
-     * @var LanguageService
-     */
-    protected LanguageService $languageService;
+    use LanguageServiceTrait;
 
     /**
      * @var int Default age
@@ -55,11 +49,6 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
      * @var string Default pattern of files to exclude from cleanup
      */
     protected string $defaultPattern = '(index\.html|\.htaccess)';
-
-    public function __construct()
-    {
-        $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
-    }
 
     /**
      * Gets additional fields to render in the form to add/edit a task
@@ -139,17 +128,6 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
             );
         }
         return $result;
-    }
-
-    /**
-     * getter/setter for LanguageService object
-     *
-     * @return LanguageService $languageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                        ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

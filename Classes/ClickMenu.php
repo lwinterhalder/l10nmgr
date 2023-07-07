@@ -29,10 +29,9 @@ namespace Localizationteam\L10nmgr;
  */
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -48,16 +47,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 class ClickMenu
 {
     use BackendUserTrait;
-
-    /**
-     * @var LanguageService
-     */
-    protected LanguageService $languageService;
-
-    public function __construct()
-    {
-        $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
-    }
+    use LanguageServiceTrait;
 
     /**
      * Main function
@@ -159,14 +149,5 @@ class ClickMenu
         return $this->getLanguageService()->includeLLFile(
             'EXT:l10nmgr/Resources/Private/Language/locallang.xml'
         );
-    }
-
-    /**
-     * @return LanguageService $languageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                        ->createFromUserPreferences($this->getBackendUser());
     }
 }

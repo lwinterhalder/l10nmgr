@@ -9,8 +9,6 @@ use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use RuntimeException;
 use TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\SiteFinder;
@@ -446,14 +444,5 @@ class LanguageRestrictionRegistry implements SingletonInterface
     protected function getAllSites(): array
     {
         return GeneralUtility::makeInstance(SiteFinder::class)->getAllSites();
-    }
-
-    /**
-     * @return LanguageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                        ->createFromUserPreferences($this->getBackendUser());
     }
 }

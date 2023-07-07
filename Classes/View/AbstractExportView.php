@@ -27,6 +27,7 @@ namespace Localizationteam\L10nmgr\View;
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use PDO;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Core\Environment;
@@ -35,7 +36,6 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
@@ -55,6 +55,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 abstract class AbstractExportView
 {
     use BackendUserTrait;
+    use LanguageServiceTrait;
 
     /**
      * @var string
@@ -105,11 +106,6 @@ abstract class AbstractExportView
     protected int $exportType = 0;
 
     /**
-     * @var LanguageService
-     */
-    protected LanguageService $languageService;
-
-    /**
      * @var array List of messages issued during rendering
      */
     protected array $internalMessages = [];
@@ -134,8 +130,7 @@ abstract class AbstractExportView
         /** @var SiteFinder $siteFinder */
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
         $this->site = $siteFinder->getSiteByPageId((int)$l10ncfgObj->getData('pid'));
-        $this->languageService = $GLOBALS['LANG'];
-        $this->languageService->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
+        $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
     }
 
     /**
@@ -401,14 +396,6 @@ abstract class AbstractExportView
             ->orderBy('crdate', 'DESC')
             ->executeQuery()
             ->fetchAll();
-    }
-
-    /**
-     * @return LanguageService $languageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $this->languageService;
     }
 
     /**

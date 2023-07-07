@@ -26,14 +26,13 @@ use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Event\XmlImportFileIsParsed;
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use PDO;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
-use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -44,6 +43,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CatXmlImportManager
 {
     use BackendUserTrait;
+    use LanguageServiceTrait;
 
     /**
      * @var array $headerData headerData of the XML
@@ -76,11 +76,6 @@ class CatXmlImportManager
     protected array $_errorMsg = [];
 
     /**
-     * @var LanguageService
-     */
-    protected LanguageService $languageService;
-
-    /**
      * @param string $file
      * @param int $sysLang
      * @param string $xmlString
@@ -88,7 +83,6 @@ class CatXmlImportManager
     public function __construct(string $file, int $sysLang, string $xmlString)
     {
         $this->sysLang = $sysLang;
-        $this->languageService = GeneralUtility::makeInstance(LanguageService::class);
         if (!empty($file)) {
             $this->file = $file;
         }
@@ -138,17 +132,6 @@ class CatXmlImportManager
             return false;
         }
         return true;
-    }
-
-    /**
-     * getter/setter for LanguageService object
-     *
-     * @return LanguageService $languageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'] ?? GeneralUtility::makeInstance(LanguageServiceFactory::class)
-                        ->createFromUserPreferences($this->getBackendUser());
     }
 
     /**

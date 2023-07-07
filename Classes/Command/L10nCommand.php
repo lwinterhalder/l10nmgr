@@ -19,8 +19,8 @@ namespace Localizationteam\L10nmgr\Command;
 
 use Localizationteam\L10nmgr\Model\Dto\EmConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use Symfony\Component\Console\Command\Command;
-use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -29,23 +29,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class L10nCommand extends Command
 {
     use BackendUserTrait;
+    use LanguageServiceTrait;
 
     /**
      * @var EmConfiguration
      */
     protected EmConfiguration $emConfiguration;
 
-    /**
-     * @var LanguageService
-     */
-    private LanguageService $languageService;
-
     public function __construct()
     {
-        $this->languageService = $GLOBALS['LANG'];
-        $fileRef = 'EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xlf';
-        $this->languageService->includeLLFile($fileRef);
-
+        $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xlf');
         parent::__construct();
     }
 
@@ -60,13 +53,5 @@ class L10nCommand extends Command
         $this->emConfiguration = GeneralUtility::makeInstance(EmConfiguration::class);
 
         return $this->emConfiguration;
-    }
-
-    /**
-     * @return LanguageService $languageService
-     */
-    protected function getLanguageService(): LanguageService
-    {
-        return $this->languageService;
     }
 }
