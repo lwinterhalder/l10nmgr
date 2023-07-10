@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en" datatype="plaintext"
+		  original="EXT:l10nmgr/Resources/Private/Language/Modules/Configuration/locallang_mod_l10nmgr_configuration.xlf"
+		  date="2023-06-29T13:244:34Z" product-name="l10nmgr">
+		<header/>
+		<body>
+			<trans-unit id="title" resname="title">
+				<source>Localization Manager</source>
+			</trans-unit>
+			<trans-unit id="mlang_tabs_tab" resname="mlang_tabs_tab">
+				<source>Localization</source>
+			</trans-unit>
+			<trans-unit id="mlang_labels_tabdescr" resname="mlang_labels_tabdescr">
+				<source>With the Localization Manager&gt;Configuration>Localization sub-module you can translate you content.</source>
+			</trans-unit>
+			<trans-unit id="mlang_labels_tablabel" resname="mlang_labels_tablabel">
+				<source>Translate your content</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
