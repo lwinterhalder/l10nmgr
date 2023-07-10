@@ -90,13 +90,6 @@ class LocalizationModuleController extends BaseModule12
     public int $previewLanguage = 0;
 
     /**
-     * ModuleTemplate Container
-     *
-     * @var ModuleTemplate
-     */
-    protected ModuleTemplate $moduleTemplate;
-
-    /**
      * @var StandaloneView
      */
     protected StandaloneView $view;
@@ -109,19 +102,9 @@ class LocalizationModuleController extends BaseModule12
     protected string $moduleName = 'LocalizationManager';
 
     /**
-     * @var IconFactory
-     */
-    protected IconFactory $iconFactory;
-
-    /**
      * @var array
      */
     protected array $pageinfo;
-
-    /**
-     * @var EmConfiguration
-     */
-    protected EmConfiguration $emConfiguration;
 
     protected array $settings = [
         'across' => 'acrossL10nmgrConfig.dst',
@@ -135,11 +118,12 @@ class LocalizationModuleController extends BaseModule12
         'sdlpassolo' => 'SDLPassolo.xfg',
     ];
 
-    public function __construct()
-    {
-        $this->emConfiguration = GeneralUtility::makeInstance(EmConfiguration::class);
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+    public function __construct(
+        public readonly IconFactory $iconFactory,
+        public readonly ModuleTemplate $moduleTemplate,
+        public readonly EmConfiguration $emConfiguration,
+
+    ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');
         $this->MCONF = [
@@ -188,7 +172,6 @@ class LocalizationModuleController extends BaseModule12
      */
     public function init(): void
     {
-        $this->getBackendUser()->modAccess($this->MCONF);
         parent::init();
     }
 

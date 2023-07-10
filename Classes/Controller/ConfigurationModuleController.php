@@ -27,21 +27,22 @@ namespace Localizationteam\L10nmgr\Controller;
  * @author Kasper Skårhøj <kasperYYYY@typo3.com>
  */
 
-use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Exception as DBALException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\Controller;
+use TYPO3\CMS\Backend\Module\ModuleInterface;
+use TYPO3\CMS\Backend\Module\ModuleProvider;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
-use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Translation management tool
@@ -53,61 +54,27 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 #[Controller]
 class ConfigurationModuleController extends BaseModule12
 {
-    /**
-     * @var array
-     */
-    public array $pageinfo = [];
+    public array $pageInfo = [];
 
     /**
      * @var array Cache of the page details already fetched from the database
      */
     protected array $pageDetails = [];
 
-    /**
-     * @var array Cache of the language records already fetched from the database
-     */
-    protected array $languageDetails = [];
+    protected ModuleTemplate $view;
 
-    /**
-     * ModuleTemplate Container
-     *
-     * @var ModuleTemplate
-     */
-    protected ModuleTemplate $moduleTemplate;
+    protected ModuleInterface $currentModule;
 
-    /**
-     * @var StandaloneView
-     */
-    protected StandaloneView $view;
+    public int $id;
 
-    /**
-     * @var UriBuilder
-     */
-    protected UriBuilder $uriBuilder;
-
-    /**
-     * The name of the module
-     *
-     * @var string
-     */
-    protected string $moduleName = 'web_ConfigurationManager';
-
-    /**
-     * @var IconFactory
-     */
-    protected IconFactory $iconFactory;
-
-    public function __construct()
-    {
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-
+    public function __construct(
+        public readonly IconFactory $iconFactory,
+        public readonly ModuleProvider $moduleProvider,
+        public readonly UriBuilder $uriBuilder,
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+    ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf');
-        $this->MCONF = [
-            'name' => $this->moduleName,
-        ];
     }
 
     /**
@@ -118,58 +85,57 @@ class ConfigurationModuleController extends BaseModule12
      */
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        // @extensionScannerIgnoreLine
-        $this->init();
+        $this->initialize($request);
 
-        // Checking for first level external objects
-        $this->checkExtObj();
-
-        // Checking second level external objects
-        $this->checkSubExtObj();
-
-        $this->main();
-
-        $this->moduleTemplate->setContent($this->content);
-        return new HtmlResponse($this->moduleTemplate->renderContent());
+        return $this->view->renderResponse('ConfigurationList');
     }
 
-    /**
-     * Initializes the Module
-     */
-    public function init(): void
+    public function initialize(ServerRequestInterface $request): void
     {
-        $this->getBackendUser()->modAccess($this->MCONF);
-        parent::init();
-    }
-
-    /**
-     * Main function of the module. Write the content to $this->content
-     * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
-     * @throws Exception
-     */
-    public function main()
-    {
+        $this->currentModule = $request->getAttribute('module');
+        $this->MCONF = [
+            'name' => $this->currentModule->getIdentifier(),
+        ];
         $backendUser = $this->getBackendUser();
 
-        // The page will show only if there is a valid page and if this page
-        // may be viewed by the user
-        // @extensionScannerIgnoreLine
-        $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
-        if ($this->pageinfo) {
-            $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($this->pageinfo);
-        }
+        $this->view = $this->moduleTemplateFactory->create($request);
 
-        $access = is_array($this->pageinfo);
+        $this->extObj = (object)[];
+        $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
+        $this->CMD = (string)GeneralUtility::_GP('CMD');
+        $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
+        $this->menuConfig();
+        $this->handleExternalFunctionValue();
+
+        $this->pageInfo = BackendUtility::readPageAccess($this->id, $this->perms_clause) ?: [];
+        // The page will show only if there is a valid page and if this page may be viewed by the user
+        if ($this->pageInfo !== []) {
+            $this->view->getDocHeaderComponent()->setMetaInformation($this->pageInfo);
+        }
+        $this->view->setTitle(
+            $this->getLanguageService()->sL($this->currentModule->getTitle()),
+            $this->id !== 0 && isset($this->pageInfo['title']) ? $this->pageInfo['title'] : ''
+        );
+
+        $accessContent = false;
         // @extensionScannerIgnoreLine
-        if (($this->id && $access) || ($backendUser->isAdmin() && ! $this->id)) {
+        if (($this->id && $this->pageInfo !== []) || ($backendUser->isAdmin() && !$this->id)) {
+            $accessContent = true;
             // @extensionScannerIgnoreLine
             if (!$this->id && $backendUser->isAdmin()) {
-                $this->pageinfo = ['title' => '[root-level]', 'uid' => 0, 'pid' => 0];
+                $this->pageInfo = ['title' => '[root-level]', 'uid' => 0, 'pid' => 0];
             }
-            $this->view = $this->getFluidTemplateObject();
-            $this->moduleContent();
-            $this->content .= $this->view->render();
+            $this->view->assign('id', $this->id);
+
+            $this->view->makeDocHeaderModuleMenu(['id' => $this->id]);
         }
+
+
+        $this->view->assignMultiple([
+            'accessContent' => $accessContent,
+        ]);
+
+        $this->moduleContent();
     }
 
     /**
@@ -183,7 +149,7 @@ class ConfigurationModuleController extends BaseModule12
         // Get the available configurations
         $l10nConfigurations = $this->getAllConfigurations();
         foreach ($l10nConfigurations as $key => $l10nConfiguation) {
-            $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute('LocalizationManager', [
+            $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute('l10nmgr_configuration_localization', [
                     'id' => $l10nConfiguation['pid'] ?? 0,
                     // @extensionScannerIgnoreLine
                     'srcPID' => $this->id,
@@ -285,22 +251,5 @@ class ConfigurationModuleController extends BaseModule12
             $this->pageDetails[$uid] = $record;
         }
         return $record;
-    }
-
-    /**
-     * @return StandaloneView
-     */
-    protected function getFluidTemplateObject(): StandaloneView
-    {
-        $view = GeneralUtility::makeInstance(StandaloneView::class);
-        $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Layouts')]);
-        $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Partials')]);
-        $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Templates')]);
-
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Templates/ConfigurationManager/Index.html'));
-
-        $view->getRequest()->setControllerExtensionName('l10nmgr');
-
-        return $view;
     }
 }
