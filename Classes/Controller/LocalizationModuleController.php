@@ -59,6 +59,7 @@ use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\HttpUtility;
@@ -136,15 +137,18 @@ class LocalizationModuleController extends BaseModule12
 
     public function initialize(ServerRequestInterface $request): void
     {
+        $backendUser = $this->getBackendUser();
         $this->currentModule = $request->getAttribute('module');
         $this->MCONF = [
             'name' => $this->currentModule->getIdentifier(),
         ];
-        $backendUser = $this->getBackendUser();
 
         $this->view = $this->moduleTemplateFactory->create($request);
 
-        parent::init();
+        // @extensionScannerIgnoreLine
+        $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
+        $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
+        $this->menuConfig();
     }
 
     /**
