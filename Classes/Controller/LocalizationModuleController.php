@@ -38,11 +38,15 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\Controller;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
+use TYPO3\CMS\Backend\Module\ModuleInterface;
+use TYPO3\CMS\Backend\Module\ModuleProvider;
 use TYPO3\CMS\Backend\Routing\Exception\ResourceNotFoundException;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
+use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Routing\Router;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\HtmlResponse;
@@ -54,8 +58,10 @@ use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
+use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\HttpUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -89,10 +95,7 @@ class LocalizationModuleController extends BaseModule12
      */
     public int $previewLanguage = 0;
 
-    /**
-     * @var StandaloneView
-     */
-    protected StandaloneView $view;
+    protected ModuleTemplate $view;
 
     /**
      * The name of the module
@@ -118,17 +121,30 @@ class LocalizationModuleController extends BaseModule12
         'sdlpassolo' => 'SDLPassolo.xfg',
     ];
 
+    protected ModuleInterface $currentModule;
+
     public function __construct(
         public readonly IconFactory $iconFactory,
-        public readonly ModuleTemplate $moduleTemplate,
+        public readonly ModuleProvider $moduleProvider,
         public readonly EmConfiguration $emConfiguration,
-
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+        protected readonly PageRenderer $newPageRenderer,
     ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');
+    }
+
+    public function initialize(ServerRequestInterface $request): void
+    {
+        $this->currentModule = $request->getAttribute('module');
         $this->MCONF = [
-            'name' => $this->moduleName,
+            'name' => $this->currentModule->getIdentifier(),
         ];
+        $backendUser = $this->getBackendUser();
+
+        $this->view = $this->moduleTemplateFactory->create($request);
+
+        parent::init();
     }
 
     /**
@@ -139,10 +155,10 @@ class LocalizationModuleController extends BaseModule12
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    public function handleRequest(): ResponseInterface
+    public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
         // @extensionScannerIgnoreLine
-        $this->init();
+        $this->initialize($request);
 
         // Checking for first level external objects
         $this->checkExtObj();
@@ -162,17 +178,9 @@ class LocalizationModuleController extends BaseModule12
                 break;
         }
 
-        $this->moduleTemplate->setContent($this->content);
+        $this->view->setContent($this->content);
 
-        return new HtmlResponse($this->moduleTemplate->renderContent());
-    }
-
-    /**
-     * Initializes the Module
-     */
-    public function init(): void
-    {
-        parent::init();
+        return new HtmlResponse($this->view->renderContent());
     }
 
     /**
@@ -186,20 +194,9 @@ class LocalizationModuleController extends BaseModule12
         // Get language to export/import
         $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
-        // Javascript
-        $this->moduleTemplate->addJavaScriptCode(
-            'jumpToUrl',
-            '
-function jumpToUrl(URL) {
-window.location.href = URL;
-return false;
-}
-'
-        );
+        $this->view->setTitle('L10N Manager');
 
-        $this->moduleTemplate->setTitle('L10N Manager');
-
-        $this->moduleTemplate->setForm('<form action="" method="post" enctype="multipart/form-data">');
+        $this->view->setForm('<form action="" method="post" enctype="multipart/form-data">');
 
         // Find l10n configuration record
         $l10nConfiguration = $this->getL10NConfiguration();
@@ -273,7 +270,6 @@ return false;
                 // Create and render view to show details for the current L10N Manager configuration
                 $configurationTable = $this->renderConfigurationTable($l10nConfiguration);
 
-                $this->view = $this->getFluidTemplateObject();
                 $this->view->assignMultiple([
                     'title' => $title,
                     'selectMenues' => $selectMenus,
@@ -301,20 +297,9 @@ return false;
         // Get language to export/import
         $this->sysLanguage = (int)$this->MOD_SETTINGS['lang'];
 
-        // Javascript
-        $this->moduleTemplate->addJavaScriptCode(
-            'jumpToUrl',
-            '
-function jumpToUrl(URL) {
-window.location.href = URL;
-return false;
-}
-'
-        );
+        $this->view->setTitle('L10N Manager');
 
-        $this->moduleTemplate->setTitle('L10N Manager');
-
-        $this->moduleTemplate->setForm('<form action="" method="post" enctype="multipart/form-data">');
+        $this->view->setForm('<form action="" method="post" enctype="multipart/form-data">');
 
         // Find l10n configuration record
         $L10nConfiguration = $this->getL10NConfiguration();
@@ -440,7 +425,7 @@ return false;
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
+            $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
 
             return [
                 'label' => $label,
@@ -496,7 +481,8 @@ return false;
             ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
             '';
         if (!empty($options)) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
+            //$onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
+            $onChange = 'window.location = ' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
@@ -526,23 +512,20 @@ return false;
         if (!is_array($mainParams)) {
             $mainParams = ['id' => $mainParams];
         }
-        if (!$script) {
-            $script = basename(Environment::getCurrentScript());
-        }
-        if (GeneralUtility::_GP('route')) {
-            /** @var Router $router */
-            $router = GeneralUtility::makeInstance(Router::class);
-            $route = $router->match(GeneralUtility::_GP('route'));
-            /** @var UriBuilder $uriBuilder */
+
+        if (($GLOBALS['TYPO3_REQUEST'] ?? null) instanceof ServerRequestInterface
+            && ($route = $GLOBALS['TYPO3_REQUEST']->getAttribute('route')) instanceof Route
+        ) {
             $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $scriptUrl = (string)$uriBuilder->buildUriFromRoute($route->getOption('_identifier'));
+            $scriptUrl = (string)$uriBuilder->buildUriFromRoute($route->getOption('_identifier'), $mainParams);
             $scriptUrl .= $addParams;
-        } elseif ($script === 'index.php' && GeneralUtility::_GET('M')) {
-            $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $scriptUrl = $uriBuilder->buildUriFromRoute(GeneralUtility::_GET('M'), $mainParams) . $addParams;
         } else {
-            $scriptUrl = $script . '?' . GeneralUtility::implodeArrayForUrl('', $mainParams) . $addParams;
+            if (!$script) {
+                $script = PathUtility::basename(Environment::getCurrentScript());
+            }
+            $scriptUrl = $script . HttpUtility::buildQueryString($mainParams, '?') . $addParams;
         }
+
         return $scriptUrl;
     }
 
@@ -572,7 +555,7 @@ return false;
         string $label = ''
     ): array {
         $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
-        $onClick = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0),this);';
+        $onClick = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0)';
 
         return [
             'onClick' => htmlspecialchars($onClick),
@@ -610,7 +593,7 @@ return false;
         string $label = ''
     ): string {
         $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
-        $onClick = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0),this);';
+        $onClick = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0)';
         return
             '<div class="form-group mb-2">' .
             '<div class="checkbox">
@@ -921,7 +904,7 @@ return false;
                 'content' => '<a class="btn btn-success" href="/' . PathUtility::stripPathSitePrefix(ExtensionManagementUtility::extPath('l10nmgr')) . 'Documentation/manual.sxw" target="_new">Download</a>',
             ],
         ];
-        $info = $this->moduleTemplate->getDynamicTabMenu($menuItems, 'ddtabs');
+        $info = $this->view->getDynamicTabMenu($menuItems, 'ddtabs');
         $actionInfo = '';
         // Read uploaded file:
         if (GeneralUtility::_POST('import_xml') && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
@@ -943,7 +926,7 @@ return false;
                 $xmlString = ''
             );
             if ($importManager->parseAndCheckXMLFile() === false) {
-                $actionInfo .= '<br /><br />' . $this->moduleTemplate->header($this->getLanguageService()->getLL('import.error.title')) . $importManager->getErrorMessages();
+                $actionInfo .= '<br /><br />' . $this->view->header($this->getLanguageService()->getLL('import.error.title')) . $importManager->getErrorMessages();
             } else {
                 if (GeneralUtility::_POST('import_delL10N') == '1') {
                     $actionInfo .= $this->getLanguageService()->getLL('import.xml.delL10N.message') . '<br />';
@@ -1096,7 +1079,7 @@ return false;
             }
         }
         if (!empty($actionInfo)) {
-            $info .= $this->moduleTemplate->header($this->getLanguageService()->getLL('misc.messages.title'));
+            $info .= $this->view->header($this->getLanguageService()->getLL('misc.messages.title'));
             $info .= $actionInfo;
         }
         // $info .= '</div>';
@@ -1392,23 +1375,6 @@ return false;
             }
         }
         parent::menuConfig();
-    }
-
-    /**
-     * @return StandaloneView
-     */
-    protected function getFluidTemplateObject(): StandaloneView
-    {
-        $view = GeneralUtility::makeInstance(StandaloneView::class);
-        $view->setLayoutRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Layouts')]);
-        $view->setPartialRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Partials')]);
-        $view->setTemplateRootPaths([GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Templates')]);
-
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName('EXT:l10nmgr/Resources/Private/Templates/LocalizationManager/Index.html'));
-
-        $view->getRequest()->setControllerExtensionName('l10nmgr');
-
-        return $view;
     }
 
     /**

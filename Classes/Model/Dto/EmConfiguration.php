@@ -160,7 +160,7 @@ class EmConfiguration
 
     public function isEnableHiddenLanguages(): bool
     {
-        return $this->enable_hidden_languages;
+        return (bool)$this->enable_hidden_languages;
     }
 
     public function isEnableNotification(): bool
