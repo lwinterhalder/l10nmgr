@@ -102,7 +102,6 @@ class ConfigurationModuleController extends BaseModule12
 
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
         $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
-        $this->menuConfig();
 
         $this->pageInfo = BackendUtility::readPageAccess($this->id, $this->perms_clause) ?: [];
         // The page will show only if there is a valid page and if this page may be viewed by the user
