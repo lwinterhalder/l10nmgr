@@ -57,7 +57,6 @@ use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
-use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -126,8 +125,7 @@ class LocalizationModuleController extends BaseModule12
         public readonly IconFactory $iconFactory,
         public readonly ModuleProvider $moduleProvider,
         public readonly EmConfiguration $emConfiguration,
-        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
-        protected readonly PageRenderer $newPageRenderer,
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory
     ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');

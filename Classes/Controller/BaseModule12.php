@@ -20,7 +20,6 @@ namespace Localizationteam\L10nmgr\Controller;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -133,11 +132,6 @@ class BaseModule12
     public object $extObj;
 
     /**
-     * @var PageRenderer
-     */
-    protected PageRenderer $pageRenderer;
-
-    /**
      * Initializes the backend module by setting internal variables, initializing the menu.
      *
      * @see menuConfig()
@@ -173,17 +167,5 @@ class BaseModule12
             $this->modMenu_dontValidateList,
             $this->modMenu_setDefaultList
         );
-    }
-
-    /**
-     * @return PageRenderer
-     */
-    protected function getPageRenderer(): PageRenderer
-    {
-        if ($this->pageRenderer === null) {
-            $this->pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
-        }
-
-        return $this->pageRenderer;
     }
 }
