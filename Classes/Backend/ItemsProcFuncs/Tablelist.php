@@ -19,7 +19,6 @@ namespace Localizationteam\L10nmgr\Backend\ItemsProcFuncs;
 
 use TYPO3\CMS\Core\Hooks\TcaItemsProcessorFunctions;
 use TYPO3\CMS\Core\SingletonInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class/Function which manipulates the item-array for table/field tx_l10nmgr_cfg tablelist.

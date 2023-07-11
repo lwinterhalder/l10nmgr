@@ -17,8 +17,8 @@ namespace Localizationteam\L10nmgr\LanguageRestriction\Collection;
  * The TYPO3 project - inspiring people to share!
  */
 
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Driver\Exception as DBALDriverException;
+use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Constants;
 use PDO;
 use SplDoublyLinkedList;
