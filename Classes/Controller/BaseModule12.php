@@ -118,14 +118,6 @@ class BaseModule12
     public string $modMenu_setDefaultList = '';
 
     /**
-     * Contains module configuration parts from TBE_MODULES_EXT if found
-     *
-     * @see handleExternalFunctionValue()
-     * @var array
-     */
-    public array $extClassConf = [];
-
-    /**
      * Generally used for accumulating the output content of backend modules
      *
      * @var string
@@ -165,28 +157,14 @@ class BaseModule12
     }
 
     /**
-     * Initializes the internal MOD_MENU array setting and unsetting items based on various conditions. It also merges in external menu items from the global array TBE_MODULES_EXT (see mergeExternalItems())
+     * Initializes the internal MOD_MENU array setting and unsetting items based on various conditions.
      * Then MOD_SETTINGS array is cleaned up (see \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData()) so it contains only valid values. It's also updated with any SET[] values submitted.
      * Also loads the modTSconfig internal variable.
      *
-     * @see init(), $MOD_MENU, $MOD_SETTINGS, \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData(), mergeExternalItems()
+     * @see init(), $MOD_MENU, $MOD_SETTINGS, \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData()
      */
     public function menuConfig(): void
     {
-        // Page / user TSconfig settings and blinding of menu-items
-        // @extensionScannerIgnoreLine
-        $this->modTSconfig['properties'] = BackendUtility::getPagesTSconfig($this->id)['mod.'][$this->MCONF['name'] . '.'] ?? [];
-        $this->MOD_MENU['function'] = $this->mergeExternalItems(
-            $this->MCONF['name'],
-            'function',
-            $this->MOD_MENU['function'] ?? []
-        );
-        $blindActions = $this->modTSconfig['properties']['menu.']['function.'] ?? [];
-        foreach ($blindActions as $key => $value) {
-            if (!$value && array_key_exists($key, $this->MOD_MENU['function'])) {
-                unset($this->MOD_MENU['function'][$key]);
-            }
-        }
         $this->MOD_SETTINGS = BackendUtility::getModuleData(
             $this->MOD_MENU,
             GeneralUtility::_GP('SET'),
@@ -195,38 +173,6 @@ class BaseModule12
             $this->modMenu_dontValidateList,
             $this->modMenu_setDefaultList
         );
-    }
-
-    /**
-     * Merges menu items from global array $TBE_MODULES_EXT
-     *
-     * @param string $modName Module name for which to find value
-     * @param string $menuKey Menu key, eg. 'function' for the function menu.
-     * @param array $menuArr The part of a MOD_MENU array to work on.
-     * @return array Modified array part.
-     * @internal
-     * @see \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(), menuConfig()
-     */
-    public function mergeExternalItems(string $modName, string $menuKey, array $menuArr): array
-    {
-        $mergeArray = $GLOBALS['TBE_MODULES_EXT'][$modName]['MOD_MENU'][$menuKey] ?? null;
-        if (is_array($mergeArray)) {
-            foreach ($mergeArray as $k => $v) {
-                $vWS = $v['ws'] ?? '';
-                if (
-                    (
-                        (string)$vWS === ''
-                        || $this->getBackendUser()->workspace === 0
-                        && GeneralUtility::inList($vWS, 'online')
-                    )
-                    || $this->getBackendUser()->workspace === -1 && GeneralUtility::inList($vWS, 'offline')
-                    || $this->getBackendUser()->workspace > 0 && GeneralUtility::inList($vWS, 'custom')
-                ) {
-                    $menuArr[$k] = $this->getLanguageService()->sL($v['title'] ?? '');
-                }
-            }
-        }
-        return $menuArr;
     }
 
     /**
