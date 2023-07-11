@@ -447,7 +447,7 @@ class L10nAccumulatedInformation
             )
             ->orderBy('uid')
             ->executeQuery()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         if (!empty($explicitlyIncludedPages)) {
             foreach ($explicitlyIncludedPages as $page) {
@@ -472,7 +472,7 @@ class L10nAccumulatedInformation
             )
             ->orderBy('uid')
             ->executeQuery()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         if (!empty($includingParentPages)) {
             foreach ($includingParentPages as $parentPage) {
@@ -504,7 +504,7 @@ class L10nAccumulatedInformation
                 )
                 ->orderBy('uid')
                 ->executeQuery()
-                ->fetchAll();
+                ->fetchAllAssociative();
 
             if (!empty($subPages)) {
                 foreach ($subPages as $page) {

@@ -663,7 +663,7 @@ class Import extends L10nCommand
                 $records = $queryBuilder->select('uid', 'title')
                     ->from('sys_workspace')
                     ->executeQuery()
-                    ->fetchAll();
+                    ->fetchAllAssociative();
                 $workspaces = [];
                 if (!empty($records)) {
                     foreach ($records as $record) {
@@ -674,7 +674,7 @@ class Import extends L10nCommand
                 $records = $queryBuilder->select('uid', 'title')
                     ->from('tx_l10nmgr_cfg')
                     ->executeQuery()
-                    ->fetchAll();
+                    ->fetchAllAssociative();
                 $l10nConfigurations = [];
                 if (!empty($records)) {
                     foreach ($records as $record) {

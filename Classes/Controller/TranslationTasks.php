@@ -130,7 +130,7 @@ class TranslationTasks extends BaseModule
             ->from('tx_l10nmgr_priorities')
             ->orderBy('sorting')
             ->executeQuery()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $tRows = [];
         $c = 0;
         foreach ($priorities as $priorityRecord) {

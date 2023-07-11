@@ -359,7 +359,7 @@ class CatXmlImportManager
                 );
             }
 
-            $delDataQuery = $queryBuilder->execute()->fetchAll();
+            $delDataQuery = $queryBuilder->executeQuery()->fetchAllAssociative();
 
             if (!empty($delDataQuery)) {
                 foreach ($delDataQuery as $row) {

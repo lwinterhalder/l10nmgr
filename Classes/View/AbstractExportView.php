@@ -302,7 +302,7 @@ abstract class AbstractExportView
                 )
             )
             ->executeQuery()
-            ->fetchColumn();
+            ->fetchOne();
 
         return $numRows > 0;
     }
@@ -395,7 +395,7 @@ abstract class AbstractExportView
             )
             ->orderBy('crdate', 'DESC')
             ->executeQuery()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**

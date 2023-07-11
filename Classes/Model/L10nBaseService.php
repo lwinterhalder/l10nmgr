@@ -346,7 +346,7 @@ class L10nBaseService implements LoggerAwareInterface
                 }
             }
 
-            return $queryBuilder->execute()->fetchAll();
+            return $queryBuilder->executeQuery()->fetchAllAssociative();
         }
         return [];
     }

@@ -181,7 +181,7 @@ class Tools
         // Find all system languages:
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
-        $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAll();
+        $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -751,7 +751,7 @@ class Tools
         }
 
         // First, select all records that are default language OR international:
-        $allRows = $queryBuilder->execute()->fetchAll();
+        $allRows = $queryBuilder->executeQuery()->fetchAllAssociative();
         return is_array($allRows) && count($allRows) ? $allRows[0] : false;
     }
 
@@ -1214,7 +1214,7 @@ class Tools
             ->from($table)
             ->where(...$constraints)
             ->executeQuery()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $translations = [];
         $translations_errors = [];
