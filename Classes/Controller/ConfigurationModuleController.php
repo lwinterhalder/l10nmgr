@@ -149,7 +149,7 @@ class ConfigurationModuleController extends BaseModule12
         // Get the available configurations
         $l10nConfigurations = $this->getAllConfigurations();
         foreach ($l10nConfigurations as $key => $l10nConfiguation) {
-            $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute('l10nmgr_configuration_localization', [
+            $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute($this->currentModule->getIdentifier() . '.localize', [
                     'id' => $l10nConfiguation['pid'] ?? 0,
                     // @extensionScannerIgnoreLine
                     'srcPID' => $this->id,

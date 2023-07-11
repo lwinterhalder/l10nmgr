@@ -30,19 +30,8 @@ return [
             '_default' => [
                 'target' => ConfigurationModuleController::class . '::handleRequest',
             ],
-        ],
-    ],
-    'l10nmgr_configuration_localization' => [
-        'parent' => 'l10nmgr',
-        'access' => 'user', // user, admin or systemMaintainer
-        'path' => '/module/l10nmgr/localization',
-        'iconIdentifier' => 'module-l10nmgr',
-        'labels' => $lll . 'Modules/Localization/locallang_mod.xlf',
-        "appearance" => [
-            'renderInModuleMenu' => false,
-        ],
-        'routes' => [
-            '_default' => [
+            'localize' => [
+                'path' => '/localization',
                 'target' => LocalizationModuleController::class . '::handleRequest',
             ],
         ],
