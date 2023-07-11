@@ -6,6 +6,7 @@ namespace Localizationteam\L10nmgr\LanguageRestriction;
 
 use InvalidArgumentException;
 use Localizationteam\L10nmgr\Constants;
+use Localizationteam\L10nmgr\LanguagesService;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use RuntimeException;
 use TYPO3\CMS\Core\Database\Event\AlterTableDefinitionStatementsEvent;
@@ -38,7 +39,7 @@ class LanguageRestrictionRegistry implements SingletonInterface
     /**
      * Creates this object.
      */
-    public function __construct()
+    public function __construct(protected readonly LanguagesService $languagesService)
     {
         $this->template = str_repeat(PHP_EOL, 3) . 'CREATE TABLE %s (' . PHP_EOL
             . '  %s text ' . PHP_EOL . ');' . str_repeat(PHP_EOL, 3);
@@ -402,22 +403,7 @@ class LanguageRestrictionRegistry implements SingletonInterface
      */
     public function populateAvailableSiteLanguages(array &$fieldInformation): void
     {
-        $allLanguages = [];
-        foreach ($this->getAllSites() as $site) {
-            foreach ($site->getAllLanguages() as $language) {
-                $languageId = $language->getLanguageId();
-                if (isset($allLanguages[$languageId])) {
-                    // Language already provided by another site, just add the label separately
-                    $allLanguages[$languageId]['label'] .= ', ' . $language->getTitle() . ' [Site: ' . $site->getIdentifier() . ']';
-                    continue;
-                }
-                $allLanguages[$languageId] = [
-                    'label' => $language->getTitle() . ' [Site: ' . $site->getIdentifier() . ']',
-                    'value' => $languageId,
-                    'icon' => $language->getFlagIdentifier(),
-                ];
-            }
-        }
+        $allLanguages = $this->languagesService->getAll();
 
         if ($allLanguages !== []) {
             ksort($allLanguages);
@@ -439,10 +425,5 @@ class LanguageRestrictionRegistry implements SingletonInterface
                 'icon' => $language->getFlagIdentifier(),
             ];
         }
-    }
-
-    protected function getAllSites(): array
-    {
-        return GeneralUtility::makeInstance(SiteFinder::class)->getAllSites();
     }
 }
