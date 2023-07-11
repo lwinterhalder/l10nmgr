@@ -92,20 +92,17 @@ class ConfigurationModuleController extends BaseModule12
 
     public function initialize(ServerRequestInterface $request): void
     {
+        $backendUser = $this->getBackendUser();
         $this->currentModule = $request->getAttribute('module');
         $this->MCONF = [
             'name' => $this->currentModule->getIdentifier(),
         ];
-        $backendUser = $this->getBackendUser();
 
         $this->view = $this->moduleTemplateFactory->create($request);
 
-        $this->extObj = (object)[];
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
-        $this->CMD = (string)GeneralUtility::_GP('CMD');
         $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
-        $this->handleExternalFunctionValue();
 
         $this->pageInfo = BackendUtility::readPageAccess($this->id, $this->perms_clause) ?: [];
         // The page will show only if there is a valid page and if this page may be viewed by the user

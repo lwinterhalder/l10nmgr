@@ -157,14 +157,7 @@ class LocalizationModuleController extends BaseModule12
      */
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
-        // @extensionScannerIgnoreLine
         $this->initialize($request);
-
-        // Checking for first level external objects
-        $this->checkExtObj();
-
-        // Checking second level external objects
-        $this->checkSubExtObj();
 
         switch ($this->MOD_SETTINGS['action'] ?? '') {
             case 'inlineEdit':

@@ -166,7 +166,6 @@ class BaseModule12
         $this->CMD = (string)GeneralUtility::_GP('CMD');
         $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
-        $this->handleExternalFunctionValue();
     }
 
     /**
@@ -232,122 +231,6 @@ class BaseModule12
             }
         }
         return $menuArr;
-    }
-
-    /**
-     * Loads $this->extClassConf with the configuration for the CURRENT function of the menu.
-     *
-     * @param string $MM_key The key to MOD_MENU for which to fetch configuration. 'function' is default since it is first and foremost used to get information per "extension object" (I think that is what its called)
-     * @param string|null $MS_value The value-key to fetch from the config array. If NULL (default) MOD_SETTINGS[$MM_key] will be used. This is useful if you want to force another function than the one defined in MOD_SETTINGS[function]. Call this in init() function of your Script Class: handleExternalFunctionValue('function', $forcedSubModKey)
-     * @see getExternalItemConfig(), init()
-     */
-    public function handleExternalFunctionValue(string $MM_key = 'function', string $MS_value = null): void
-    {
-        if ($MS_value === null) {
-            $MS_value = $this->MOD_SETTINGS[$MM_key];
-        }
-        $this->extClassConf = $this->getExternalItemConfig($this->MCONF['name'] ?? '', $MM_key, $MS_value);
-    }
-
-    /**
-     * Returns configuration values from the global variable $TBE_MODULES_EXT for the module given.
-     * For example if the module is named "web_info" and the "function" key ($menuKey) of MOD_SETTINGS is "stat" ($value) then you will have the values of $TBE_MODULES_EXT['webinfo']['MOD_MENU']['function']['stat'] returned.
-     *
-     * @param string $modName Module name
-     * @param string $menuKey Menu key, eg. "function" for the function menu. See $this->MOD_MENU
-     * @param string $value Optionally the value-key to fetch from the array that would otherwise have been returned if this value was not set. Look source...
-     * @return array The value from the TBE_MODULES_EXT array.
-     * @see handleExternalFunctionValue()
-     */
-    public function getExternalItemConfig(string $modName, string $menuKey, string $value = ''): array
-    {
-        if (isset($GLOBALS['TBE_MODULES_EXT'][$modName])) {
-            if ($value !== '') {
-                return $GLOBALS['TBE_MODULES_EXT'][$modName]['MOD_MENU'][$menuKey][$value] ?? [];
-            }
-            return $GLOBALS['TBE_MODULES_EXT'][$modName]['MOD_MENU'][$menuKey] ?? [];
-        }
-        return [];
-    }
-
-    /**
-     * Creates an instance of the class found in $this->extClassConf['name'] in $this->extObj if any (this should hold three keys, "name", "path" and "title" if a "Function menu module" tries to connect...)
-     * This value in extClassConf might be set by an extension (in an ext_tables/ext_localconf file) which thus "connects" to a module.
-     * The array $this->extClassConf is set in handleExternalFunctionValue() based on the value of MOD_SETTINGS[function]
-     * If an instance is created it is initiated with $this passed as value and $this->extClassConf as second argument. Further the $this->MOD_SETTING is cleaned up again after calling the init function.
-     *
-     * @see handleExternalFunctionValue(), \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(), $extObj
-     */
-    public function checkExtObj(): void
-    {
-        if (is_array($this->extClassConf) && !empty($this->extClassConf['name'])) {
-            $this->extObj = GeneralUtility::makeInstance($this->extClassConf['name']);
-            $this->extObj->init();
-            // Re-write:
-            $this->MOD_SETTINGS = BackendUtility::getModuleData($this->MOD_MENU, GeneralUtility::_GP('SET'), $this->MCONF['name'] ?? '', $this->modMenu_type, $this->modMenu_dontValidateList, $this->modMenu_setDefaultList);
-        }
-    }
-
-    /**
-     * Calls the checkExtObj function in sub module if present.
-     */
-    public function checkSubExtObj(): void
-    {
-        if (is_object($this->extObj) && method_exists($this->extObj, 'checkExtObj')) {
-            $this->extObj->checkExtObj();
-        }
-    }
-
-    /**
-     * Calls the 'header' function inside the "Function menu module" if present.
-     * A header function might be needed to add JavaScript or other stuff in the head. This can't be done in the main function because the head is already written.
-     */
-    public function extObjHeader(): void
-    {
-        if (is_callable([$this->extObj, 'head'])) {
-            $this->extObj->head();
-        }
-    }
-
-    /**
-     * Return the content of the 'main' function inside the "Function menu module" if present
-     *
-     * @return string
-     * @throws Exception
-     */
-    public function getExtObjContent(): string
-    {
-        $savedContent = $this->content;
-        $this->content = '';
-        $this->extObjContent();
-        $newContent = $this->content;
-        $this->content = $savedContent;
-        return $newContent;
-    }
-
-    /**
-     * Calls the 'main' function inside the "Function menu module" if present
-     * @throws Exception
-     */
-    public function extObjContent(): void
-    {
-        if ($this->extObj === null) {
-            $flashMessage = GeneralUtility::makeInstance(
-                FlashMessage::class,
-                $this->getLanguageService()->sL('LLL:EXT:backend/Resources/Private/Language/locallang.xlf:no_modules_registered'),
-                $this->getLanguageService()->getLL('title'),
-                AbstractMessage::ERROR
-            );
-            /** @var FlashMessageService $flashMessageService */
-            $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-            $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-            $defaultFlashMessageQueue->enqueue($flashMessage);
-        } else {
-            $this->extObj->pObj = $this;
-            if (is_callable([$this->extObj, 'main'])) {
-                $this->content .= $this->extObj->main();
-            }
-        }
     }
 
     /**
