@@ -88,9 +88,9 @@ class L10nHtmlListView extends AbstractExportView
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
      */
-    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
+    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang, ModuleTemplate $moduleTemplate)
     {
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+        $this->moduleTemplate = $moduleTemplate;
         parent::__construct($l10ncfgObj, $sysLang);
     }
 
