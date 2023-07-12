@@ -473,7 +473,7 @@ class LocalizationModuleController extends BaseModule12
             '';
         if (!empty($options)) {
             //$onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
-            $onChange = 'window.location = ' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
+            $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
@@ -549,7 +549,7 @@ class LocalizationModuleController extends BaseModule12
         $onClick = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0)';
 
         return [
-            'onClick' => htmlspecialchars($onClick),
+            'onClick' => $onClick,
             'elementName' => $elementName,
             'checked' => ($currentValue ? ' checked="checked"' : ''),
             'tagParams' => ($tagParams ? ' ' . $tagParams : ''),
