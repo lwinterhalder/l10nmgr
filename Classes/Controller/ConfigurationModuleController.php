@@ -123,12 +123,10 @@ class ConfigurationModuleController extends BaseModule12
             $this->view->makeDocHeaderModuleMenu(['id' => $this->id]);
         }
 
-
         $this->view->assignMultiple([
             'accessContent' => $accessContent,
+            'configurations' => $this->getContent(),
         ]);
-
-        $this->moduleContent();
     }
 
     /**
@@ -137,7 +135,7 @@ class ConfigurationModuleController extends BaseModule12
      * @throws DBALException
      * @throws RouteNotFoundException
      */
-    protected function moduleContent(): void
+    protected function getContent(): array
     {
         // Get the available configurations
         $l10nConfigurations = $this->getAllConfigurations();
@@ -151,7 +149,8 @@ class ConfigurationModuleController extends BaseModule12
             $pagePath = BackendUtility::getRecordPath($l10nConfiguation['pid'] ?? 0, '1', 20, 50);
             $l10nConfigurations[$key]['path'] = (is_array($pagePath)) ? ($pagePath[1] ?? '') : $pagePath;
         }
-        $this->view->assign('configurations', $l10nConfigurations);
+
+        return $l10nConfigurations;
     }
 
     /**
