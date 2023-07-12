@@ -165,107 +165,107 @@ class EmConfiguration
 
     public function isEnableNotification(): bool
     {
-        return $this->enable_notification;
+        return (bool)$this->enable_notification;
     }
 
     public function isEnableCustomername(): bool
     {
-        return $this->enable_customername;
+        return (bool)$this->enable_customername;
     }
 
     public function isEnableFtp(): bool
     {
-        return $this->enable_ftp;
+        return (bool)$this->enable_ftp;
     }
 
     public function isEnableStatHook(): bool
     {
-        return $this->enable_stat_hook;
+        return (bool)$this->enable_stat_hook;
     }
 
     public function isEnableNeverHideAtCopy(): bool
     {
-        return $this->enable_neverHideAtCopy;
+        return (bool)$this->enable_neverHideAtCopy;
     }
 
     public function getDisallowDoktypes(): string
     {
-        return $this->disallowDoktypes;
+        return (string)$this->disallowDoktypes;
     }
 
     public function isImportDontProcessTransformations(): bool
     {
-        return $this->import_dontProcessTransformations;
+        return (bool)$this->import_dontProcessTransformations;
     }
 
     public function getL10NmgrCfg(): string
     {
-        return $this->l10nmgr_cfg;
+        return (string)$this->l10nmgr_cfg;
     }
 
     public function getL10NmgrTlangs(): string
     {
-        return $this->l10nmgr_tlangs;
+        return (string)$this->l10nmgr_tlangs;
     }
 
     public function getEmailRecipient(): string
     {
-        return $this->email_recipient;
+        return (string)$this->email_recipient;
     }
 
     public function getEmailRecipientImport(): string
     {
-        return $this->email_recipient_import;
+        return (string)$this->email_recipient_import;
     }
 
     public function getEmailSender(): string
     {
-        return $this->email_sender;
+        return (string)$this->email_sender;
     }
 
     public function getEmailSenderName(): string
     {
-        return $this->email_sender_name;
+        return (string)$this->email_sender_name;
     }
 
     public function getEmailSenderOrganisation(): string
     {
-        return $this->email_sender_organisation;
+        return (string)$this->email_sender_organisation;
     }
 
     public function isEmailAttachment(): bool
     {
-        return $this->email_attachment;
+        return (bool)$this->email_attachment;
     }
 
     public function getFtpServerPath(): string
     {
-        return $this->ftp_server_path;
+        return (string)$this->ftp_server_path;
     }
 
     public function getFtpServerDownPath(): string
     {
-        return $this->ftp_server_downpath;
+        return (string)$this->ftp_server_downpath;
     }
 
     public function getServiceChildren(): int
     {
-        return $this->service_children;
+        return (int)$this->service_children;
     }
 
     public function getServiceUser(): string
     {
-        return $this->service_user;
+        return (string)$this->service_user;
     }
 
     public function getServicePwd(): string
     {
-        return $this->service_pwd;
+        return (string)$this->service_pwd;
     }
 
     public function getServiceEnc(): string
     {
-        return $this->service_enc;
+        return (string)$this->service_enc;
     }
 
     public function hasFtpCredentials(): bool
@@ -278,16 +278,16 @@ class EmConfiguration
 
     public function getFtpServer(): string
     {
-        return $this->ftp_server;
+        return (string)$this->ftp_server;
     }
 
     public function getFtpServerUsername(): string
     {
-        return $this->ftp_server_username;
+        return (string)$this->ftp_server_username;
     }
 
     public function getFtpServerPassword(): string
     {
-        return $this->ftp_server_password;
+        return (string)$this->ftp_server_password;
     }
 }

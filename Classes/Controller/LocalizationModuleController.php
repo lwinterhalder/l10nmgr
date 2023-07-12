@@ -274,7 +274,7 @@ class LocalizationModuleController extends BaseModule12
                     'isRteInstalled' => ExtensionManagementUtility::isLoaded('rte_ckeditor'),
                 ]);
 
-                $this->content .= $this->view->render();
+                $this->content .= $this->view->render('LocalizationModule/Index');
             }
         }
     }
