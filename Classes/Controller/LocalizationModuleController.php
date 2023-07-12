@@ -611,25 +611,25 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function moduleContentNew(L10nConfiguration $l10NConfiguration): array
     {
-        $subcontentNew = [];
+        $subcontent = [];
 
         switch ($this->MOD_SETTINGS['action'] ?? '') {
             case 'inlineEdit':
             case 'link':
-                $subcontentNew = $this->linkOverviewAndOnlineTranslationAction($l10NConfiguration, $subcontentNew);
+                $subcontent = $this->linkOverviewAndOnlineTranslationAction($l10NConfiguration, $subcontent);
                 break;
             case 'export_excel':
-                $subcontentNew = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
+                $subcontent = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
                 break;
             case 'export_xml':
-                $subcontentNew = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
+                $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
                 break;
             default:
-                $subcontentNew = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
+                $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
                 break;
         }
 
-        return $subcontentNew;
+        return $subcontent;
     }
 
     /**
