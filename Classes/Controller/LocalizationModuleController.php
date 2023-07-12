@@ -164,16 +164,16 @@ class LocalizationModuleController extends BaseModule12
             case 'link':
                 // TODO: Rename this to main()
                 $this->mainNew();
-                break;
+
+                return $this->view->renderResponse('LocalizationModule/Index');
             default:
                 // TODO: Remove this when done
                 $this->main();
-                break;
+                $this->view->setContent($this->content);
+
+                return new HtmlResponse($this->view->renderContent());
         }
 
-        $this->view->setContent($this->content);
-
-        return new HtmlResponse($this->view->renderContent());
     }
 
     /**
@@ -273,8 +273,6 @@ class LocalizationModuleController extends BaseModule12
                     'configurationTable' => $configurationTable,
                     'isRteInstalled' => ExtensionManagementUtility::isLoaded('rte_ckeditor'),
                 ]);
-
-                $this->content .= $this->view->render('LocalizationModule/Index');
             }
         }
     }
