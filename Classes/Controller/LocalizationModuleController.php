@@ -176,6 +176,59 @@ class LocalizationModuleController extends BaseModule12
 
     }
 
+    protected function makeFunctionMenu(string $action, string $addParams): array
+    {
+        $selectMenus = [];
+        // @extensionScannerIgnoreLine
+        $selectMenus[] = self::getFuncMenuNew(
+            $this->id,
+            'SET[action]',
+            $action,
+            $this->MOD_MENU['action'] ?? [],
+            '',
+            $addParams,
+            $this->getLanguageService()->getLL('general.export.choose.action.title')
+        );
+
+        // @extensionScannerIgnoreLine
+        $selectMenus[] = self::getFuncMenuNew(
+            $this->id,
+            'SET[lang]',
+            (string)$this->sysLanguage,
+            $this->MOD_MENU['lang'] ?? [],
+            '',
+            $addParams,
+            $this->getLanguageService()->getLL('export.overview.targetlanguage.label')
+        );
+
+        $checkBoxes = [];
+        // @extensionScannerIgnoreLine
+        $checkBoxes[] = self::getFuncCheckNew(
+            $this->id,
+            'SET[onlyChangedContent]',
+            $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
+            '',
+            $addParams,
+            '',
+            $this->getLanguageService()->getLL('export.xml.new.title')
+        );
+        // @extensionScannerIgnoreLine
+        $checkBoxes[] = self::getFuncCheckNew(
+            $this->id,
+            'SET[noHidden]',
+            $this->MOD_SETTINGS['noHidden'] ?? '',
+            '',
+            $addParams,
+            '',
+            $this->getLanguageService()->getLL('export.xml.noHidden.title')
+        );
+
+        return [
+            'select' => $selectMenus,
+            'checkboxes' => $checkBoxes,
+        ];
+    }
+
     /**
      * Main function of the module. Write the content to
      *
@@ -205,56 +258,10 @@ class LocalizationModuleController extends BaseModule12
             if ($this->id && $access) {
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action] ?? '';
-
                 $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getId());
-                $selectMenus = [];
-                // @extensionScannerIgnoreLine
-                $selectMenus[] = self::getFuncMenuNew(
-                    $this->id,
-                    'SET[action]',
-                    $action,
-                    $this->MOD_MENU['action'] ?? [],
-                    '',
-                    $addParams,
-                    $this->getLanguageService()->getLL('general.export.choose.action.title')
-                );
-
-                // @extensionScannerIgnoreLine
-                $selectMenus[] = self::getFuncMenuNew(
-                    $this->id,
-                    'SET[lang]',
-                    (string)$this->sysLanguage,
-                    $this->MOD_MENU['lang'] ?? [],
-                    '',
-                    $addParams,
-                    $this->getLanguageService()->getLL('export.overview.targetlanguage.label')
-                );
-
-                $checkBoxes = [];
-                // @extensionScannerIgnoreLine
-                $checkBoxes[] = self::getFuncCheckNew(
-                    $this->id,
-                    'SET[onlyChangedContent]',
-                    $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
-                    '',
-                    $addParams,
-                    '',
-                    $this->getLanguageService()->getLL('export.xml.new.title')
-                );
-                // @extensionScannerIgnoreLine
-                $checkBoxes[] = self::getFuncCheckNew(
-                    $this->id,
-                    'SET[noHidden]',
-                    $this->MOD_SETTINGS['noHidden'] ?? '',
-                    '',
-                    $addParams,
-                    '',
-                    $this->getLanguageService()->getLL('export.xml.noHidden.title')
-                );
-
-                // Render content:
                 $userCanEditTranslations = count($this->MOD_MENU['lang'] ?? []) > 0;
 
+                // Render content:
                 $moduleContent = [];
                 if ($userCanEditTranslations) {
                     $moduleContent = $this->moduleContentNew($l10nConfiguration);
@@ -263,10 +270,12 @@ class LocalizationModuleController extends BaseModule12
                 // Create and render view to show details for the current L10N Manager configuration
                 $configurationTable = $this->renderConfigurationTable($l10nConfiguration);
 
+                $functionMenu = $this->makeFunctionMenu($action, $addParams);
+
                 $this->view->assignMultiple([
                     'title' => $title,
-                    'selectMenues' => $selectMenus,
-                    'checkBoxes' => $checkBoxes,
+                    'selectMenues' => $functionMenu['select'],
+                    'checkBoxes' => $functionMenu['checkboxes'],
                     'userCanEditTranslations' => $userCanEditTranslations,
                     'moduleAction' => $action,
                     'moduleContent' => $moduleContent,
