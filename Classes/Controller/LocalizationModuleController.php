@@ -1338,11 +1338,10 @@ class LocalizationModuleController extends BaseModule12
             'noHidden' => '',
         ];
 
-        $configurationId = (int)($GLOBALS['TYPO3_REQUEST']->getQueryParams()['exportUID'] ?? 0);
-        $configuration = BackendUtility::getRecord('tx_l10nmgr_cfg', $configurationId);
+        $configuration = $this->getL10NConfiguration();
         $targetLanguages = [];
-        if (!empty($configuration['targetLanguages'])) {
-            $targetLanguages = array_flip(GeneralUtility::intExplode(',', $configuration['targetLanguages'], true));
+        if (!empty($configuration->getTargetLanguages())) {
+            $targetLanguages = array_flip(GeneralUtility::intExplode(',', $configuration->getTargetLanguages(), true));
         }
 
         // TODO: Migrate to SiteConfiguration
@@ -1375,7 +1374,8 @@ class LocalizationModuleController extends BaseModule12
     {
         /** @var L10nConfiguration $l10nConfiguration */
         $l10nConfiguration = GeneralUtility::makeInstance(L10nConfiguration::class);
-        $l10nConfiguration->load((int)GeneralUtility::_GP('exportUID'));
+        $exportId = (int)($GLOBALS['TYPO3_REQUEST']->getQueryParams()['exportUID'] ?? 0);
+        $l10nConfiguration->load($exportId);
 
         return $l10nConfiguration;
     }

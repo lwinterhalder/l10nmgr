@@ -49,7 +49,7 @@ class L10nConfiguration
     /**
      * @var array
      */
-    public array $l10ncfg;
+    public array $l10ncfg = [];
 
     /**
      * @var int
@@ -63,7 +63,9 @@ class L10nConfiguration
      **/
     public function load(int $id): void
     {
-        $this->l10ncfg = BackendUtility::getRecord('tx_l10nmgr_cfg', $id);
+        if ($this->l10ncfg === []) {
+            $this->l10ncfg = BackendUtility::getRecord('tx_l10nmgr_cfg', $id);
+        }
     }
 
     /**
@@ -72,7 +74,7 @@ class L10nConfiguration
     public function isLoaded(): bool
     {
         // array must have values also!
-        return is_array($this->l10ncfg) && (! empty($this->l10ncfg));
+        return is_array($this->l10ncfg) && ($this->l10ncfg !== []);
     }
 
     /**
@@ -91,6 +93,16 @@ class L10nConfiguration
     public function getPid(): int
     {
         return (int)$this->getData('pid');
+    }
+
+    /**
+     * @todo There is no field `targetLanguage` in the database. Can we remove this?
+     *
+     * @return string
+     */
+    public function getTargetLanguages(): string
+    {
+        return $this->getData('targetLanguages');
     }
 
     /**
