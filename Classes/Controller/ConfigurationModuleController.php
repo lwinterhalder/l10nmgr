@@ -28,6 +28,8 @@ namespace Localizationteam\L10nmgr\Controller;
  */
 
 use Doctrine\DBAL\Exception as DBALException;
+use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Attribute\Controller;
@@ -52,8 +54,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Stefano Kowalke <info@arroba-it.de>
  */
 #[Controller]
-class ConfigurationModuleController extends BaseModule12
+class ConfigurationModuleController
 {
+    use BackendUserTrait;
+    use LanguageServiceTrait;
+
     public array $pageInfo = [];
 
     /**
@@ -93,22 +98,19 @@ class ConfigurationModuleController extends BaseModule12
     public function initialize(ServerRequestInterface $request): void
     {
         $backendUser = $this->getBackendUser();
-        $this->currentModule = $request->getAttribute('module');
-
-        $this->view = $this->moduleTemplateFactory->create($request);
-
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
-        $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
-
-        $this->pageInfo = BackendUtility::readPageAccess($this->id, $this->perms_clause) ?: [];
-        // The page will show only if there is a valid page and if this page may be viewed by the user
-        if ($this->pageInfo !== []) {
-            $this->view->getDocHeaderComponent()->setMetaInformation($this->pageInfo);
-        }
+        $this->view = $this->moduleTemplateFactory->create($request);
+        $this->currentModule = $request->getAttribute('module');
+        $this->pageInfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW)) ?: [];
         $this->view->setTitle(
             $this->getLanguageService()->sL($this->currentModule->getTitle()),
             $this->id !== 0 && isset($this->pageInfo['title']) ? $this->pageInfo['title'] : ''
         );
+
+        // The page will show only if there is a valid page and if this page may be viewed by the user
+        if ($this->pageInfo !== []) {
+            $this->view->getDocHeaderComponent()->setMetaInformation($this->pageInfo);
+        }
 
         $accessContent = false;
         // @extensionScannerIgnoreLine
