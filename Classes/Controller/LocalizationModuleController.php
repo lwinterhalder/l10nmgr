@@ -125,7 +125,8 @@ class LocalizationModuleController extends BaseModule12
         public readonly IconFactory $iconFactory,
         public readonly ModuleProvider $moduleProvider,
         public readonly EmConfiguration $emConfiguration,
-        protected readonly ModuleTemplateFactory $moduleTemplateFactory
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+        protected readonly L10nBaseService $l10nBaseService,
     ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');
@@ -674,9 +675,6 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function inlineEditAction(L10nConfiguration $l10NConfiguration): array
     {
-        /** @var L10nBaseService $service */
-        $service = GeneralUtility::makeInstance(L10nBaseService::class);
-
         // simple init of translation object:
         /** @var TranslationData $translationData */
         $translationData = GeneralUtility::makeInstance(TranslationData::class);
@@ -685,7 +683,7 @@ class LocalizationModuleController extends BaseModule12
         $translationData->setPreviewLanguage($this->previewLanguage);
         // See, if incoming translation is available, if so, submit it
         if (GeneralUtility::_POST('saveInline')) {
-            $service->saveTranslation($l10NConfiguration, $translationData);
+            $this->l10nBaseService->saveTranslation($l10NConfiguration, $translationData);
         }
 
         // Buttons:
@@ -704,10 +702,8 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function excelExportImportAction(L10nConfiguration $l10ncfgObj): string
     {
-        /** @var L10nBaseService $service */
-        $service = GeneralUtility::makeInstance(L10nBaseService::class);
         if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
-            $service->setImportAsDefaultLanguage(true);
+            $this->l10nBaseService->setImportAsDefaultLanguage(true);
         }
         // Buttons:
         $_selectOptions = ['0' => '-default-'];
@@ -747,7 +743,7 @@ class LocalizationModuleController extends BaseModule12
             $translationData->setLanguage($this->sysLanguage);
             $translationData->setPreviewLanguage($this->previewLanguage);
             GeneralUtility::unlink_tempfile($uploadedTempFile);
-            $service->saveTranslation($l10ncfgObj, $translationData);
+            $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
             $icon = $this->iconFactory->getIcon('status-dialog-notification', Icon::SIZE_SMALL)->render();
             $info .= '<br /><br />' . $icon . $this->getLanguageService()->getLL('import.success.message') . '<br /><br />';
         }
@@ -884,8 +880,6 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function catXMLExportImportAction(L10nConfiguration $l10ncfgObj): string
     {
-        /** @var L10nBaseService $service */
-        $service = GeneralUtility::makeInstance(L10nBaseService::class);
         $menuItems = [
             '0' => [
                 'label' => $this->getLanguageService()->getLL('export.xml.headline.title'),
@@ -915,7 +909,7 @@ class LocalizationModuleController extends BaseModule12
             //var_dump($this->getBackendUser()->user);
             //print "</pre>";
             if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
-                $service->setImportAsDefaultLanguage(true);
+                $this->l10nBaseService->setImportAsDefaultLanguage(true);
             }
             // Relevant processing of XML Import with the help of the Importmanager
             /** @var CatXmlImportManager $importManager */
@@ -957,9 +951,9 @@ class LocalizationModuleController extends BaseModule12
                 $translationData->setPreviewLanguage($this->previewLanguage);
                 //$actionInfo.="<pre>".var_export($GLOBALS['BE_USER'],true)."</pre>";
                 unset($importManager);
-                $service->saveTranslation($l10ncfgObj, $translationData);
+                $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
                 $icon = $this->iconFactory->getIcon('status-dialog-notification', Icon::SIZE_SMALL)->render();
-                $actionInfo .= '<br /><br />' . $icon . 'Import done<br /><br />(Command count:' . $service->lastTCEMAINCommandsCount . ')';
+                $actionInfo .= '<br /><br />' . $icon . 'Import done<br /><br />(Command count:' . $this->l10nBaseService->lastTCEMAINCommandsCount . ')';
             }
             GeneralUtility::unlink_tempfile($uploadedTempFile);
         }
