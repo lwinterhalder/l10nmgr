@@ -177,7 +177,7 @@ class L10nBaseService implements LoggerAwareInterface
     protected function preTranslateAllContent(TranslationData $translationData)
     {
         $inputArray = $translationData->getTranslationData();
-        $pageUids = array_keys((array)$inputArray['pages'] ?? []);
+        $pageUids = array_keys((array)($inputArray['pages'] ?? []));
         foreach ($pageUids as $pageUid) {
             $this->translateContentOnPage($pageUid, $translationData->getLanguage());
         }
