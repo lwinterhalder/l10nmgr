@@ -87,7 +87,7 @@ class ConfigurationModuleController extends BaseModule12
     {
         $this->initialize($request);
 
-        return $this->view->renderResponse('ConfigurationList');
+        return $this->view->renderResponse('ConfigurationModule/ConfigurationList');
     }
 
     public function initialize(ServerRequestInterface $request): void
