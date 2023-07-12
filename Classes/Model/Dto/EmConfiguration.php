@@ -5,140 +5,66 @@ declare(strict_types=1);
 namespace Localizationteam\L10nmgr\Model\Dto;
 
 use Exception;
+use ReflectionProperty;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class EmConfiguration
 {
-    /**
-     * @var bool
-     */
-    protected $enable_hidden_languages = false;
+    protected bool $enable_hidden_languages = false;
 
     // Enable settings
-    /**
-     * @var bool
-     */
-    protected $enable_notification = false;
+    protected bool $enable_notification = false;
 
-    /**
-     * @var bool
-     */
-    protected $enable_customername = false;
+    protected bool $enable_customername = false;
 
-    /**
-     * @var bool
-     */
-    protected $enable_ftp = false;
+    protected bool $enable_ftp = false;
 
-    /**
-     * @var bool
-     */
-    protected $enable_stat_hook = false;
+    protected bool $enable_stat_hook = false;
 
-    /**
-     * @var bool
-     */
-    protected $enable_neverHideAtCopy = true;
+    protected bool $enable_neverHideAtCopy = true;
 
-    /**
-     * @var string
-     */
-    protected $disallowDoktypes = '255, ---div---';
+    protected string $disallowDoktypes = '255, ---div---';
 
-    /**
-     * @var bool
-     */
-    protected $import_dontProcessTransformations = true;
+    protected bool $import_dontProcessTransformations = true;
 
-    /**
-     * @var string
-     */
-    protected $l10nmgr_cfg = '';
+    protected string $l10nmgr_cfg = '';
 
     // Load L10N manager configration
-    /**
-     * @var string
-     */
-    protected $l10nmgr_tlangs = '';
+    protected string $l10nmgr_tlangs = '';
 
-    /**
-     * @var string
-     */
-    protected $email_recipient = '';
+    protected string $email_recipient = '';
 
     // Define email notification
-    /**
-     * @var string
-     */
-    protected $email_recipient_import = '';
+    protected string $email_recipient_import = '';
 
-    /**
-     * @var string
-     */
-    protected $email_sender = '';
+    protected string $email_sender = '';
 
-    /**
-     * @var string
-     */
-    protected $email_sender_name = '';
+    protected string $email_sender_name = '';
 
-    /**
-     * @var string
-     */
-    protected $email_sender_organisation = '';
+    protected string $email_sender_organisation = '';
 
-    /**
-     * @var bool
-     */
-    protected $email_attachment = false;
+    protected bool $email_attachment = false;
 
-    /**
-     * @var string
-     */
-    protected $ftp_server = '';
+    protected string $ftp_server = '';
 
     // Define FTP server details
-    /**
-     * @var string
-     */
-    protected $ftp_server_path = '';
+    protected string $ftp_server_path = '';
 
-    /**
-     * @var string
-     */
-    protected $ftp_server_downpath = '';
+    protected string $ftp_server_downpath = '';
 
-    /**
-     * @var string
-     */
-    protected $ftp_server_username = '';
+    protected string $ftp_server_username = '';
 
-    /**
-     * @var string
-     */
-    protected $ftp_server_password = '';
+    protected string $ftp_server_password = '';
 
-    /**
-     * @var int
-     */
-    protected $service_children = 3;
+    protected int $service_children = 3;
 
     // Import service
-    /**
-     * @var string
-     */
-    protected $service_user = '';
+    protected string $service_user = '';
 
-    /**
-     * @var string
-     */
-    protected $service_pwd = '';
+    protected string $service_pwd = '';
 
-    /**
-     * @var string
-     */
-    protected $service_enc = '';
+    protected string $service_enc = '';
 
     public function __construct(array $configuration = [])
     {
@@ -153,6 +79,9 @@ class EmConfiguration
 
         foreach ($configuration as $key => $value) {
             if (property_exists(__CLASS__, $key)) {
+                $property = new ReflectionProperty($this, $key);
+                $type = $property->getType()?->getName();
+                settype($value, $type);
                 $this->$key = $value;
             }
         }
@@ -160,112 +89,112 @@ class EmConfiguration
 
     public function isEnableHiddenLanguages(): bool
     {
-        return (bool)$this->enable_hidden_languages;
+        return $this->enable_hidden_languages;
     }
 
     public function isEnableNotification(): bool
     {
-        return (bool)$this->enable_notification;
+        return $this->enable_notification;
     }
 
     public function isEnableCustomername(): bool
     {
-        return (bool)$this->enable_customername;
+        return $this->enable_customername;
     }
 
     public function isEnableFtp(): bool
     {
-        return (bool)$this->enable_ftp;
+        return $this->enable_ftp;
     }
 
     public function isEnableStatHook(): bool
     {
-        return (bool)$this->enable_stat_hook;
+        return $this->enable_stat_hook;
     }
 
     public function isEnableNeverHideAtCopy(): bool
     {
-        return (bool)$this->enable_neverHideAtCopy;
+        return $this->enable_neverHideAtCopy;
     }
 
     public function getDisallowDoktypes(): string
     {
-        return (string)$this->disallowDoktypes;
+        return $this->disallowDoktypes;
     }
 
     public function isImportDontProcessTransformations(): bool
     {
-        return (bool)$this->import_dontProcessTransformations;
+        return $this->import_dontProcessTransformations;
     }
 
     public function getL10NmgrCfg(): string
     {
-        return (string)$this->l10nmgr_cfg;
+        return $this->l10nmgr_cfg;
     }
 
     public function getL10NmgrTlangs(): string
     {
-        return (string)$this->l10nmgr_tlangs;
+        return $this->l10nmgr_tlangs;
     }
 
     public function getEmailRecipient(): string
     {
-        return (string)$this->email_recipient;
+        return $this->email_recipient;
     }
 
     public function getEmailRecipientImport(): string
     {
-        return (string)$this->email_recipient_import;
+        return $this->email_recipient_import;
     }
 
     public function getEmailSender(): string
     {
-        return (string)$this->email_sender;
+        return $this->email_sender;
     }
 
     public function getEmailSenderName(): string
     {
-        return (string)$this->email_sender_name;
+        return $this->email_sender_name;
     }
 
     public function getEmailSenderOrganisation(): string
     {
-        return (string)$this->email_sender_organisation;
+        return $this->email_sender_organisation;
     }
 
     public function isEmailAttachment(): bool
     {
-        return (bool)$this->email_attachment;
+        return $this->email_attachment;
     }
 
     public function getFtpServerPath(): string
     {
-        return (string)$this->ftp_server_path;
+        return $this->ftp_server_path;
     }
 
     public function getFtpServerDownPath(): string
     {
-        return (string)$this->ftp_server_downpath;
+        return $this->ftp_server_downpath;
     }
 
     public function getServiceChildren(): int
     {
-        return (int)$this->service_children;
+        return $this->service_children;
     }
 
     public function getServiceUser(): string
     {
-        return (string)$this->service_user;
+        return $this->service_user;
     }
 
     public function getServicePwd(): string
     {
-        return (string)$this->service_pwd;
+        return $this->service_pwd;
     }
 
     public function getServiceEnc(): string
     {
-        return (string)$this->service_enc;
+        return $this->service_enc;
     }
 
     public function hasFtpCredentials(): bool
@@ -278,16 +207,16 @@ class EmConfiguration
 
     public function getFtpServer(): string
     {
-        return (string)$this->ftp_server;
+        return $this->ftp_server;
     }
 
     public function getFtpServerUsername(): string
     {
-        return (string)$this->ftp_server_username;
+        return $this->ftp_server_username;
     }
 
     public function getFtpServerPassword(): string
     {
-        return (string)$this->ftp_server_password;
+        return $this->ftp_server_password;
     }
 }
