@@ -97,17 +97,9 @@ class L10nBaseService implements LoggerAwareInterface
     protected array $flexFormDiffArray;
 
     /**
-     * @var EmConfiguration
-     */
-    protected EmConfiguration $emConfiguration;
-
-    /**
      * Check for deprecated configuration throws false positive in extension scanner.
      */
-    public function __construct()
-    {
-        $this->emConfiguration = GeneralUtility::makeInstance(EmConfiguration::class);
-    }
+    public function __construct(protected readonly EmConfiguration $emConfiguration) {}
 
     /**
      * @return int

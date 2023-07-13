@@ -39,15 +39,7 @@ class XmlTools implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /**
-     * @var RteHtmlParser
-     */
-    protected RteHtmlParser $parseHTML;
-
-    public function __construct()
-    {
-        $this->parseHTML = GeneralUtility::makeInstance(RteHtmlParser::class);
-    }
+    public function __construct(protected readonly RteHtmlParser $parseHTML) {}
 
     /**
      * Parses XML input into a PHP array with associative keys

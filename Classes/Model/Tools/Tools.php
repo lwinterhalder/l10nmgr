@@ -114,12 +114,6 @@ class Tools
      */
     public bool $includeFceWithDefaultLanguage = false; // Output for translation details
 
-    // Internal:
-    /**
-     * @var TranslationConfigurationProvider
-     */
-    public TranslationConfigurationProvider $t8Tools;
-
     /**
      * @var array
      */
@@ -171,16 +165,17 @@ class Tools
     protected array $_callBackParams_currentRow = [];
 
     /**
-     * Constructor
      * Setting up internal variable ->t8Tools
+     *
      * @throws DBALException
      */
-    public function __construct()
-    {
-        $this->t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
+    public function __construct(
+        protected readonly TranslationConfigurationProvider $t8Tools,
+        protected readonly ConnectionPool $connectionPool,
+    ) {
         // Find all system languages:
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_language');
         $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAllAssociative();
     }
 
@@ -700,7 +695,7 @@ class Tools
             );
         }
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
@@ -771,7 +766,7 @@ class Tools
             $allowedFields = $cache->get($key);
         } else {
             $configuredFields = array_keys($GLOBALS['TCA'][$table]['columns'] ?? []);
-            $tableColumns = GeneralUtility::makeInstance(ConnectionPool::class)
+            $tableColumns = $this->connectionPool
                 ->getConnectionForTable($table)
                 ->getSchemaManager()
                 ->listTableColumns($table);
@@ -1149,7 +1144,7 @@ class Tools
 
         // Look for translations of this record, index by language field value:
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
@@ -1517,7 +1512,7 @@ class Tools
         }
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $queryBuilder->getRestrictions()
             ->removeAll()
             ->add(GeneralUtility::makeInstance(DeletedRestriction::class))
@@ -1645,8 +1640,7 @@ class Tools
     protected function updateIndexTable(array $record): void
     {
         /** @var Connection $databaseConnection */
-        $databaseConnection = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getConnectionForTable('tx_l10nmgr_index');
+        $databaseConnection = $this->connectionPool->getConnectionForTable('tx_l10nmgr_index');
 
         $databaseConnection->delete(
             'tx_l10nmgr_index',
@@ -1665,9 +1659,7 @@ class Tools
     public function flushIndexOfWorkspace(int $ws): void
     {
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable(
-            'tx_l10nmgr_index'
-        );
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_l10nmgr_index');
         $queryBuilder->delete('tx_l10nmgr_index')
             ->where(
                 $queryBuilder->expr()->eq(

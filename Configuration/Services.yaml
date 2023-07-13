@@ -7,6 +7,12 @@ services:
   Localizationteam\L10nmgr\:
     resource: '../Classes/*'
 
+  Localizationteam\L10nmgr\Model\Tools\Tools:
+    public: true
+    arguments:
+      $t8Tools: '@TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider'
+      $connectionPool: '@TYPO3\CMS\Core\Database\ConnectionPool'
+
   Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry:
     tags:
       - name: event.listener
