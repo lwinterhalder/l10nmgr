@@ -238,32 +238,14 @@ abstract class AbstractExportView
         } else {
             $fileType = 'catxml';
         }
-        if ($this->sysLang && ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            if ($this->l10ncfgObj->getData('sourceLangStaticId')) {
-                $staticLangArr = BackendUtility::getRecord(
-                    'static_languages',
-                    $this->l10ncfgObj->getData('sourceLangStaticId'),
-                    'lg_iso_2'
-                );
-            }
-            $targetLangSysLangArr = BackendUtility::getRecord('sys_language', $this->sysLang);
-            $targetLangArr = BackendUtility::getRecord(
-                'static_languages',
-                $targetLangSysLangArr['static_lang_isocode'] ?? 0
-            );
-            // Set sourceLang for filename
-            $sourceLang = $staticLangArr['lg_iso_2'] ?? 0;
-            // Use locale for targetLang in filename if available
-            $targetLang = $targetLangArr['lg_collate_locale'] ?? ($targetLangArr['lg_iso_2'] ?? 0);
-        } else {
-            $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
-            if ($sourceLanguageConfiguration instanceof SiteLanguage) {
-                $sourceLang = $sourceLanguageConfiguration->getHreflang() ?: $sourceLanguageConfiguration->getTwoLetterIsoCode();
-            }
-            $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
-            if ($targetLanguageConfiguration instanceof SiteLanguage) {
-                $targetLang = $targetLanguageConfiguration->getHreflang() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
-            }
+
+        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
+        if ($sourceLanguageConfiguration instanceof SiteLanguage) {
+            $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
+        }
+        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
+        if ($targetLanguageConfiguration instanceof SiteLanguage) {
+            $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
         }
         if (isset($sourceLang) && isset($targetLang)) {
             $fileNamePrefix = (trim($this->l10ncfgObj->getData('filenameprefix'))) ? $this->l10ncfgObj->getData('filenameprefix') . '_' . $fileType : $fileType;

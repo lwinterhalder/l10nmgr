@@ -157,30 +157,21 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
         $XML .= "\t" . '<head>' . "\n";
         $XML .= "\t\t" . '<t3_l10ncfg translate="no">' . $this->l10ncfgObj->getData('uid') . '</t3_l10ncfg>' . "\n";
         $XML .= "\t\t" . '<t3_sysLang translate="no">' . $sysLang . '</t3_sysLang>' . "\n";
-        // get ISO2L code for source language
-        if ($this->l10ncfgObj->getData('sourceLangStaticId') && ExtensionManagementUtility::isLoaded('static_info_tables')) {
-            $staticLangArr = BackendUtility::getRecord(
-                'static_languages',
-                $this->l10ncfgObj->getData('sourceLangStaticId'),
-                'lg_iso_2'
-            );
-            $XML .= "\t\t" . '<t3_sourceLang translate="no">' . $staticLangArr['lg_iso_2'] . '</t3_sourceLang>' . "\n";
-            $XML .= "\t\t" . '<t3_targetLang translate="no">' . $targetIso . '</t3_targetLang>' . "\n";
-        } else {
-            $sourceLang = '';
-            $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
-            if ($sourceLanguageConfiguration instanceof SiteLanguage) {
-                $sourceLang = $sourceLanguageConfiguration->getHreflang() ?: $sourceLanguageConfiguration->getTwoLetterIsoCode();
-            }
-            $targetLang = '';
-            $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
-            if ($targetLanguageConfiguration instanceof SiteLanguage) {
-                $targetLang = $targetLanguageConfiguration->getHreflang() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
-            }
-            $XML .= "\t\t" . '<t3_sourceLang translate="no">' . $sourceLang . '</t3_sourceLang>' . "\n";
-            $XML .= "\t\t" . '<t3_targetLang translate="no">' . $targetLang . '</t3_targetLang>' . "\n";
+
+        $sourceLang = '';
+        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
+        if ($sourceLanguageConfiguration instanceof SiteLanguage) {
+            $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
         }
+        $targetLang = '';
+        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
+        if ($targetLanguageConfiguration instanceof SiteLanguage) {
+            $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
+        }
+        $XML .= "\t\t" . '<t3_sourceLang translate="no">' . $sourceLang . '</t3_sourceLang>' . "\n";
+        $XML .= "\t\t" . '<t3_targetLang translate="no">' . $targetLang . '</t3_targetLang>' . "\n";
         $XML .= "\t\t" . '<t3_baseURL translate="no">' . $this->baseUrl . '</t3_baseURL>' . "\n";
+
         if ($accumObj->getExtensionConfiguration()->isEnableCustomername()) {
             // Customer set by CLI parameter will override CLI backend user name for CLI based exports
             $customer = $this->customer ?: $this->getBackendUser()->user['realName'];

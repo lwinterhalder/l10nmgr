@@ -254,11 +254,7 @@ class Export extends L10nCommand
             } else {
                 throw new Exception("Wrong format. Use 'CATXML' or 'EXCEL'");
             }
-            // Check if sourceLangStaticId is set in configuration and set setForcedSourceLanguage to this value
-            if ($l10nmgrCfgObj->getData('sourceLangStaticId') && ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                $forceLanguage = $this->getStaticLangUid((int)$l10nmgrCfgObj->getData('sourceLangStaticId'));
-                $l10nmgrGetXML->setForcedSourceLanguage($forceLanguage);
-            }
+
             $forceLanguage = $input->getOption('forcedSourceLanguage');
             if (is_string($forceLanguage)) {
                 $l10nmgrGetXML->setForcedSourceLanguage((int)$forceLanguage);
@@ -320,28 +316,6 @@ class Export extends L10nCommand
             $error .= $this->getLanguageService()->getLL('error.l10nmgr.object_not_loaded.msg') . "\n";
         }
         return $error;
-    }
-
-    /**
-     * @param int $sourceLangStaticId
-     * @return int
-     * @throws DBALException
-     */
-    protected function getStaticLangUid(int $sourceLangStaticId): int
-    {
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('sys_language');
-        $result = $queryBuilder->select('uid')
-            ->from('sys_language')
-            ->where(
-                $queryBuilder->expr()->eq(
-                    'static_lang_isocode',
-                    $sourceLangStaticId
-                )
-            )
-            ->executeQuery()
-            ->fetch();
-        return $result['uid'] ?? 0;
     }
 
     /**

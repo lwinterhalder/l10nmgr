@@ -17,5 +17,4 @@ Installation
 Download the extension from the TYPO3 extension repository or from forge.typo3.org. Then install it with the extension
 manager. If you already use an older version of l10nmgr, make a backup of the extension directory. In case something
 fails, you'll have the possibility of re-establishing the original installation state from where you started the update.
-Please note that you first need to install the extension :code:`static_info_tables`.
 
