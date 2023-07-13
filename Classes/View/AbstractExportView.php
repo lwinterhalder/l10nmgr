@@ -116,8 +116,6 @@ abstract class AbstractExportView
     protected int $forcedSourceLanguage = 0;
 
     /**
-     * AbstractExportView constructor.
-     *
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
      * @throws SiteNotFoundException

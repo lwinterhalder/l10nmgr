@@ -23,6 +23,7 @@ namespace Localizationteam\L10nmgr\View;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -50,9 +51,9 @@ class ExcelXmlView extends AbstractExportView implements ExportViewInterface
     protected int $forcedSourceLanguage = 0;
 
     /**
-     * ExcelXmlView constructor.
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
+     * @throws SiteNotFoundException
      */
     public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
     {

@@ -57,13 +57,6 @@ class MkPreviewLinkService
      */
     protected int $workspaceId;
 
-    /**
-     * MkPreviewLinkService constructor.
-     *
-     * @param int $t3_workspaceId
-     * @param int $t3_sysLang
-     * @param array $pageIds
-     */
     public function __construct(int $t3_workspaceId, int $t3_sysLang, array $pageIds)
     {
         $this->sysLang = $t3_sysLang;

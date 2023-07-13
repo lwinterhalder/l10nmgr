@@ -36,9 +36,6 @@ class LanguageRestrictionRegistry implements SingletonInterface
      */
     protected string $template = '';
 
-    /**
-     * Creates this object.
-     */
     public function __construct(protected readonly LanguagesService $languagesService)
     {
         $this->template = str_repeat(PHP_EOL, 3) . 'CREATE TABLE %s (' . PHP_EOL

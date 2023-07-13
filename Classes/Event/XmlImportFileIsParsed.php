@@ -16,10 +16,6 @@ class XmlImportFileIsParsed
      */
     private array $xmlNodes;
 
-    /**
-     * @param array $xmlNodes
-     * @param array $errorMessages
-     */
     public function __construct(array $xmlNodes, array $errorMessages)
     {
         $this->errorMessages = $errorMessages;

@@ -44,9 +44,6 @@ class L10nConfigurationDetailView
      */
     protected L10nConfiguration $l10ncfgObj;
 
-    /**
-     * @param L10nConfiguration $l10ncfgObj
-     */
     public function __construct(L10nConfiguration $l10ncfgObj)
     {
         $this->l10ncfgObj = $l10ncfgObj;

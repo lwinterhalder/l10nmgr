@@ -75,11 +75,6 @@ class CatXmlImportManager
      */
     protected array $_errorMsg = [];
 
-    /**
-     * @param string $file
-     * @param int $sysLang
-     * @param string $xmlString
-     */
     public function __construct(string $file, int $sysLang, string $xmlString)
     {
         $this->sysLang = $sysLang;

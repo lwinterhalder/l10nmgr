@@ -10,10 +10,6 @@ class L10nAccumulatedInformationIsProcessed
 
     private array $l10nConfiguration;
 
-    /**
-     * @param array $accumulatedInformation
-     * @param array $l10nConfiguration
-     */
     public function __construct(array $accumulatedInformation, array $l10nConfiguration)
     {
         $this->accumulatedInformation = $accumulatedInformation;
