@@ -244,7 +244,7 @@ abstract class AbstractExportView
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
             $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
         }
-        if (isset($sourceLang) && isset($targetLang)) {
+        if ($sourceLang !== '' && $targetLang !== '') {
             $fileNamePrefix = (trim($this->l10ncfgObj->getData('filenameprefix'))) ? $this->l10ncfgObj->getData('filenameprefix') . '_' . $fileType : $fileType;
             // Setting filename:
             $filename = $fileNamePrefix . '_' . $sourceLang . '_to_' . $targetLang . '_' . date('dmy-His') . '.xml';

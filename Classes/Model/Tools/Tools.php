@@ -1599,14 +1599,14 @@ class Tools
             }
         }
 
-        $resource = $queryBuilder->execute();
+        $resource = $queryBuilder->executeQuery();
         $results = [];
-        while (($data = $resource->fetch(PDO::FETCH_ASSOC))) {
+        while (($data = $resource->fetchAssociative())) {
             if ($this->canUserEditRecord($table, $data)) {
                 $results[] = $data;
             }
         }
-        $resource->closeCursor();
+        $resource->free();
 
         return $results;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Localizationteam\L10nmgr\Model\Dto;
 
 use Exception;
+use ReflectionNamedType;
 use ReflectionProperty;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -80,8 +81,11 @@ class EmConfiguration
         foreach ($configuration as $key => $value) {
             if (property_exists(__CLASS__, $key)) {
                 $property = new ReflectionProperty($this, $key);
-                $type = $property->getType()?->getName();
-                settype($value, $type);
+                $type = $property->getType();
+                if ($type instanceof ReflectionNamedType) {
+                    $typeName = $type->getName();
+                    settype($value, $typeName);
+                }
                 $this->$key = $value;
             }
         }

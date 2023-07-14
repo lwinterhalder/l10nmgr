@@ -54,9 +54,8 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
      * @param int $languageId Id of the language to be loaded
      * @param bool $fillItems Populates the entries directly on load, might be bad for memory on large collections
      * @param string $tableName Name of table from which entries should be loaded
-     * @param string $pageId ID of the page
+     * @param int $pageId ID of the page
      * @return CollectionInterface
-     * @throws DBALException
      */
     public static function load($languageId, $fillItems = false, string $tableName = '', int $pageId = 0): CollectionInterface
     {

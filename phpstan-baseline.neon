@@ -6,11 +6,6 @@ parameters:
 			path: Classes/Command/Export.php
 
 		-
-			message: "#^Access to an undefined property TYPO3\\\\CMS\\\\Core\\\\Configuration\\\\FlexForm\\\\FlexFormTools\\:\\:\\$traverseFlexFormXMLData_Data\\.$#"
-			count: 3
-			path: Classes/Model/Tools/Tools.php
-
-		-
 			message: "#^Constant CR not found\\.$#"
 			count: 1
 			path: Classes/Model/Tools/XmlTools.php
