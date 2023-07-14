@@ -2,10 +2,45 @@
   "name": "localizationteam/l10nmgr",
   "type": "typo3-cms-extension",
   "description": "Module for managing localization import and export",
-  "homepage": "https://docs.typo3.org/typo3cms/extensions/l10nmgr/",
+  "homepage": "https://extensions.typo3.org/extension/l10nmgr",
   "authors": [
     {
+      "name": "Kasper Skaarhoej",
+	  "email": "kasperYYYY@typo3.com",
+      "role": "Developer"
+    },
+	{
+     "name": "Daniel Zielinski",
+  	 "email": "info@loctimize.com",
+     "role": "Developer",
+     "homepage": "https://loctimize.com"
+    },
+	{
+     "name": "Daniel Poetzinger",
+     "role": "Developer"
+    },
+	{
+	  "name": "Fabian Seltmann",
+	  "role": "Developer"
+	},
+	{
+	  "name": "Andreas Otto",
+	  "role": "Developer"
+	},
+	{
+	  "name": "Jo Hasenau",
+	  "email": "info@cybercraft.de",
+	  "role": "Developer",
+	  "homepage": "https://cybercraft.de"
+	},
+	{
+	  "name": "Peter Russ",
+	  "email": "pruss@uon.li",
+	  "role": "Developer"
+	},
+    {
       "name": "Stefano Kowalke",
+	  "email": "info@arroba-it.de",
       "role": "Developer",
       "homepage": "https://arroba-it.de"
     }
@@ -24,8 +59,16 @@
     "language"
   ],
   "support": {
-    "issues": "https://forge.typo3.org/projects/extension-l10nmgr/issues"
+    "issues": "https://github.com/CodersCare/l10nmgr/issues",
+	"docs": "https://docs.typo3.org/p/localizationteam/l10nmgr/main/en-us",
+	"source": "https://github.com/CodersCare/l10nmgr"
   },
+  "funding": [
+	{
+	  "type": "other",
+	  "url": "https://coders.care/de/services/crowdfunding/l10nmgr-und-localizer"
+	}
+  ],
   "require": {
     "ext-pdo": "*",
 	"ext-ftp": "*",

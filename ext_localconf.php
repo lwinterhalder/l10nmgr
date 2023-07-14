@@ -9,7 +9,7 @@ defined('TYPO3') or die();
 
 //! increase with every change to XML Format
 const L10NMGR_FILEVERSION = '2.0';
-const L10NMGR_VERSION = '11.0.0';
+const L10NMGR_VERSION = '12.0.0';
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['processDatamapClass']['tx_l10nmgr'] = \Localizationteam\L10nmgr\Hooks\Tcemain::class;
 
 // Enable stats

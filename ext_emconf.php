@@ -14,13 +14,13 @@ $EM_CONF[$_EXTKEY] = [
     'version'          => '12.0.0',
     'state'            => 'alpha',
     'clearCacheOnLoad' => true,
-    'author'           => 'Kasper Skaarhoej, Daniel Zielinski, Daniel Poetzinger, Fabian Seltmann, Andreas Otto, Jo Hasenau, Peter Russ',
-    'author_email'     => 'kasperYYYY@typo3.com, info@loctimize.com, info@cybercraft.de, pruss@uon.li',
+    'author'           => 'Kasper Skaarhoej, Daniel Zielinski, Daniel Poetzinger, Fabian Seltmann, Andreas Otto, Jo Hasenau, Peter Russ, Stefano Kowalke',
+    'author_email'     => 'kasperYYYY@typo3.com, info@loctimize.com, , , , info@cybercraft.de, pruss@uon.li, info@arroba-it.de',
     'author_company'   => 'Localization Manager Team',
     'constraints'      => [
         'depends'   => [
-            'typo3'              => '10.0.0-11.5.99',
-            'scheduler'          => '10.0.0-11.5.99',
+            'typo3'              => '11.ß.0-12.4.99',
+            'scheduler'          => '11.0.0-12.4.99',
         ],
         'conflicts' => [],
         'suggests'  => [],
