@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Localizationteam\L10nmgr\Test;
 
 use Localizationteam\L10nmgr\Model\Dto\EmConfiguration;
-use Nimut\TestingFramework\TestCase\UnitTestCase;
+use TYPO3\TestingFramework\Core\BaseTestCase;
 
-class EmConfigurationTest extends UnitTestCase
+class EmConfigurationTest extends BaseTestCase
 {
     protected EmConfiguration $subject;
 
@@ -247,10 +247,7 @@ class EmConfigurationTest extends UnitTestCase
     /**
      * @return array[]
      */
-    /**
-     * @return array[]
-     */
-    public function ftpCredentialsDataProvider(): array
+    public static function ftpCredentialsDataProvider(): array
     {
         return [
             'No FTP-Credentials given returns false' => [

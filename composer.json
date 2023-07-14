@@ -82,6 +82,7 @@
     "friendsofphp/php-cs-fixer": "^3.1.0",
     "friendsoftypo3/phpstan-typo3": "^0.9",
     "phpstan/phpstan": "^1.10"
+    "typo3/testing-framework": "^8.0"
   },
   "autoload": {
     "psr-4": {
@@ -111,6 +112,8 @@
     "ci:php:fixer": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
     "ci:php:stan": ".Build/vendor/bin/phpstan analyze --no-progress -c phpstan.neon",
     "phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
+	"test:unit": ".Build/vendor/bin/phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
+	"test:functional": ".Build/vendor/bin/phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
     "typo3:docs:render": [
       "docker compose run --rm t3docmake"
     ],

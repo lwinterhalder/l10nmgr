@@ -38,3 +38,8 @@ test_php_8.1:
 # test_php_8.2: @ Check the code compatibility with PHP 8.2
 test_php_8.2:
 	phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp
+unittest:
+	composer test:unit
+
+functionaltest:
+	composer test:functional

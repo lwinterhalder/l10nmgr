@@ -23,7 +23,7 @@ namespace Localizationteam\L10nmgr\Test;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
  * Test case for checking the xmltools class
@@ -31,26 +31,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Daniel Poetzinger <poetzinger@aoemedia.de>
  * @author Michael Klapper <klapper@aoemedia.de>
  */
-class XmlToolsTestCase extends tx_phpunit_testcase
+class XmlToolsTest extends FunctionalTestCase
 {
-    /**
-     * @var XmlTools
-     */
     protected XmlTools $XMLtools;
 
-    /**
-     * setUp
-     * Create the XMLtools object
-     */
-    public function setUp()
+    protected array $testExtensionsToLoad = ['typo3conf/ext/l10nmgr'];
+
+    public function setUp(): void
     {
-        $this->XMLtools = GeneralUtility::makeInstance(XmlTools::class);
+        parent::setUp();
+        $this->XMLtools = $this->getContainer()->get(XmlTools::class);
     }
 
     /**
-     * test_isXMLString
+     * @test
      */
-    public function test_isXMLString()
+    public function isXMLString(): void
     {
         //prepare testdatas
         $_fixture_noXML = '<a>my test<p>test</p>';
@@ -64,9 +60,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * test_simpleTransformationTest
+     * @test
      */
-    public function test_simpleTransformationTest()
+    public function simpleTransformationTest(): void
     {
         //prepare testdata
         $fixtureRTE = '<link 3>my link</link><strong>strong text</strong>' . "\n";
@@ -82,9 +78,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * test_transformationLinkTagTest
+     * @test
      */
-    public function test_transformationLinkTagTest()
+    public function transformationLinkTagTest(): void
     {
         //prepare testdata
         $fixtureRTE = '<link 3 target class "name">my link</link><strong>strong text</strong>' . "\n";
@@ -101,9 +97,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * test_transformationEntityTest
+     * @test
      */
-    public function test_transformationEntityTest()
+    public function transformationEntityTest(): void
     {
         //prepare testdata
         $fixtureRTE = '& &amp; &nbsp; ich&du';
@@ -120,9 +116,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * test_keepXHTMLValidBRTest
+     * @test
      */
-    public function test_keepXHTMLValidBRTest()
+    public function keepXHTMLValidBRTest(): void
     {
         // prepare the test data
         $fixtureRTE = 'here coms some .. 8747()/=<="($<br />';
@@ -134,9 +130,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * testr_keepXHMLValidBRInnerList
+     * @test
      */
-    public function testr_keepXHMLValidBRInnerList()
+    public function keepXHMLValidBRInnerList(): void
     {
         //prepare the test data
         $fixtureRTE = '<ul><li>  Sign on with a single user name and password to simplify user management and support  </li><li> Easily share individual applications and documents with the click of a mouse  </li><li> Simplify meeting participation with callbacks and 800 numbers through our integrated telephony and audio<br /><br /> </li></ul>';
@@ -148,9 +144,9 @@ class XmlToolsTestCase extends tx_phpunit_testcase
     }
 
     /**
-     * test_removeDeadLinkHandlingTest
+     * @test
      */
-    public function test_removeDeadLinkHandlingTest()
+    public function removeDeadLinkHandlingTest(): void
     {
         // prepare testdata
         $fixtureRTE = 'here comes some ... <link 92783928>this is my link</link>';
