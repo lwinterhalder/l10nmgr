@@ -198,7 +198,6 @@ class Import extends L10nCommand
      *
      * @return int ID of the workspace to import to
      * @throws Exception
-     * @throws Exception
      */
     protected function getWsIdFromCATXML(string $xml): int
     {
@@ -207,7 +206,7 @@ class Import extends L10nCommand
         }
         preg_match('/<t3_workspaceId>([^<]+)/', $xml, $matches);
         if (!empty($matches)) {
-            return $matches[1];
+            return (int)$matches[1];
         }
         throw new Exception('No workspace id found in the passed XML', 1322475562);
     }
