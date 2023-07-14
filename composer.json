@@ -81,7 +81,8 @@
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.1.0",
     "friendsoftypo3/phpstan-typo3": "^0.9",
-    "phpstan/phpstan": "^1.10"
+    "phpcompatibility/php-compatibility": "^9.3",
+    "phpstan/phpstan": "^1.10",
     "typo3/testing-framework": "^8.0"
   },
   "autoload": {
@@ -114,6 +115,8 @@
     "phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
 	"test:unit": ".Build/vendor/bin/phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
 	"test:functional": ".Build/vendor/bin/phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
+	"phpcs:testphp:81": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp,public",
+	"phpcs:testphp:82": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp,public",
     "typo3:docs:render": [
       "docker compose run --rm t3docmake"
     ],

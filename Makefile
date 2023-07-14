@@ -33,11 +33,12 @@ Documentation-GENERATED-temp: docs_render
 
 # test_php_8.1: @ Check the code compatibility with PHP 8.1
 test_php_8.1:
-	phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp
+	composer phpcs:testphp:81
 
 # test_php_8.2: @ Check the code compatibility with PHP 8.2
 test_php_8.2:
-	phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp
+	composer phpcs:testphp:82
+
 unittest:
 	composer test:unit
 
