@@ -13,6 +13,11 @@ services:
       $t8Tools: '@TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider'
       $connectionPool: '@TYPO3\CMS\Core\Database\ConnectionPool'
 
+  Localizationteam\L10nmgr\Model\Tools\XmlTools:
+    public: true
+    arguments:
+      $parseHTML: '@TYPO3\CMS\Core\Html\RteHtmlParser'
+
   Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry:
     tags:
       - name: event.listener
