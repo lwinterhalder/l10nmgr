@@ -469,7 +469,7 @@ class Import extends L10nCommand
         $files = [];
         // If no file path was given, try to gather files from FTP
         if (empty($file)) {
-            if (!empty($this->getExtConf()->getFtpServer())) {
+            if (!empty($this->emConfiguration->getFtpServer())) {
                 $files = $this->getFilesFromFtp();
             }
         } else {
@@ -501,23 +501,23 @@ class Import extends L10nCommand
     {
         $files = [];
         // First try connecting and logging in
-        $connection = ftp_connect($this->getExtConf()->getFtpServer());
+        $connection = ftp_connect($this->emConfiguration->getFtpServer());
         if ($connection === false) {
             throw new Exception('Could not connect to FTP server', 1322489458);
         }
         if (@ftp_login(
             $connection,
-            $this->getExtConf()->getFtpServerUsername(),
-            $this->getExtConf()->getFtpServerPassword()
+            $this->emConfiguration->getFtpServerUsername(),
+            $this->emConfiguration->getFtpServerPassword()
         )
         ) {
             ftp_pasv($connection, true);
             // If a path was defined, change directory to this path
-            if (!empty($this->getExtConf()->getFtpServerDownPath())) {
-                $result = ftp_chdir($connection, $this->getExtConf()->getFtpServerDownPath());
+            if (!empty($this->emConfiguration->getFtpServerDownPath())) {
+                $result = ftp_chdir($connection, $this->emConfiguration->getFtpServerDownPath());
                 if ($result === false) {
                     throw new Exception(
-                        'Could not change to directory: ' . $this->getExtConf()->getFtpServerDownPath(),
+                        'Could not change to directory: ' . $this->emConfiguration->getFtpServerDownPath(),
                         1322489723
                     );
                 }
@@ -653,9 +653,9 @@ class Import extends L10nCommand
     protected function sendMailNotification()
     {
         // Send mail only if notifications are active and at least one file was imported
-        if ($this->getExtConf()->isEnableNotification() && count($this->filesImported) > 0) {
+        if ($this->emConfiguration->isEnableNotification() && count($this->filesImported) > 0) {
             // If at least a recipient is indeed defined, proceed with sending the mail
-            $recipients = GeneralUtility::trimExplode(',', $this->getExtConf()->getEmailRecipientImport());
+            $recipients = GeneralUtility::trimExplode(',', $this->emConfiguration->getEmailRecipientImport());
             if (count($recipients) > 0) {
                 // First of all get a list of all workspaces and all l10nmgr configurations to use in the reporting
                 /** @var QueryBuilder $queryBuilder */
@@ -739,7 +739,7 @@ class Import extends L10nCommand
                 }
                 // Add signature
                 $message .= "\n\n" . $this->getLanguageService()->getLL('email.goodbye.msg');
-                $message .= "\n" . $this->getExtConf()->getEmailSenderName();
+                $message .= "\n" . $this->emConfiguration->getEmailSenderName();
                 $subject = sprintf(
                     $this->getLanguageService()->getLL('import.mail.subject'),
                     $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''
@@ -747,7 +747,7 @@ class Import extends L10nCommand
                 // Instantiate the mail object, set all necessary properties and send the mail
                 /** @var MailMessage $mailObject */
                 $mailObject = GeneralUtility::makeInstance(MailMessage::class);
-                $mailObject->setFrom([$this->getExtConf()->getEmailSender() => $this->getExtConf()->getEmailSenderName()]);
+                $mailObject->setFrom([$this->emConfiguration->getEmailSender() => $this->emConfiguration->getEmailSenderName()]);
                 $mailObject->setTo($recipients);
                 $mailObject->setSubject($subject);
                 $mailObject->text($message);
