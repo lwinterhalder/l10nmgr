@@ -1245,9 +1245,9 @@ class LocalizationModuleController extends BaseModule12
      *
      * @param string $xmlFileName Name of the XML file
      * @param L10nConfiguration $l10nmgrCfgObj L10N Manager configuration object
-     * @param int $tlang ID of the language to translate to
+     * @param int $targetLanguageId ID of the language to translate to
      */
-    protected function emailNotification(string $xmlFileName, L10nConfiguration $l10nmgrCfgObj, int $tlang)
+    protected function emailNotification(string $xmlFileName, L10nConfiguration $l10nmgrCfgObj, int $targetLanguageId)
     {
         // If at least a recipient is indeed defined, proceed with sending the mail
         $recipients = GeneralUtility::trimExplode(',', $this->emConfiguration->getEmailRecipient());
@@ -1263,7 +1263,7 @@ class LocalizationModuleController extends BaseModule12
                 $l10nmgrCfgObj->l10ncfg['sourceLangStaticId'] ?? 0,
                 'lg_iso_2'
             );
-            $targetStaticLang = BackendUtility::getRecord('sys_language', $tlang, 'static_lang_isocode');
+            $targetStaticLang = BackendUtility::getRecord('sys_language', $targetLanguageId, 'static_lang_isocode');
             $targetStaticLangArr = BackendUtility::getRecord(
                 'static_languages',
                 $targetStaticLang['static_lang_isocode'] ?? 0,

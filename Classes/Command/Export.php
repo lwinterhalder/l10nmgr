@@ -152,14 +152,14 @@ class Export extends L10nCommand
         }
 
         // get target languages
-        $tlang = $input->getOption('target') ?? '0';
-        $tlangs = [];
-        if ($tlang !== '0') {
+        $targetLanguageIdsFromCli = $input->getOption('target') ?? '0';
+        $targetLanguageIds = [];
+        if ($targetLanguageIdsFromCli !== '0') {
             //export single
-            $tlangs = explode(',', $tlang);
+            $targetLanguageIds = explode(',', $targetLanguageIdsFromCli);
         } elseif (!empty($this->emConfiguration->getL10NmgrTlangs())) {
             //export multiple
-            $tlangs = explode(',', $this->emConfiguration->getL10NmgrTlangs());
+            $targetLanguageIds = explode(',', $this->emConfiguration->getL10NmgrTlangs());
         } else {
             $output->writeln('<error>' . $this->getLanguageService()->getLL('error.target_language_id.msg') . '</error>');
             $error = true;
@@ -187,13 +187,13 @@ class Export extends L10nCommand
                 $output->writeln('<error>' . $this->getLanguageService()->getLL('error.l10ncfg_id_int.msg') . '</error>');
                 return 1;
             }
-            foreach ($tlangs as $tlang) {
-                if (MathUtility::canBeInterpretedAsInteger($tlang) === false) {
+            foreach ($targetLanguageIds as $targetLanguageId) {
+                if (MathUtility::canBeInterpretedAsInteger($targetLanguageId) === false) {
                     $output->writeln('<error>' . $this->getLanguageService()->getLL('error.target_language_id_integer.msg') . '</error>');
                     return 1;
                 }
                 try {
-                    $msg .= $this->exportXML((int)$l10ncfg, (int)$tlang, (string)$format, $input, $output);
+                    $msg .= $this->exportXML((int)$l10ncfg, (int)$targetLanguageId, (string)$format, $input, $output);
                 } catch (Exception $e) {
                     $output->writeln('<error>' . $e->getMessage() . '</error>');
                     return 1;
@@ -213,7 +213,7 @@ class Export extends L10nCommand
      * exportCATXML which is called over cli
      *
      * @param int $l10ncfg ID of the configuration to load
-     * @param int $tlang ID of the language to translate to
+     * @param int $targetLanguageId ID of the language to translate to
      * @param string $format
      * @param InputInterface $input
      * @param OutputInterface $output
@@ -221,7 +221,7 @@ class Export extends L10nCommand
      * @return string An error message in case of failure
      * @throws Exception
      */
-    protected function exportXML(int $l10ncfg, int $tlang, string $format, InputInterface $input, OutputInterface $output): string
+    protected function exportXML(int $l10ncfg, int $targetLanguageId, string $format, InputInterface $input, OutputInterface $output): string
     {
         $error = '';
         // Load the configuration
@@ -233,7 +233,7 @@ class Export extends L10nCommand
         if ($l10nmgrCfgObj->isLoaded()) {
             if ($format == 'CATXML') {
                 /** @var CatXmlView $l10nmgrGetXML */
-                $l10nmgrGetXML = GeneralUtility::makeInstance(CatXmlView::class, $l10nmgrCfgObj, $tlang);
+                $l10nmgrGetXML = GeneralUtility::makeInstance(CatXmlView::class, $l10nmgrCfgObj, $targetLanguageId);
                 if ($input->hasOption('baseUrl')) {
                     $baseUrl = $input->getOption('baseUrl');
                     $baseUrl = rtrim($baseUrl, '/') . '/';
@@ -246,7 +246,7 @@ class Export extends L10nCommand
                     ]
                 );
             } elseif ($format == 'EXCEL') {
-                $l10nmgrGetXML = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nmgrCfgObj, $tlang);
+                $l10nmgrGetXML = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nmgrCfgObj, $targetLanguageId);
             } else {
                 throw new Exception("Wrong format. Use 'CATXML' or 'EXCEL'");
             }
@@ -287,7 +287,7 @@ class Export extends L10nCommand
                     if (empty($this->emConfiguration->getEmailRecipient())) {
                         $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.repient_missing.msg') . '</error>');
                     }
-                    $this->emailNotification($xmlFileName, $l10nmgrCfgObj, $tlang);
+                    $this->emailNotification($xmlFileName, $l10nmgrCfgObj, $targetLanguageId);
                 } else {
                     $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.notification_disabled.msg') . '</error>');
                 }
@@ -319,9 +319,9 @@ class Export extends L10nCommand
      *
      * @param string $xmlFileName Name of the XML file
      * @param L10nConfiguration $l10nmgrCfgObj L10N Manager configuration object
-     * @param int $tlang ID of the language to translate to
+     * @param int $targetLanguageId ID of the language to translate to
      */
-    protected function emailNotification(string $xmlFileName, L10nConfiguration $l10nmgrCfgObj, int $tlang)
+    protected function emailNotification(string $xmlFileName, L10nConfiguration $l10nmgrCfgObj, int $targetLanguageId)
     {
         // If at least a recipient is indeed defined, proceed with sending the mail
         $recipients = GeneralUtility::trimExplode(',', $this->emConfiguration->getEmailRecipient());
@@ -337,7 +337,7 @@ class Export extends L10nCommand
                 $l10nmgrCfgObj->l10ncfg['sourceLangStaticId'] ?? 0,
                 'lg_iso_2'
             );
-            $targetStaticLang = BackendUtility::getRecord('sys_language', $tlang, 'static_lang_isocode');
+            $targetStaticLang = BackendUtility::getRecord('sys_language', $targetLanguageId, 'static_lang_isocode');
             $targetStaticLangArr = BackendUtility::getRecord(
                 'static_languages',
                 $targetStaticLang['static_lang_isocode'] ?? 0,
