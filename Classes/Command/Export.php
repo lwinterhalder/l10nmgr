@@ -24,15 +24,14 @@ namespace Localizationteam\L10nmgr\Command;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
+use Localizationteam\L10nmgr\Services\NotificationService;
 use Localizationteam\L10nmgr\View\CatXmlView;
 use Localizationteam\L10nmgr\View\ExcelXmlView;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Exception;
-use TYPO3\CMS\Core\Mail\MailMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 
@@ -201,7 +200,6 @@ class Export extends L10nCommand
             }
         }
 
-        // Send email notification if set
         $time_end = microtime(true);
         $time = $time_end - $time_start;
         $output->writeln($msg . LF);
@@ -287,7 +285,10 @@ class Export extends L10nCommand
                     if (empty($this->emConfiguration->getEmailRecipient())) {
                         $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.repient_missing.msg') . '</error>');
                     }
-                    $this->emailNotification($xmlFileName, $l10nmgrCfgObj, $targetLanguageId);
+
+                    /** @var NotificationService $notificationService */
+                    $notificationService = GeneralUtility::makeInstance(NotificationService::class);
+                    $notificationService->sendMail($xmlFileName, $l10nmgrCfgObj, $targetLanguageId, $this->emConfiguration);
                 } else {
                     $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.notification_disabled.msg') . '</error>');
                 }
@@ -312,88 +313,6 @@ class Export extends L10nCommand
             $error .= $this->getLanguageService()->getLL('error.l10nmgr.object_not_loaded.msg') . "\n";
         }
         return $error;
-    }
-
-    /**
-     * The function emailNotification sends an email with a translation job to the recipient specified in the extension config.
-     *
-     * @param string $xmlFileName Name of the XML file
-     * @param L10nConfiguration $l10nmgrCfgObj L10N Manager configuration object
-     * @param int $targetLanguageId ID of the language to translate to
-     */
-    protected function emailNotification(string $xmlFileName, L10nConfiguration $l10nmgrCfgObj, int $targetLanguageId)
-    {
-        // If at least a recipient is indeed defined, proceed with sending the mail
-        $recipients = GeneralUtility::trimExplode(',', $this->emConfiguration->getEmailRecipient());
-        if (count($recipients) > 0) {
-            $jobsOutPath = Environment::getPublicPath() . '/uploads/tx_l10nmgr/jobs/out/';
-            if (!is_dir(GeneralUtility::getFileAbsFileName($jobsOutPath))) {
-                GeneralUtility::mkdir_deep($jobsOutPath);
-            }
-            $fullFilename = $jobsOutPath . $xmlFileName;
-            // Get source & target language ISO codes
-            $sourceStaticLangArr = BackendUtility::getRecord(
-                'static_languages',
-                $l10nmgrCfgObj->l10ncfg['sourceLangStaticId'] ?? 0,
-                'lg_iso_2'
-            );
-            $targetStaticLang = BackendUtility::getRecord('sys_language', $targetLanguageId, 'static_lang_isocode');
-            $targetStaticLangArr = BackendUtility::getRecord(
-                'static_languages',
-                $targetStaticLang['static_lang_isocode'] ?? 0,
-                'lg_iso_2'
-            );
-            $sourceLang = $sourceStaticLangArr['lg_iso_2'] ?? 0;
-            $targetLang = $targetStaticLangArr['lg_iso_2'] ?? 0;
-            // Collect mail data
-            $fromMail = $this->emConfiguration->getEmailSender();
-            $fromName = $this->emConfiguration->getEmailSenderName();
-            $subject = sprintf(
-                $this->getLanguageService()->getLL('email.subject.msg'),
-                $sourceLang,
-                $targetLang,
-                $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''
-            );
-            // Assemble message body
-            $message = [
-                'msg1' => $this->getLanguageService()->getLL('email.greeting.msg'),
-                'msg2' => '',
-                'msg3' => sprintf(
-                    $this->getLanguageService()->getLL('email.new_translation_job.msg'),
-                    $sourceLang,
-                    $targetLang,
-                    $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''
-                ),
-                'msg4' => $this->getLanguageService()->getLL('email.info.msg'),
-                'msg5' => $this->getLanguageService()->getLL('email.info.import.msg'),
-                'msg6' => '',
-                'msg7' => $this->getLanguageService()->getLL('email.goodbye.msg'),
-                'msg8' => $fromName,
-                'msg9' => '--',
-                'msg10' => $this->getLanguageService()->getLL('email.info.exported_file.msg'),
-                'msg11' => $xmlFileName,
-            ];
-            if ($this->emConfiguration->isEmailAttachment()) {
-                $message['msg3'] = sprintf(
-                    $this->getLanguageService()->getLL('email.new_translation_job_attached.msg'),
-                    $sourceLang,
-                    $targetLang,
-                    $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] ?? ''
-                );
-            }
-            $msg = implode(chr(10), $message);
-            // Instantiate the mail object, set all necessary properties and send the mail
-            /** @var MailMessage $mailObject */
-            $mailObject = GeneralUtility::makeInstance(MailMessage::class);
-            $mailObject->setFrom([$fromMail => $fromName]);
-            $mailObject->setTo($recipients);
-            $mailObject->setSubject($subject);
-            $mailObject->text($msg);
-            if ($this->emConfiguration->isEmailAttachment()) {
-                $mailObject->attach($fullFilename);
-            }
-            $mailObject->send();
-        }
     }
 
     /**
