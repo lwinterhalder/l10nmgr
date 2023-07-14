@@ -19,6 +19,3 @@ Language visibility (languagevisibility):
 
 Language detection (rlmp_language_detection):
 	Detects the visitors preferred language and redirects to the localized pages accordingly.
-
-Flag icons for sys_languages (syslanguage_flags):
-	Adds 200 flag icons to sys_language flag selection.

@@ -270,11 +270,9 @@ class LanguageRestrictionRegistry implements SingletonInterface
 
     /**
      * Get the config array for given table and field.
-     * This method does NOT take care of adding sql fields, adding the field to TCA types
-     * nor does it set the MM_oppositeUsage in the sys_language TCA. This has to be taken care of manually!
+     * This method does NOT take care of adding sql fields or adding the field to TCA types.
+     * This has to be taken care of manually!
      *
-     * @param string $tableName The table name
-     * @param string $fieldName The field name (default l10nmgr_language_restriction)
      * @param array $fieldConfigurationOverride Changes to the default configuration
      * @return array
      * @api

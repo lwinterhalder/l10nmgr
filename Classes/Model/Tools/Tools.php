@@ -174,6 +174,7 @@ class Tools
         protected readonly ConnectionPool $connectionPool,
     ) {
         // Find all system languages:
+        // TODO: Refactor this to SiteConfiguration and get the languages from there. Its unclear to present me how to get the current page ID but future me will figure that out.
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_language');
         $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAllAssociative();
@@ -626,6 +627,9 @@ class Tools
 
     /**
      * Creating localization index for a single record (which must be default/international language and an online version!)
+     *
+     * @todo In case of reactivation of the ClickMenu, this needs to be refactored as well. The table `sys_language` does not
+     * @todo anymore and the languages has to be taken from the SiteConfiguration.
      *
      * @param string $table Table name
      * @param int $uid Record UID
