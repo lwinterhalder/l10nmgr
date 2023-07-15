@@ -143,7 +143,6 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
             $output[] = "\t" . '</pageGrp>' . "\r";
         }
         // Provide a hook for specific manipulations before building the actual XML
-
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['exportCatXmlPreProcess'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['exportCatXmlPreProcess'] as $classReference) {
                 $processingObject = GeneralUtility::makeInstance($classReference);
