@@ -1,132 +1,132 @@
 {
-  "name": "localizationteam/l10nmgr",
-  "type": "typo3-cms-extension",
-  "description": "Module for managing localization import and export",
-  "homepage": "https://extensions.typo3.org/extension/l10nmgr",
-  "authors": [
-    {
-      "name": "Kasper Skaarhoej",
-	  "email": "kasperYYYY@typo3.com",
-      "role": "Developer"
-    },
-	{
-     "name": "Daniel Zielinski",
-  	 "email": "info@loctimize.com",
-     "role": "Developer",
-     "homepage": "https://loctimize.com"
-    },
-	{
-     "name": "Daniel Poetzinger",
-     "role": "Developer"
-    },
-	{
-	  "name": "Fabian Seltmann",
-	  "role": "Developer"
+	"name": "localizationteam/l10nmgr",
+	"type": "typo3-cms-extension",
+	"description": "Module for managing localization import and export",
+	"homepage": "https://extensions.typo3.org/extension/l10nmgr",
+	"authors": [
+		{
+			"name": "Kasper Skaarhoej",
+			"email": "kasperYYYY@typo3.com",
+			"role": "Developer"
+		},
+		{
+			"name": "Daniel Zielinski",
+			"email": "info@loctimize.com",
+			"role": "Developer",
+			"homepage": "https://loctimize.com"
+		},
+		{
+			"name": "Daniel Poetzinger",
+			"role": "Developer"
+		},
+		{
+			"name": "Fabian Seltmann",
+			"role": "Developer"
+		},
+		{
+			"name": "Andreas Otto",
+			"role": "Developer"
+		},
+		{
+			"name": "Jo Hasenau",
+			"email": "info@cybercraft.de",
+			"role": "Developer",
+			"homepage": "https://cybercraft.de"
+		},
+		{
+			"name": "Peter Russ",
+			"email": "pruss@uon.li",
+			"role": "Developer"
+		},
+		{
+			"name": "Stefano Kowalke",
+			"email": "info@arroba-it.de",
+			"role": "Developer",
+			"homepage": "https://arroba-it.de"
+		}
+	],
+	"license": [
+		"GPL-2.0-or-later"
+	],
+	"keywords": [
+		"TYPO3 CMS",
+		"L10N",
+		"I18N",
+		"T9N",
+		"localization",
+		"translation",
+		"internationalization",
+		"language"
+	],
+	"support": {
+		"issues": "https://github.com/CodersCare/l10nmgr/issues",
+		"docs": "https://docs.typo3.org/p/localizationteam/l10nmgr/main/en-us",
+		"source": "https://github.com/CodersCare/l10nmgr"
 	},
-	{
-	  "name": "Andreas Otto",
-	  "role": "Developer"
+	"funding": [
+		{
+			"type": "other",
+			"url": "https://coders.care/de/services/crowdfunding/l10nmgr-und-localizer"
+		}
+	],
+	"require": {
+		"ext-pdo": "*",
+		"ext-ftp": "*",
+		"ext-xml": "*",
+		"typo3/cms-backend": "^11.5 || ^12.4",
+		"typo3/cms-core": "^11.5 || ^12.4",
+		"typo3/cms-fluid": "^11.5 || ^12.4",
+		"typo3/cms-scheduler": "^11.5 || ^12.4"
 	},
-	{
-	  "name": "Jo Hasenau",
-	  "email": "info@cybercraft.de",
-	  "role": "Developer",
-	  "homepage": "https://cybercraft.de"
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^3.1.0",
+		"friendsoftypo3/phpstan-typo3": "^0.9",
+		"phpcompatibility/php-compatibility": "^9.3",
+		"phpstan/phpstan": "^1.10",
+		"typo3/testing-framework": "^8.0"
 	},
-	{
-	  "name": "Peter Russ",
-	  "email": "pruss@uon.li",
-	  "role": "Developer"
+	"autoload": {
+		"psr-4": {
+			"Localizationteam\\L10nmgr\\": "Classes"
+		}
 	},
-    {
-      "name": "Stefano Kowalke",
-	  "email": "info@arroba-it.de",
-      "role": "Developer",
-      "homepage": "https://arroba-it.de"
-    }
-  ],
-  "license": [
-    "GPL-2.0-or-later"
-  ],
-  "keywords": [
-    "TYPO3 CMS",
-    "L10N",
-    "I18N",
-    "T9N",
-    "localization",
-    "translation",
-    "internationalization",
-    "language"
-  ],
-  "support": {
-    "issues": "https://github.com/CodersCare/l10nmgr/issues",
-	"docs": "https://docs.typo3.org/p/localizationteam/l10nmgr/main/en-us",
-	"source": "https://github.com/CodersCare/l10nmgr"
-  },
-  "funding": [
-	{
-	  "type": "other",
-	  "url": "https://coders.care/de/services/crowdfunding/l10nmgr-und-localizer"
+	"autoload-dev": {
+		"psr-4": {
+			"Localizationteam\\L10nmgr\\Tests\\": "Tests"
+		}
+	},
+	"config": {
+		"preferred-install": {
+			"*": "dist"
+		},
+		"sort-packages": true,
+		"process-timeout": 1000,
+		"vendor-dir": ".Build/vendor",
+		"allow-plugins": {
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true
+		}
+	},
+	"scripts": {
+		"php:fix": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
+		"ci:php:lint": "find *.php Classes Configuration Tests -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
+		"ci:php:fixer": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
+		"ci:php:stan": ".Build/vendor/bin/phpstan analyze --no-progress -c phpstan.neon",
+		"phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
+		"test:unit": ".Build/vendor/bin/phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
+		"test:functional": ".Build/vendor/bin/phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
+		"phpcs:testphp:81": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp,public",
+		"phpcs:testphp:82": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp,public",
+		"typo3:docs:render": [
+			"docker compose run --rm t3docmake"
+		],
+		"typo3:docs:serve": [
+			"php -S 127.0.0.1:4000 -t Documentation-GENERATED-temp/Result/project/0.0.0"
+		]
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "l10nmgr"
+		}
 	}
-  ],
-  "require": {
-    "ext-pdo": "*",
-	"ext-ftp": "*",
-	"ext-xml": "*",
-    "typo3/cms-backend": "^11.5 || ^12.4",
-    "typo3/cms-core": "^11.5 || ^12.4",
-    "typo3/cms-fluid": "^11.5 || ^12.4",
-    "typo3/cms-scheduler": "^11.5 || ^12.4"
-  },
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "^3.1.0",
-    "friendsoftypo3/phpstan-typo3": "^0.9",
-    "phpcompatibility/php-compatibility": "^9.3",
-    "phpstan/phpstan": "^1.10",
-    "typo3/testing-framework": "^8.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Localizationteam\\L10nmgr\\": "Classes"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Localizationteam\\L10nmgr\\Tests\\": "Tests"
-    }
-  },
-  "config": {
-    "preferred-install": {
-      "*": "dist"
-    },
-    "sort-packages": true,
-    "process-timeout": 1000,
-    "vendor-dir": ".Build/vendor",
-    "allow-plugins": {
-      "typo3/class-alias-loader": true,
-      "typo3/cms-composer-installers": true
-    }
-  },
-  "scripts": {
-    "php:fix": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
-    "ci:php:lint": "find *.php Classes Configuration Tests -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
-    "ci:php:fixer": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
-    "ci:php:stan": ".Build/vendor/bin/phpstan analyze --no-progress -c phpstan.neon",
-    "phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
-	"test:unit": ".Build/vendor/bin/phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
-	"test:functional": ".Build/vendor/bin/phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
-	"phpcs:testphp:81": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp,public",
-	"phpcs:testphp:82": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp,public",
-    "typo3:docs:render": [
-      "docker compose run --rm t3docmake"
-    ],
-    "typo3:docs:serve": [
-      "php -S 127.0.0.1:4000 -t Documentation-GENERATED-temp/Result/project/0.0.0"
-    ]
-  },
-  "extra": {
-    "typo3/cms": {
-      "extension-key": "l10nmgr"
-    }
-  }
 }
