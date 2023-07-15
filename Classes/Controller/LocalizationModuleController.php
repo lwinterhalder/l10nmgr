@@ -719,13 +719,27 @@ class LocalizationModuleController extends BaseModule12
                 '',
                 $this->getLanguageService()->getLL('export.xml.check_exports.title')
             ) .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
-            '</label></div></div>' .
+            static::getFuncCheck(
+                $this->id,
+                'SET[import_asdefaultlanguage]',
+                $this->MOD_SETTINGS['import_asdefaultlanguage'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title')
+            ) .
+            '</div><div class="form-section">' .
+                // @extensionScannerIgnoreLine
+                self::getFuncMenu(
+                    $this->id,
+                    'SET[export_xml_forcepreviewlanguage]',
+                    $this->MOD_SETTINGS['export_xml_forcepreviewlanguage'] ?? '',
+                    $_selectOptions,
+                    '',
+                    '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                    $this->getLanguageService()->getLL('export.xml.source-language.title')
+                ) .
             '</div><div class="form-section"><div class="form-group mb-2">
-<label>' . $this->getLanguageService()->getLL('export.xml.source-language.title') . '</label><br />' .
-            $this->_getSelectField('export_xml_forcepreviewlanguage', (string)$this->previewLanguage, $_selectOptions) .
-            '</div></div><div class="form-section"><div class="form-group mb-2">
 <label>' . $this->getLanguageService()->getLL('general.action.import.upload.title') . '</label><br />' .
             '<input type="file" size="60" name="uploaded_import_file" />' .
             '</div></div><div class="form-section"><div class="form-group mb-2">' .
@@ -824,43 +838,6 @@ class LocalizationModuleController extends BaseModule12
     }
 
     /**
-     * @param string $elementName
-     * @param string $currentValue
-     * @param array $menuItems
-     * @return string
-     */
-    protected function _getSelectField(string $elementName, string $currentValue, array $menuItems): string
-    {
-        $options = [];
-        $return = '';
-        foreach ($menuItems as $value => $label) {
-            $options[] = '<option value="' . htmlspecialchars((string)$value) . '"' . (!strcmp(
-                $currentValue,
-                (string)$value
-            ) ? ' selected="selected"' : '') . '>' . htmlspecialchars(
-                (string)$label,
-                ENT_COMPAT,
-                'UTF-8',
-                false
-            ) . '</option>';
-        }
-        if (count($options) > 0) {
-            $return = '
-	<select class="form-control" name="' . $elementName . '" ' . ($currentValue ? 'disabled="disabled"' : '') . '>
-	' . implode('
-	', $options) . '
-	</select>
-	';
-        }
-
-        if ($currentValue) {
-            $return .= '<input type="hidden" name="' . $elementName . '" value="' . $currentValue . '" />';
-        }
-
-        return $return;
-    }
-
-    /**
      * Sends download header and calls render method of the view.
      * Used for excelXML and CATXML.
      *
@@ -883,7 +860,7 @@ class LocalizationModuleController extends BaseModule12
         $menuItems = [
             '0' => [
                 'label' => $this->getLanguageService()->getLL('export.xml.headline.title'),
-                'content' => $this->getTabContentXmlExport(),
+                'content' => $this->getTabContentXmlExport($l10ncfgObj),
             ],
             '1' => [
                 'label' => $this->getLanguageService()->getLL('import.xml.headline.title'),
@@ -959,14 +936,11 @@ class LocalizationModuleController extends BaseModule12
         }
         // If export of XML is asked for, do that (this will exit and push a file for download, or upload to FTP is option is checked)
         if (GeneralUtility::_POST('export_xml')) {
-            // Save user prefs
-            $this->getBackendUser()->pushModuleData('l10nmgr/cm1/checkUTF8', GeneralUtility::_POST('check_utf8'));
             // Render the XML
             /** @var CatXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10ncfgObj, $this->sysLanguage);
-            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
-            if ($export_xml_forcepreviewlanguage > 0) {
-                $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
+            if ($this->MOD_SETTINGS['export_xml_forcepreviewlanguage'] ?? false) {
+                $viewClass->setForcedSourceLanguage((int)($this->MOD_SETTINGS['export_xml_forcepreviewlanguage'] ?? 0));
             }
             if ($this->MOD_SETTINGS['onlyChangedContent'] ?? false) {
                 $viewClass->setModeOnlyChanged();
@@ -1086,25 +1060,49 @@ class LocalizationModuleController extends BaseModule12
     /**
      * @return string
      */
-    protected function getTabContentXmlExport(): string
+    protected function getTabContentXmlExport(L10nConfiguration $l10ncfgObj): string
     {
         $_selectOptions = ['0' => '-default-'];
         $_selectOptions = $_selectOptions + ($this->MOD_MENU['lang'] ?? []);
         $tabContentXmlExport = '<div class="form-section">' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="check_exports" /> ' . $this->getLanguageService()->getLL('export.xml.check_exports.title') .
-            '</label></div></div>' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" checked="checked" name="no_check_xml" /> ' . $this->getLanguageService()->getLL('export.xml.no_check_xml.title') .
-            '</label></div></div>' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="check_utf8" /> ' . $this->getLanguageService()->getLL('export.xml.checkUtf8.title') .
-            '</label></div></div>' .
+            static::getFuncCheck(
+                $this->id,
+                'SET[check_exports]',
+                $this->MOD_SETTINGS['check_exports'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('export.xml.check_exports.title')
+            ) .
+            static::getFuncCheck(
+                $this->id,
+                'SET[no_check_xml]',
+                $this->MOD_SETTINGS['no_check_xml'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('export.xml.no_check_xml.title')
+            ) .
+            static::getFuncCheck(
+                $this->id,
+                'SET[check_utf8]',
+                $this->MOD_SETTINGS['check_utf8'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('export.xml.checkUtf8.title')
+            ) .
             '</div><div class="form-section">' .
-            '<div class="form-group mb-2">' .
-            '<label>' . $this->getLanguageService()->getLL('export.xml.source-language.title') . '</label><br />' .
-            $this->_getSelectField('export_xml_forcepreviewlanguage', (string)$this->previewLanguage, $_selectOptions) .
-            '</div></div>';
+                // @extensionScannerIgnoreLine
+                self::getFuncMenu(
+                    $this->id,
+                    'SET[export_xml_forcepreviewlanguage]',
+                    $this->MOD_SETTINGS['export_xml_forcepreviewlanguage'] ?? '',
+                    $_selectOptions,
+                    '',
+                    '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                    $this->getLanguageService()->getLL('export.xml.source-language.title')
+                ) . '</div>';
         // Add the option to send to FTP server, if FTP information is defined
         if ($this->emConfiguration->hasFtpCredentials()) {
             $tabContentXmlExport .= '<input type="checkbox" value="1" name="ftp_upload" id="tx_l10nmgr_ftp_upload" />
@@ -1258,8 +1256,12 @@ class LocalizationModuleController extends BaseModule12
             ],
             'lang' => [],
             'onlyChangedContent' => '',
+            'check_utf8' => 1,
             'check_exports' => 1,
+            'no_check_xml' => 0,
             'noHidden' => '',
+            'import_asdefaultlanguage' => 0,
+            'export_xml_forcepreviewlanguage' => 0,
         ];
 
         $configuration = $this->getL10NConfiguration();
@@ -1349,9 +1351,9 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function exportImportXmlAction(L10nConfiguration $l10NConfiguration): string
     {
-        $prefs['utf8'] = GeneralUtility::_POST('check_utf8');
-        $prefs['noxmlcheck'] = GeneralUtility::_POST('no_check_xml');
-        $prefs['check_exports'] = GeneralUtility::_POST('check_exports');
+        $prefs['check_utf8'] = (bool)$this->MOD_SETTINGS['check_utf8'];
+        $prefs['noxmlcheck'] = (bool)$this->MOD_SETTINGS['no_check_xml'];
+        $prefs['check_exports'] = (bool)$this->MOD_SETTINGS['check_exports'];
         $this->getBackendUser()->pushModuleData('l10nmgr/cm1/prefs', $prefs);
 
         return $this->catXMLExportImportAction($l10NConfiguration);

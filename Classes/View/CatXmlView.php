@@ -258,14 +258,14 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
                 $this->overrideParams
             );
         }
-        if (!empty($this->params['utf8'])) {
+        if (!empty($this->params['check_utf8'])) {
             $dataForTranslation = Utf8Tools::utf8_bad_strip($dataForTranslation);
-        }
-        if ($xmlTool->isValidXMLString($dataForTranslation)) {
-            return $dataForTranslation;
         }
         if (!empty($this->params['noxmlcheck'])) {
             return '<![CDATA[' . $dataForTranslation . ']]>';
+        }
+        if ($xmlTool->isValidXMLString($dataForTranslation)) {
+            return $dataForTranslation;
         }
         return null;
     }
