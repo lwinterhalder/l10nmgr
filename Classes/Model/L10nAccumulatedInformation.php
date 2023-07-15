@@ -272,76 +272,74 @@ class L10nAccumulatedInformation
                 $accum[$pageId]['header']['prevLang'] = $previewLanguage;
                 $accum[$pageId]['header']['url'] = (string)$siteFinder->getSiteByPageId($pageId)->getRouter()->generateUri($pageId);
                 $accum[$pageId]['items'] = [];
+
                 // Traverse tables:
-                if (!empty($GLOBALS['TCA'])) {
-                    foreach ($GLOBALS['TCA'] as $table => $cfg) {
-                        // Only those tables we want to work on:
-                        if (GeneralUtility::inList($l10ncfg['tablelist'] ?? '', $table)) {
-                            if ($table === 'pages') {
-                                $row = BackendUtility::getRecordWSOL('pages', $pageId);
-                                if ($t8Tools->canUserEditRecord($table, $row)) {
-                                    $accum[$pageId]['items'][$table][$pageId] = $t8Tools->translationDetails(
-                                        'pages',
-                                        $row,
-                                        $sysLang,
-                                        $flexFormDiff,
-                                        $previewLanguage
-                                    );
-                                    $this->_increaseInternalCounters($accum[$pageId]['items'][$table][$pageId]['fields'] ?? '');
-                                }
-                            } else {
-                                $allRows = $t8Tools->getRecordsToTranslateFromTable(
+                $tablesToExport = GeneralUtility::trimExplode(',', $l10ncfg['tablelist']);
+                $tablesToExport = array_intersect_key($GLOBALS['TCA'], array_flip($tablesToExport));
+                foreach ($tablesToExport as $table => $cfg) {
+                    if ($table === 'pages') {
+                        $row = BackendUtility::getRecordWSOL('pages', $pageId);
+                        if ($t8Tools->canUserEditRecord($table, $row)) {
+                            $accum[$pageId]['items'][$table][$pageId] = $t8Tools->translationDetails(
+                                'pages',
+                                $row,
+                                $sysLang,
+                                $flexFormDiff,
+                                $previewLanguage
+                            );
+                            $this->_increaseInternalCounters($accum[$pageId]['items'][$table][$pageId]['fields'] ?? '');
+                        }
+                    } else {
+                        $allRows = $t8Tools->getRecordsToTranslateFromTable(
+                            $table,
+                            $pageId,
+                            0,
+                            (bool)($l10ncfg['sortexports'] ?? false),
+                            $this->noHidden
+                        );
+                        if (empty($allRows)) {
+                            continue;
+                        }
+                        // Now, for each record, look for localization:
+                        foreach ($allRows as $row) {
+                            $rowUid = (int)($row['uid'] ?? 0);
+                            if (isset($this->excludeIndex[$table . ':' . $rowUid]) || $rowUid === 0) {
+                                continue;
+                            }
+                            if (!empty($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
+                                /** @var LanguageRestrictionCollection $languageIsRestricted */
+                                $languageIsRestricted = LanguageRestrictionCollection::load(
+                                    $sysLang,
+                                    true,
                                     $table,
-                                    $pageId,
-                                    0,
-                                    (bool)($l10ncfg['sortexports'] ?? false),
-                                    $this->noHidden
+                                    $rowUid,
                                 );
-                                if (empty($allRows)) {
+                                if ($languageIsRestricted->hasItem($rowUid)) {
+                                    $this->excludeIndex[$table . ':' . $rowUid] = 1;
                                     continue;
                                 }
-                                // Now, for each record, look for localization:
-                                foreach ($allRows as $row) {
-                                    $rowUid = (int)($row['uid'] ?? 0);
-                                    if (isset($this->excludeIndex[$table . ':' . $rowUid]) || $rowUid === 0) {
-                                        continue;
-                                    }
-                                    if (!empty($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                                        /** @var LanguageRestrictionCollection $languageIsRestricted */
-                                        $languageIsRestricted = LanguageRestrictionCollection::load(
-                                            $sysLang,
-                                            true,
-                                            $table,
-                                            $rowUid,
-                                        );
-                                        if ($languageIsRestricted->hasItem($rowUid)) {
-                                            $this->excludeIndex[$table . ':' . $rowUid] = 1;
-                                            continue;
-                                        }
-                                    }
-                                    BackendUtility::workspaceOL($table, $row);
-                                    if (empty($row)) {
-                                        continue;
-                                    }
-
-                                    $accum[$pageId]['items'][$table][$rowUid] = $t8Tools->translationDetails(
-                                        $table,
-                                        $row,
-                                        $sysLang,
-                                        $flexFormDiff,
-                                        $previewLanguage
-                                    );
-                                    if (empty($accum[$pageId]['items'][$table][$rowUid])) {
-                                        // if there is no record available anymore, skip to the next row
-                                        // records might be disabled when onlyForcedSourceLanguage is set
-                                        continue;
-                                    }
-                                    if ($table === 'sys_file_reference' && isset($row['uid_local'])) {
-                                        $fileList[] = (int)$row['uid_local'];
-                                    }
-                                    $this->_increaseInternalCounters($accum[$pageId]['items'][$table][$rowUid]['fields'] ?? []);
-                                }
                             }
+                            BackendUtility::workspaceOL($table, $row);
+                            if (empty($row)) {
+                                continue;
+                            }
+
+                            $accum[$pageId]['items'][$table][$rowUid] = $t8Tools->translationDetails(
+                                $table,
+                                $row,
+                                $sysLang,
+                                $flexFormDiff,
+                                $previewLanguage
+                            );
+                            if (empty($accum[$pageId]['items'][$table][$rowUid])) {
+                                // if there is no record available anymore, skip to the next row
+                                // records might be disabled when onlyForcedSourceLanguage is set
+                                continue;
+                            }
+                            if ($table === 'sys_file_reference' && isset($row['uid_local'])) {
+                                $fileList[] = (int)$row['uid_local'];
+                            }
+                            $this->_increaseInternalCounters($accum[$pageId]['items'][$table][$rowUid]['fields'] ?? []);
                         }
                     }
                 }
