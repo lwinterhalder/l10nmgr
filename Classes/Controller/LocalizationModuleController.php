@@ -702,7 +702,7 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function excelExportImportAction(L10nConfiguration $l10ncfgObj): string
     {
-        if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
+        if ($this->MOD_SETTINGS['import_asdefaultlanguage'] == '1') {
             $this->l10nBaseService->setImportAsDefaultLanguage(true);
         }
         // Buttons:
@@ -766,7 +766,7 @@ class LocalizationModuleController extends BaseModule12
             // Render the XML
             /** @var ExcelXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10ncfgObj, $this->sysLanguage);
-            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            $export_xml_forcepreviewlanguage = $this->MOD_SETTINGS['export_xml_forcepreviewlanguage'];
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
             }
@@ -864,7 +864,7 @@ class LocalizationModuleController extends BaseModule12
             ],
             '1' => [
                 'label' => $this->getLanguageService()->getLL('import.xml.headline.title'),
-                'content' => $this->getTabContentXmlImport(),
+                'content' => $this->getTabContentXmlImport($l10ncfgObj),
             ],
             '2' => [
                 'label' => $this->getLanguageService()->getLL('file.settings.downloads.title'),
@@ -899,7 +899,7 @@ class LocalizationModuleController extends BaseModule12
             if ($importManager->parseAndCheckXMLFile() === false) {
                 $actionInfo .= '<br /><br />' . $this->view->header($this->getLanguageService()->getLL('import.error.title')) . $importManager->getErrorMessages();
             } else {
-                if (GeneralUtility::_POST('import_delL10N') == '1') {
+                if ($this->MOD_SETTINGS['import_delL10N'] == '1') {
                     $actionInfo .= $this->getLanguageService()->getLL('import.xml.delL10N.message') . '<br />';
                     $delCount = $importManager->delL10N($importManager->getDelL10NDataFromCATXMLNodes($importManager->getXMLNodes()));
                     $actionInfo .= sprintf(
@@ -1116,7 +1116,7 @@ class LocalizationModuleController extends BaseModule12
     /**
      * @return string
      */
-    protected function getTabContentXmlImport(): string
+    protected function getTabContentXmlImport(L10nConfiguration $l10ncfgObj): string
     {
         return '<div class="form-section">' .
             (
@@ -1126,12 +1126,27 @@ class LocalizationModuleController extends BaseModule12
                 '</label></div></div>'
                 ) : ''
             ) .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="import_delL10N" /> ' . $this->getLanguageService()->getLL('import.xml.delL10N.title') .
-            '</label></div></div>' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
-            '</label></div></div></div>' .
+            // @extensionScannerIgnoreLine
+            static::getFuncCheck(
+                $this->id,
+                'SET[import_delL10N]',
+                $this->MOD_SETTINGS['import_delL10N'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('import.xml.delL10N.title')
+            ) .
+            // @extensionScannerIgnoreLine
+            static::getFuncCheck(
+                $this->id,
+                'SET[import_asdefaultlanguage]',
+                $this->MOD_SETTINGS['import_asdefaultlanguage'] ?? '',
+                '',
+                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
+                '',
+                $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title')
+            ) .
+            '</div>' .
             '<div class="form-section"><div class="form-group mb-2">' .
             '<input type="file" size="60" name="uploaded_import_file" />' .
             '</div></div>' .
@@ -1262,6 +1277,7 @@ class LocalizationModuleController extends BaseModule12
             'noHidden' => '',
             'import_asdefaultlanguage' => 0,
             'export_xml_forcepreviewlanguage' => 0,
+            'import_delL10N' => 0,
         ];
 
         $configuration = $this->getL10NConfiguration();
