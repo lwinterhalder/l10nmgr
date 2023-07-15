@@ -917,7 +917,7 @@ class Tools
     {
         // Initialize:
         $tInfo = $this->translationInfo($table, $row['uid'] ?? 0, $sysLang, null, '', $previewLanguage);
-        $tvInstalled = ExtensionManagementUtility::isLoaded('templavoila');
+        $tvInstalled = ExtensionManagementUtility::isLoaded('templavoila'); // TODO: Remove references to TemplaVoila
         $this->detailsOutput = [];
         $this->flexFormDiff = $flexFormDiff;
         if (is_array($tInfo)) {
