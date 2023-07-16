@@ -482,11 +482,15 @@ class LocalizationModuleController extends BaseModule12
             ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
             '';
         if (!empty($options)) {
+            $onChange = '';
+            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+                $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
+            }
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
                 $label .
-                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change" data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}">
+                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change" data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}"' . $onChange . '>
 	' . implode('
 	', $options) . '
 	</select>

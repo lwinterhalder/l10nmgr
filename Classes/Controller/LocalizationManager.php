@@ -56,6 +56,7 @@ use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
+use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -455,9 +456,14 @@ return false;
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
+            $onChange = '';
+            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+                $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
+            }
             return [
                 'label' => $label,
                 'elementName' => $elementName,
+                'onChange' => $onChange,
                 'url' => $scriptUrl . '&' . $elementName . '=',
                 'options' => $options,
             ];
@@ -509,11 +515,15 @@ return false;
             ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
             '';
         if (!empty($options)) {
+            $onChange = '';
+            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+                $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
+            }
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
                 $label .
-                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change"  data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}">
+                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change"  data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}"' . $onChange . '>
 	' . implode('
 	', $options) . '
 	</select>
