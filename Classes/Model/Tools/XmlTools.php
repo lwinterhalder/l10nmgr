@@ -189,9 +189,9 @@ class XmlTools implements LoggerAwareInterface
      */
     public function RTE2XML(string $content, int $withStripBadUTF8 = 0)
     {
-        //function RTE2XML($content,$withStripBadUTF8=$this->getBackendUser()->getModuleData('l10nmgr/cm1/check_utf8', '')) {
+        //function RTE2XML($content,$withStripBadUTF8=$this->getBackendUser()->getModuleData('l10nmgr/cm1/checkUTF8', '')) {
         //if (!$withStripBadUTF8) {
-        // $withStripBadUTF8 = $this->getBackendUser()->getModuleData('l10nmgr/cm1/check_utf8', '');
+        // $withStripBadUTF8 = $this->getBackendUser()->getModuleData('l10nmgr/cm1/checkUTF8', '');
         //}
         //echo '###'.$withStripBadUTF8;
         // First call special transformations (registered using hooks)
