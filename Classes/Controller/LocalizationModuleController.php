@@ -709,16 +709,9 @@ class LocalizationModuleController extends BaseModule12
         $_selectOptions = ['0' => '-default-'];
         $_selectOptions = $_selectOptions + $this->MOD_MENU['lang'];
         $info = '<div class="form-section">' .
-            // @extensionScannerIgnoreLine
-            static::getFuncCheck(
-                $this->id,
-                'SET[check_exports]',
-                $this->MOD_SETTINGS['check_exports'] ?? '',
-                '',
-                '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $l10ncfgObj->getId(),
-                '',
-                $this->getLanguageService()->getLL('export.xml.check_exports.title')
-            ) .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="check_exports" /> ' . $this->getLanguageService()->getLL('export.xml.check_exports.title') .
+            '</label></div></div>' .
             '<div class="form-group mb-2"><div class="checkbox"><label>' .
             '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
             '</label></div></div>' .
