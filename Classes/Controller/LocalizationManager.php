@@ -455,12 +455,10 @@ return false;
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
-
             return [
                 'label' => $label,
                 'elementName' => $elementName,
-                'onChange' => $onChange,
+                'url' => $scriptUrl . '&' . $elementName . '=',
                 'options' => $options,
             ];
         }
@@ -511,12 +509,11 @@ return false;
             ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
             '';
         if (!empty($options)) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
                 $label .
-                '<select class="form-control clear-both" id="' . $elementName . '" name="' . $elementName . '" onchange="' . htmlspecialchars($onChange) . '">
+                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change"  data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}">
 	' . implode('
 	', $options) . '
 	</select>
