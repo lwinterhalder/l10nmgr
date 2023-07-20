@@ -7,6 +7,9 @@ services:
   Localizationteam\L10nmgr\:
     resource: '../Classes/*'
 
+  Localizationteam\L10nmgr\Model\L10nBaseService:
+    public: true
+
   Localizationteam\L10nmgr\Model\Tools\Tools:
     public: true
     arguments:

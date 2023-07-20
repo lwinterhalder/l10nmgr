@@ -1373,7 +1373,8 @@ return false;
         $htmlListView = GeneralUtility::makeInstance(
             L10nHtmlListView::class,
             $l10NConfiguration,
-            $this->sysLanguage
+            $this->sysLanguage,
+            $this->moduleTemplate,
         );
         $action = $this->MOD_SETTINGS['action'] ?? '';
         // Render the module content (for all modes):
