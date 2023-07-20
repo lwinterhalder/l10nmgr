@@ -23,6 +23,7 @@ class LanguagesService
         $allLanguages = [];
         foreach ($this->siteFinder->getAllSites() as $site) {
             foreach ($site->getAllLanguages() as $language) {
+                // @extensionScannerIgnoreLine
                 $languageId = $language->getLanguageId();
                 if (isset($allLanguages[$languageId])) {
                     // Language already provided by another site, just add the label separately

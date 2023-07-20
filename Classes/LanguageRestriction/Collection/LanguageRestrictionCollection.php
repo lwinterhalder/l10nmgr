@@ -61,6 +61,7 @@ class LanguageRestrictionCollection extends AbstractRecordCollection implements 
     {
         try {
             $language = self::getLanguage($pageId, $languageId);
+            // @extensionScannerIgnoreLine
             $collectionRecord['uid'] = $language->getLanguageId();
             $collectionRecord['title'] = $language->getTitle();
         } catch (\RuntimeException $exception) {

@@ -98,12 +98,15 @@ class ConfigurationModuleController
     public function initialize(ServerRequestInterface $request): void
     {
         $backendUser = $this->getBackendUser();
+        // @extensionScannerIgnoreLine
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
         $this->view = $this->moduleTemplateFactory->create($request);
         $this->currentModule = $request->getAttribute('module');
+        // @extensionScannerIgnoreLine
         $this->pageInfo = BackendUtility::readPageAccess($this->id, $backendUser->getPagePermsClause(Permission::PAGE_SHOW)) ?: [];
         $this->view->setTitle(
             $this->getLanguageService()->sL($this->currentModule->getTitle()),
+            // @extensionScannerIgnoreLine
             $this->id !== 0 && isset($this->pageInfo['title']) ? $this->pageInfo['title'] : ''
         );
 
