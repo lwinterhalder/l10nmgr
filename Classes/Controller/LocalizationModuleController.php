@@ -54,6 +54,7 @@ use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
@@ -483,7 +484,7 @@ class LocalizationModuleController extends BaseModule12
             '';
         if (!empty($options)) {
             $onChange = '';
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
                 $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
             }
             return '

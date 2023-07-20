@@ -50,13 +50,13 @@ use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -457,7 +457,7 @@ return false;
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
             $onChange = '';
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
                 $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
             }
             return [
@@ -516,7 +516,7 @@ return false;
             '';
         if (!empty($options)) {
             $onChange = '';
-            if (\TYPO3\CMS\Core\Utility\VersionNumberUtility::convertVersionNumberToInteger(TYPO3_version) <= 11000000) {
+            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
                 $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
             }
             return '
