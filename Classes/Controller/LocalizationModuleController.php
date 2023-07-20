@@ -427,10 +427,14 @@ class LocalizationModuleController extends BaseModule12
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
-            $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
+            $onChange = '';
+            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
+                $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
+            }
 
             return [
                 'label' => $label,
+                'url' => $scriptUrl . '&' . $elementName . '=${value}',
                 'elementName' => $elementName,
                 'onChange' => $onChange,
                 'options' => $options,
