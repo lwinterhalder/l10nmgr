@@ -52,7 +52,6 @@ use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
@@ -433,15 +432,12 @@ return false;
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
         if (count($options) > 0) {
-            $onChange = '';
-            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
-                $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
-            }
+            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
+
             return [
                 'label' => $label,
                 'elementName' => $elementName,
                 'onChange' => $onChange,
-                'url' => $scriptUrl . '&' . $elementName . '=',
                 'options' => $options,
             ];
         }
@@ -492,15 +488,12 @@ return false;
             ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
             '';
         if (!empty($options)) {
-            $onChange = '';
-            if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() <= 11) {
-                $onChange = ' onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);"';
-            }
+            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
             return '
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
                 $label .
-                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change"  data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}"' . $onChange . '>
+                '<select class="form-control clear-both" id="' . $elementName . '" name="' . $elementName . '" onchange="' . htmlspecialchars($onChange) . '">
 	' . implode('
 	', $options) . '
 	</select>
