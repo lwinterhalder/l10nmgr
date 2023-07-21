@@ -40,6 +40,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
 use TYPO3\CMS\Backend\Routing\Exception\ResourceNotFoundException;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
+use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Routing\Router;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
@@ -89,8 +90,6 @@ class LocalizationManager extends BaseModule
 
     protected StandaloneView $view;
 
-    protected string $moduleName = 'LocalizationManager';
-
     /** @var array */
     protected array $pageinfo;
 
@@ -114,7 +113,6 @@ class LocalizationManager extends BaseModule
     ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');
-        $this->MCONF['name'] = $this->moduleName;
     }
 
     /**
@@ -153,6 +151,15 @@ class LocalizationManager extends BaseModule
         $this->moduleTemplate->setContent($this->content);
 
         return new HtmlResponse($this->moduleTemplate->renderContent());
+    }
+
+    public function init(ServerRequestInterface $request): void
+    {
+        /** @var Route $route */
+        $route = $request->getAttribute('route');
+        $this->MCONF['name'] = $route->getOption('moduleConfiguration')['name'];
+
+        parent::init($request);
     }
 
     /**

@@ -32,6 +32,7 @@ use Doctrine\DBAL\Exception as DBALException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
+use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -71,8 +72,6 @@ class ConfigurationManager extends BaseModule
 
     protected StandaloneView $view;
 
-    protected string $moduleName = 'web_ConfigurationManager';
-
     public function __construct(
         protected readonly IconFactory $iconFactory,
         protected readonly ModuleTemplateFactory $moduleTemplateFactory,
@@ -80,7 +79,6 @@ class ConfigurationManager extends BaseModule
     ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf');
-        $this->MCONF['name'] = $this->moduleName;
     }
 
     /**
@@ -106,6 +104,15 @@ class ConfigurationManager extends BaseModule
 
         $this->moduleTemplate->setContent($this->content);
         return new HtmlResponse($this->moduleTemplate->renderContent());
+    }
+
+    public function init(ServerRequestInterface $request): void
+    {
+        /** @var Route $route */
+        $route = $request->getAttribute('route');
+        $this->MCONF['name'] = $route->getOption('moduleConfiguration')['name'];
+
+        parent::init($request);
     }
 
     /**

@@ -31,6 +31,7 @@ use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Hooks\Tcemain;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\Route;
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -60,10 +61,12 @@ class TranslationTasks extends BaseModule
      */
     protected array $sysLanguages = [];
 
-    /**
-     * main action to be registered in ext_tables.php
-     * @return HtmlResponse
-     */
+    public function __construct()
+    {
+        $this->getLanguageService()
+            ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf');
+    }
+
     public function mainAction(ServerRequestInterface $request): HtmlResponse
     {
         // @extensionScannerIgnoreLine
@@ -74,9 +77,11 @@ class TranslationTasks extends BaseModule
 
     public function init(ServerRequestInterface $request): void
     {
+        /** @var Route $route */
+        $route = $request->getAttribute('route');
+        $this->MCONF['name'] = $route->getOption('moduleConfiguration')['name'];
         $this->module = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->MCONF['name'] = 'LocalizationManager_TranslationTasks';
-        $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf');
+
         parent::init($request);
     }
 
