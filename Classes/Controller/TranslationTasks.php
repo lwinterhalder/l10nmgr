@@ -76,7 +76,6 @@ class TranslationTasks extends BaseModule
     {
         $this->module = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->MCONF['name'] = 'LocalizationManager_TranslationTasks';
-        $this->getBackendUser()->modAccess($this->MCONF);
         $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf');
         parent::init($request);
     }

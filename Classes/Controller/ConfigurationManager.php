@@ -109,15 +109,6 @@ class ConfigurationManager extends BaseModule
     }
 
     /**
-     * Initializes the Module
-     */
-    public function init(ServerRequestInterface $request): void
-    {
-        $this->getBackendUser()->modAccess($this->MCONF);
-        parent::init($request);
-    }
-
-    /**
      * Main function of the module. Write the content to $this->content
      * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
      * @throws Exception

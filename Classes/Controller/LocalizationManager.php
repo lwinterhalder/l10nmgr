@@ -156,15 +156,6 @@ class LocalizationManager extends BaseModule
     }
 
     /**
-     * Initializes the Module
-     */
-    public function init(ServerRequestInterface $request): void
-    {
-        $this->getBackendUser()->modAccess($this->MCONF);
-        parent::init($request);
-    }
-
-    /**
      * Main function of the module. Write the content to
      *
      * @throws ResourceNotFoundException
