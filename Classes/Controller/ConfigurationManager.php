@@ -90,9 +90,6 @@ class ConfigurationManager extends BaseModule
         // Checking for first level external objects
         $this->checkExtObj();
 
-        // Checking second level external objects
-        $this->checkSubExtObj();
-
         $this->main();
 
         $this->moduleTemplate->setContent($this->content);

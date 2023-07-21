@@ -268,68 +268,6 @@ class BaseModule
     }
 
     /**
-     * Calls the checkExtObj function in sub module if present.
-     */
-    public function checkSubExtObj(): void
-    {
-        if (is_object($this->extObj) && method_exists($this->extObj, 'checkExtObj')) {
-            $this->extObj->checkExtObj();
-        }
-    }
-
-    /**
-     * Calls the 'header' function inside the "Function menu module" if present.
-     * A header function might be needed to add JavaScript or other stuff in the head. This can't be done in the main function because the head is already written.
-     */
-    public function extObjHeader(): void
-    {
-        if (is_callable([$this->extObj, 'head'])) {
-            $this->extObj->head();
-        }
-    }
-
-    /**
-     * Return the content of the 'main' function inside the "Function menu module" if present
-     *
-     * @return string
-     * @throws Exception
-     */
-    public function getExtObjContent(): string
-    {
-        $savedContent = $this->content;
-        $this->content = '';
-        $this->extObjContent();
-        $newContent = $this->content;
-        $this->content = $savedContent;
-        return $newContent;
-    }
-
-    /**
-     * Calls the 'main' function inside the "Function menu module" if present
-     * @throws Exception
-     */
-    public function extObjContent(): void
-    {
-        if ($this->extObj === null) {
-            $flashMessage = GeneralUtility::makeInstance(
-                FlashMessage::class,
-                $this->getLanguageService()->sL('LLL:EXT:backend/Resources/Private/Language/locallang.xlf:no_modules_registered'),
-                $this->getLanguageService()->getLL('title'),
-                AbstractMessage::ERROR
-            );
-            /** @var FlashMessageService $flashMessageService */
-            $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-            $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-            $defaultFlashMessageQueue->enqueue($flashMessage);
-        } else {
-            $this->extObj->pObj = $this;
-            if (is_callable([$this->extObj, 'main'])) {
-                $this->content .= $this->extObj->main();
-            }
-        }
-    }
-
-    /**
      * @return PageRenderer
      */
     protected function getPageRenderer(): PageRenderer

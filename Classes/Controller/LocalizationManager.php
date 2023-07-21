@@ -133,9 +133,6 @@ class LocalizationManager extends BaseModule
         // Checking for first level external objects
         $this->checkExtObj();
 
-        // Checking second level external objects
-        $this->checkSubExtObj();
-
         switch ($this->MOD_SETTINGS['action'] ?? '') {
             case 'inlineEdit':
             case 'link':
