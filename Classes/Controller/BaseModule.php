@@ -193,18 +193,14 @@ class BaseModule
      */
     public function mergeExternalItems(string $modName, string $menuKey, array $menuArr): array
     {
+        $backenUser = $this->getBackendUser();
         $mergeArray = $GLOBALS['TBE_MODULES_EXT'][$modName]['MOD_MENU'][$menuKey] ?? null;
         if (is_array($mergeArray)) {
             foreach ($mergeArray as $k => $v) {
                 $vWS = $v['ws'] ?? '';
-                if (
-                    (
-                        (string)$vWS === ''
-                        || $this->getBackendUser()->workspace === 0
-                        && GeneralUtility::inList($vWS, 'online')
-                    )
-                    || $this->getBackendUser()->workspace === -1 && GeneralUtility::inList($vWS, 'offline')
-                    || $this->getBackendUser()->workspace > 0 && GeneralUtility::inList($vWS, 'custom')
+                if (((string)$vWS === '' || ($backenUser->workspace === 0 && GeneralUtility::inList($vWS, 'online')))
+                    || ($backenUser->workspace === -1 && GeneralUtility::inList($vWS, 'offline'))
+                    || ($backenUser->workspace > 0 && GeneralUtility::inList($vWS, 'custom'))
                 ) {
                     $menuArr[$k] = $this->getLanguageService()->sL($v['title'] ?? '');
                 }
