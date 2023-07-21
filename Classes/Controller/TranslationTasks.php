@@ -30,6 +30,7 @@ namespace Localizationteam\L10nmgr\Controller;
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Hooks\Tcemain;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -63,21 +64,21 @@ class TranslationTasks extends BaseModule
      * main action to be registered in ext_tables.php
      * @return HtmlResponse
      */
-    public function mainAction(): HtmlResponse
+    public function mainAction(ServerRequestInterface $request): HtmlResponse
     {
         // @extensionScannerIgnoreLine
-        $this->init();
+        $this->init($request);
         // $this->main();
         return new HtmlResponse($this->getContent());
     }
 
-    public function init(): void
+    public function init(ServerRequestInterface $request): void
     {
         $this->module = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->MCONF['name'] = 'LocalizationManager_TranslationTasks';
         $this->getBackendUser()->modAccess($this->MCONF);
         $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/Module2/locallang.xlf');
-        parent::init();
+        parent::init($request);
     }
 
     /**

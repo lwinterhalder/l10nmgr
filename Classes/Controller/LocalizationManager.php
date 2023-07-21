@@ -130,7 +130,7 @@ class LocalizationManager extends BaseModule
         $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
 
         // @extensionScannerIgnoreLine
-        $this->init();
+        $this->init($request);
 
         // Checking for first level external objects
         $this->checkExtObj();
@@ -158,10 +158,10 @@ class LocalizationManager extends BaseModule
     /**
      * Initializes the Module
      */
-    public function init(): void
+    public function init(ServerRequestInterface $request): void
     {
         $this->getBackendUser()->modAccess($this->MCONF);
-        parent::init();
+        parent::init($request);
     }
 
     /**

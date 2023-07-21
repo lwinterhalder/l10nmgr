@@ -19,6 +19,7 @@ namespace Localizationteam\L10nmgr\Controller;
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
+use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -154,7 +155,7 @@ class BaseModule
      *
      * @see menuConfig()
      */
-    public function init(): void
+    public function init(ServerRequestInterface $request): void
     {
         $this->extObj = (object)[];
         // Name might be set from outside
