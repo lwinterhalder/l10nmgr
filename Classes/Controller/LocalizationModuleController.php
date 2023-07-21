@@ -495,7 +495,7 @@ class LocalizationModuleController extends BaseModule12
 	<!-- Function Menu of module -->
 <div class="form-group mb-2">' .
                 $label .
-                '<select class="form-control clear-both" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change" data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}"' . $onChange . '>
+                '<select class="form-select form-select-sm t3-js-jumpMenuBox" name="' . $elementName . '" data-menu-identifier="' . $elementName . '" data-global-event="change" data-action-navigate="$data=~s/$value/" data-navigate-value="' . $scriptUrl . '&' . $elementName . '=' . '${value}"' . $onChange . '>
 	' . implode('
 	', $options) . '
 	</select>
