@@ -54,14 +54,6 @@ class BaseModule
     public int $id;
 
     /**
-     * The value of GET/POST var, 'CMD'
-     *
-     * @see init()
-     * @var string
-     */
-    public string $CMD;
-
-    /**
      * A WHERE clause for selection records from the pages table based on read-permissions of the current backend user.
      *
      * @see init()
@@ -159,7 +151,6 @@ class BaseModule
     {
         $this->extObj = (object)[];
         // @extensionScannerIgnoreLine
-        $this->CMD = (string)GeneralUtility::_GP('CMD');
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
         $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
