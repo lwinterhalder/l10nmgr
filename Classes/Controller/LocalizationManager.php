@@ -597,7 +597,7 @@ return false;
         $onClick = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0),this);';
 
         return [
-            'onClick' => htmlspecialchars($onClick),
+            'onClick' => $onClick,
             'elementName' => $elementName,
             'checked' => ($currentValue ? ' checked="checked"' : ''),
             'tagParams' => ($tagParams ? ' ' . $tagParams : ''),
