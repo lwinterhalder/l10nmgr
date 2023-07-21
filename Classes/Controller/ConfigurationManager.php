@@ -136,7 +136,7 @@ class ConfigurationManager extends BaseModule
                 $this->pageinfo = ['title' => '[root-level]', 'uid' => 0, 'pid' => 0];
             }
             $this->view = $this->getFluidTemplateObject();
-            $this->moduleContent();
+            $this->view->assign('configurations', $this->getContent());
             $this->content .= $this->view->render();
         }
     }
@@ -147,7 +147,7 @@ class ConfigurationManager extends BaseModule
      * @throws DBALException
      * @throws RouteNotFoundException
      */
-    protected function moduleContent(): void
+    protected function getContent(): array
     {
         // Get the available configurations
         $l10nConfigurations = $this->getAllConfigurations();
@@ -161,7 +161,8 @@ class ConfigurationManager extends BaseModule
             $pagePath = BackendUtility::getRecordPath($l10nConfiguation['pid'] ?? 0, '1', 20, 50);
             $l10nConfigurations[$key]['path'] = (is_array($pagePath)) ? ($pagePath[1] ?? '') : $pagePath;
         }
-        $this->view->assign('configurations', $l10nConfigurations);
+
+        return $l10nConfigurations;
     }
 
     /**
