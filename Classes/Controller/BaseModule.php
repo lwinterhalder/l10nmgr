@@ -158,10 +158,6 @@ class BaseModule
     public function init(ServerRequestInterface $request): void
     {
         $this->extObj = (object)[];
-        // Name might be set from outside
-        if (empty($this->MCONF['name'])) {
-            $this->MCONF = $GLOBALS['MCONF'] ?? [];
-        }
         // @extensionScannerIgnoreLine
         $this->id = (int)GeneralUtility::_GP('id');
         $this->CMD = (string)GeneralUtility::_GP('CMD');
