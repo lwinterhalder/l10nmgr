@@ -18,6 +18,7 @@ namespace Localizationteam\L10nmgr\Backend\ItemsProcFuncs;
  */
 
 use TYPO3\CMS\Core\Hooks\TcaItemsProcessorFunctions;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -27,7 +28,7 @@ use TYPO3\CMS\Core\SingletonInterface;
  */
 class Tablelist implements SingletonInterface
 {
-    public function __construct(readonly TcaItemsProcessorFunctions $tcaItemsProcessor) {}
+    public function __construct(readonly TcaItemsProcessorFunctions $tcaItemsProcessor, readonly Typo3Version $typo3Version) {}
 
     /**
      * ItemProcFunc for colpos items
@@ -37,6 +38,16 @@ class Tablelist implements SingletonInterface
     public function populateAvailableTables(array &$params)
     {
         $this->tcaItemsProcessor->populateAvailableTables($params);
+
+        if ($this->typo3Version->getMajorVersion() < 12) {
+            $params = array_map(static function ($item) {
+                return [
+                    'label' => $item[0],
+                    'value' => $item[1],
+                    'icon' => $item[2],
+                ];
+            }, $params['items']);
+        }
 
         $items = [];
         foreach ($params['items'] as $item) {
