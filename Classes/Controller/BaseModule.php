@@ -159,8 +159,8 @@ class BaseModule
     {
         $this->extObj = (object)[];
         // @extensionScannerIgnoreLine
-        $this->id = (int)GeneralUtility::_GP('id');
         $this->CMD = (string)GeneralUtility::_GP('CMD');
+        $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
         $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
         $this->handleExternalFunctionValue();
