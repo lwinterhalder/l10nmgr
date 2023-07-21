@@ -43,6 +43,7 @@ use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\Router;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\HtmlResponse;
@@ -78,49 +79,20 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class LocalizationManager extends BaseModule
 {
-    /**
-     * @var int Default language to export
-     */
+    /** @var int Default language to export */
     protected int $sysLanguage = 0; // Internal
 
-    /**
-     * @var int Forced source language to export
-     */
+    /** @var int Forced source language to export */
     public int $previewLanguage = 0;
 
-    /**
-     * ModuleTemplate Container
-     *
-     * @var ModuleTemplate
-     */
     protected ModuleTemplate $moduleTemplate;
 
-    /**
-     * @var StandaloneView
-     */
     protected StandaloneView $view;
 
-    /**
-     * The name of the module
-     *
-     * @var string
-     */
     protected string $moduleName = 'LocalizationManager';
 
-    /**
-     * @var IconFactory
-     */
-    protected IconFactory $iconFactory;
-
-    /**
-     * @var array
-     */
+    /** @var array */
     protected array $pageinfo;
-
-    /**
-     * @var EmConfiguration
-     */
-    protected EmConfiguration $emConfiguration;
 
     protected array $settings = [
         'across' => 'acrossL10nmgrConfig.dst',
@@ -134,16 +106,15 @@ class LocalizationManager extends BaseModule
         'sdlpassolo' => 'SDLPassolo.xfg',
     ];
 
-    public function __construct()
-    {
-        $this->emConfiguration = GeneralUtility::makeInstance(EmConfiguration::class);
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
+    public function __construct(
+        protected readonly IconFactory $iconFactory,
+        protected readonly EmConfiguration $emConfiguration,
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+        protected readonly L10nBaseService $l10nBaseService,
+    ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/LocalizationManager/locallang.xlf');
-        $this->MCONF = [
-            'name' => $this->moduleName,
-        ];
+        $this->MCONF['name'] = $this->moduleName;
     }
 
     /**
@@ -154,8 +125,10 @@ class LocalizationManager extends BaseModule
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    public function mainAction(): ResponseInterface
+    public function mainAction(ServerRequestInterface $request): ResponseInterface
     {
+        $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
+
         // @extensionScannerIgnoreLine
         $this->init();
 

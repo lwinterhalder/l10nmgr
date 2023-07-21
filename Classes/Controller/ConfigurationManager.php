@@ -34,6 +34,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
@@ -66,46 +67,20 @@ class ConfigurationManager extends BaseModule
      */
     protected array $languageDetails = [];
 
-    /**
-     * ModuleTemplate Container
-     *
-     * @var ModuleTemplate
-     */
     protected ModuleTemplate $moduleTemplate;
 
-    /**
-     * @var StandaloneView
-     */
     protected StandaloneView $view;
 
-    /**
-     * @var UriBuilder
-     */
-    protected UriBuilder $uriBuilder;
-
-    /**
-     * The name of the module
-     *
-     * @var string
-     */
     protected string $moduleName = 'web_ConfigurationManager';
 
-    /**
-     * @var IconFactory
-     */
-    protected IconFactory $iconFactory;
-
-    public function __construct()
-    {
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
-        $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-
+    public function __construct(
+        protected readonly IconFactory $iconFactory,
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+        protected readonly UriBuilder $uriBuilder,
+    ) {
         $this->getLanguageService()
             ->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf');
-        $this->MCONF = [
-            'name' => $this->moduleName,
-        ];
+        $this->MCONF['name'] = $this->moduleName;
     }
 
     /**
@@ -116,6 +91,8 @@ class ConfigurationManager extends BaseModule
      */
     public function mainAction(ServerRequestInterface $request): ResponseInterface
     {
+        $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
+
         // @extensionScannerIgnoreLine
         $this->init();
 
