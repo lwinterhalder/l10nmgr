@@ -48,14 +48,6 @@ class BaseModule12
     public int $id;
 
     /**
-     * A WHERE clause for selection records from the pages table based on read-permissions of the current backend user.
-     *
-     * @see init()
-     * @var string
-     */
-    public string $perms_clause;
-
-    /**
      * The module menu items array. Each key represents a key for which values can range between the items in the array of that key.
      *
      * @see init()
@@ -137,7 +129,6 @@ class BaseModule12
         }
         // @extensionScannerIgnoreLine
         $this->id = (int)GeneralUtility::_GP('id');
-        $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
     }
 

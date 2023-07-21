@@ -145,7 +145,6 @@ class LocalizationModuleController extends BaseModule12
 
         // @extensionScannerIgnoreLine
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
-        $this->perms_clause = $backendUser->getPagePermsClause(Permission::PAGE_SHOW);
         $this->menuConfig();
     }
 
@@ -239,6 +238,8 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function mainNew()
     {
+        $backendUser = $this->getBackendUser();
+
         // Get language to export/import
         $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
@@ -252,9 +253,11 @@ class LocalizationModuleController extends BaseModule12
             // Setting page id
             // @extensionScannerIgnoreLine
             $this->id = $l10nConfiguration->getPid();
-            $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
             // @extensionScannerIgnoreLine
-            $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+            $this->pageinfo = BackendUtility::readPageAccess(
+                $this->id,
+                $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
+            );
             $access = is_array($this->pageinfo);
             // @extensionScannerIgnoreLine
             if ($this->id && $access) {
@@ -296,6 +299,8 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function main()
     {
+        $backendUser = $this->getBackendUser();
+
         // Get language to export/import
         $this->sysLanguage = (int)$this->MOD_SETTINGS['lang'];
 
@@ -313,8 +318,10 @@ class LocalizationModuleController extends BaseModule12
             if ($forcedSourceLanguage > 0) {
                 $this->previewLanguage = $forcedSourceLanguage;
             }
-            $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
-            $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+            $this->pageinfo = BackendUtility::readPageAccess(
+                $this->id,
+                $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
+            );
             $access = is_array($this->pageinfo);
             // @extensionScannerIgnoreLine
             if ($this->id && $access) {

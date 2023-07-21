@@ -41,6 +41,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
@@ -53,16 +54,13 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  */
 class ConfigurationManager extends BaseModule
 {
-    /**
-     * @var array
-     */
     public array $pageinfo = [];
 
     /**
      * @var array Cache of the page details already fetched from the database
      */
     protected array $pageDetails = [];
-    
+
     protected ModuleTemplate $moduleTemplate;
 
     protected StandaloneView $view;
@@ -122,7 +120,10 @@ class ConfigurationManager extends BaseModule
         // The page will show only if there is a valid page and if this page
         // may be viewed by the user
         // @extensionScannerIgnoreLine
-        $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+        $this->pageinfo = BackendUtility::readPageAccess(
+            $this->id,
+            $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
+        );
         if ($this->pageinfo) {
             $this->moduleTemplate->getDocHeaderComponent()->setMetaInformation($this->pageinfo);
         }

@@ -56,6 +56,7 @@ use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -90,7 +91,6 @@ class LocalizationManager extends BaseModule
 
     protected StandaloneView $view;
 
-    /** @var array */
     protected array $pageinfo;
 
     protected array $settings = [
@@ -170,6 +170,8 @@ class LocalizationManager extends BaseModule
      */
     protected function mainNew()
     {
+        $backendUser = $this->getBackendUser();
+
         // Get language to export/import
         $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
@@ -194,9 +196,12 @@ return false;
             // Setting page id
             // @extensionScannerIgnoreLine
             $this->id = $l10nConfiguration->getPid();
-            $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
+
             // @extensionScannerIgnoreLine
-            $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+            $this->pageinfo = BackendUtility::readPageAccess(
+                $this->id,
+                $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
+            );
             $access = is_array($this->pageinfo);
             // @extensionScannerIgnoreLine
             if ($this->id && $access) {
@@ -285,6 +290,8 @@ return false;
      */
     protected function main()
     {
+        $backendUser = $this->getBackendUser();
+
         // Get language to export/import
         $this->sysLanguage = (int)$this->MOD_SETTINGS['lang'];
 
@@ -313,8 +320,10 @@ return false;
             if ($forcedSourceLanguage > 0) {
                 $this->previewLanguage = $forcedSourceLanguage;
             }
-            $this->perms_clause = $this->getBackendUser()->getPagePermsClause(1);
-            $this->pageinfo = BackendUtility::readPageAccess($this->id, $this->perms_clause);
+            $this->pageinfo = BackendUtility::readPageAccess(
+                $this->id,
+                $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
+            );
             $access = is_array($this->pageinfo);
             // @extensionScannerIgnoreLine
             if ($this->id && $access) {
