@@ -62,12 +62,7 @@ class ConfigurationManager extends BaseModule
      * @var array Cache of the page details already fetched from the database
      */
     protected array $pageDetails = [];
-
-    /**
-     * @var array Cache of the language records already fetched from the database
-     */
-    protected array $languageDetails = [];
-
+    
     protected ModuleTemplate $moduleTemplate;
 
     protected StandaloneView $view;
