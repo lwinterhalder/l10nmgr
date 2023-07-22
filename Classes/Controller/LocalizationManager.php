@@ -132,19 +132,7 @@ class LocalizationManager extends BaseModule
         // Checking for first level external objects
         $this->checkExtObj();
 
-        switch ($this->MOD_SETTINGS['action'] ?? '') {
-            case 'inlineEdit':
-            case 'link':
-            case 'export_excel':
-            case 'export_xml':
-                // TODO: Rename this to main()
-                $this->mainNew();
-                break;
-            default:
-                // TODO: Remove this when done
-                $this->mainNew();
-                break;
-        }
+        $this->main();
 
         $this->moduleTemplate->setContent($this->content);
 
@@ -166,7 +154,7 @@ class LocalizationManager extends BaseModule
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    protected function mainNew()
+    protected function main()
     {
         $backendUser = $this->getBackendUser();
 
@@ -209,7 +197,7 @@ return false;
                 $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getId());
                 $selectMenus = [];
                 // @extensionScannerIgnoreLine
-                $selectMenus[] = self::getFuncMenuNew(
+                $selectMenus[] = self::getFuncMenu(
                     $this->id,
                     'SET[action]',
                     $action,
@@ -220,7 +208,7 @@ return false;
                 );
 
                 // @extensionScannerIgnoreLine
-                $selectMenus[] = self::getFuncMenuNew(
+                $selectMenus[] = self::getFuncMenu(
                     $this->id,
                     'SET[lang]',
                     (string)$this->sysLanguage,
@@ -232,7 +220,7 @@ return false;
 
                 $checkBoxes = [];
                 // @extensionScannerIgnoreLine
-                $checkBoxes[] = self::getFuncCheckNew(
+                $checkBoxes[] = self::getFuncCheck(
                     $this->id,
                     'SET[onlyChangedContent]',
                     $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
@@ -242,7 +230,7 @@ return false;
                     $this->getLanguageService()->getLL('export.xml.new.title')
                 );
                 // @extensionScannerIgnoreLine
-                $checkBoxes[] = self::getFuncCheckNew(
+                $checkBoxes[] = self::getFuncCheck(
                     $this->id,
                     'SET[noHidden]',
                     $this->MOD_SETTINGS['noHidden'] ?? '',
@@ -297,7 +285,7 @@ return false;
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    public static function getFuncMenuNew(
+    public static function getFuncMenu(
         $mainParams,
         string $elementName,
         string $currentValue,
@@ -382,9 +370,9 @@ return false;
      * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
-     * @see getFuncMenuNew()
+     * @see getFuncMenu()
      */
-    public static function getFuncCheckNew(
+    public static function getFuncCheck(
         $mainParams,
         string $elementName,
         string $currentValue,
@@ -504,7 +492,7 @@ return false;
         $selectOptions += $this->MOD_MENU['lang'];
 
         // @extensionScannerIgnoreLine
-        $previewLanguageMenu = self::getFuncMenuNew(
+        $previewLanguageMenu = self::getFuncMenu(
             $this->id,
             'export_xml_forcepreviewlanguage',
             (string)$this->previewLanguage,
