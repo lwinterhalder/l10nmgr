@@ -311,7 +311,8 @@ return false;
         if ($L10nConfiguration->isLoaded()) {
             // Setting page id
             // @extensionScannerIgnoreLine
-            $this->id = (int)$L10nConfiguration->getData('pid');
+            $this->id = $L10nConfiguration->getPid();
+
             $forcedSourceLanguage = (int)$L10nConfiguration->getData('forcedSourceLanguage');
             if ($forcedSourceLanguage > 0) {
                 $this->previewLanguage = $forcedSourceLanguage;
