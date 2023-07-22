@@ -141,7 +141,7 @@ class LocalizationManager extends BaseModule
                 break;
             default:
                 // TODO: Remove this when done
-                $this->main();
+                $this->mainNew();
                 break;
         }
 
@@ -647,9 +647,6 @@ return false;
                 break;
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
-                break;
-            default:
-                $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
                 break;
         }
 

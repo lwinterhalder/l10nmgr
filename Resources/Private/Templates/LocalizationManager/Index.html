@@ -23,13 +23,6 @@
                 <f:case value="inlineEdit">
                     <f:render section="inlineAndLink" arguments="{_all}"/>
                 </f:case>
-                <f:defaultCase>
-                    <div class="col-md-6">
-                        <div class="form">
-                            <input class="btn btn-default" type="submit" value="{f:translate(key: '{lll}general.action.refresh.button.title')}" name="_" />
-                        </div>
-                    </div>
-                </f:defaultCase>
             </f:switch>
         </f:then>
         <f:else>
@@ -70,6 +63,13 @@
                             <f:case value="export_xml">
                                 <f:render section="exportXml" arguments="{_all}"/>
                             </f:case>
+                            <f:defaultCase>
+                                <div class="col-md-6">
+                                    <div class="form">
+                                        <input class="btn btn-default" type="submit" value="{f:translate(key: '{lll}general.action.refresh.button.title')}" name="_" />
+                                    </div>
+                                </div>
+                            </f:defaultCase>
                         </f:switch>
                     </div>
                 </div>
