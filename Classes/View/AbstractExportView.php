@@ -36,6 +36,7 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
@@ -228,6 +229,8 @@ abstract class AbstractExportView
      */
     public function setFilename(): void
     {
+        $t3version = GeneralUtility::makeInstance(Typo3Version::class);
+
         $sourceLang = '';
         $targetLang = '';
         if ($this->exportType == '0') {
@@ -238,11 +241,19 @@ abstract class AbstractExportView
 
         $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
         if ($sourceLanguageConfiguration instanceof SiteLanguage) {
-            $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
+            if ($t3version->getMajorVersion() < 12) {
+                $sourceLang = $sourceLanguageConfiguration->getLocale() ?: $sourceLanguageConfiguration->getTwoLetterIsoCode();
+            } else {
+                $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
+            }
         }
         $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
-            $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
+            if ($t3version->getMajorVersion() < 12) {
+                $targetLang = $targetLanguageConfiguration->getLocale() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
+            } else {
+                $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
+            }
         }
         if ($sourceLang !== '' && $targetLang !== '') {
             $fileNamePrefix = (trim($this->l10ncfgObj->getData('filenameprefix'))) ? $this->l10ncfgObj->getData('filenameprefix') . '_' . $fileType : $fileType;
@@ -439,6 +450,38 @@ abstract class AbstractExportView
         /** @var DiffUtility $t3lib_diff_Obj */
         $t3lib_diff_Obj = GeneralUtility::makeInstance(DiffUtility::class);
         return $t3lib_diff_Obj->makeDiffDisplay($old, $new);
+    }
+
+
+    /**
+     * Renders internal messages as flash message.
+     * If the export was successful, check if there were any internal warnings.
+     * If yes, display them below the success message.
+     *
+     * @param string $status Flag which indicates if the export was successful.
+     * @return ?FlashMessage Rendered flash message or empty string if there are no messages.
+     */
+    public function renderInternalMessagesAsFlashMessageNew(string $status): ?FlashMessage
+    {
+        $flashMessage = null;
+        if ($status == AbstractMessage::OK) {
+            $internalMessages = $this->getMessages();
+            if (count($internalMessages) > 0) {
+                $messageBody = '';
+                foreach ($internalMessages as $messageInformation) {
+                    $messageBody .= ($messageInformation['message'] ?? '') . ' (' . ($messageInformation['key'] ?? '') . ')' . "\n" ;
+                }
+                /** @var FlashMessage $flashMessage */
+                $flashMessage = GeneralUtility::makeInstance(
+                    FlashMessage::class,
+                    $messageBody,
+                    $this->getLanguageService()->getLL('export.ftp.warnings'),
+                    AbstractMessage::WARNING
+                );
+            }
+        }
+
+        return $flashMessage;
     }
 
     /**
