@@ -136,6 +136,7 @@ class LocalizationManager extends BaseModule
             case 'inlineEdit':
             case 'link':
             case 'export_excel':
+            case 'export_xml':
                 // TODO: Rename this to main()
                 $this->mainNew();
                 break;
@@ -280,124 +281,6 @@ return false;
     }
 
     /**
-     * Main function of the module. Write the content to
-     *
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
-     */
-    protected function main()
-    {
-        $backendUser = $this->getBackendUser();
-
-        // Get language to export/import
-        $this->sysLanguage = (int)$this->MOD_SETTINGS['lang'];
-
-        // Javascript
-        $this->moduleTemplate->addJavaScriptCode(
-            'jumpToUrl',
-            '
-function jumpToUrl(URL) {
-window.location.href = URL;
-return false;
-}
-'
-        );
-
-        $this->moduleTemplate->setTitle('L10N Manager');
-
-        $this->moduleTemplate->setForm('<form action="" method="post" enctype="multipart/form-data">');
-
-        // Find l10n configuration record
-        $L10nConfiguration = $this->getL10NConfiguration();
-        if ($L10nConfiguration->isLoaded()) {
-            // Setting page id
-            // @extensionScannerIgnoreLine
-            $this->id = $L10nConfiguration->getPid();
-
-            $forcedSourceLanguage = (int)$L10nConfiguration->getData('forcedSourceLanguage');
-            if ($forcedSourceLanguage > 0) {
-                $this->previewLanguage = $forcedSourceLanguage;
-            }
-            $this->pageinfo = BackendUtility::readPageAccess(
-                $this->id,
-                $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
-            );
-            $access = is_array($this->pageinfo);
-            // @extensionScannerIgnoreLine
-            if ($this->id && $access) {
-                $action = (string)($this->MOD_SETTINGS['action'] ?? '');
-                $title = $this->MOD_MENU['action'][$action];
-
-                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $L10nConfiguration->getId());
-
-                $this->content .= '<div class="panel panel-default expanded">
-    <div class="panel-heading" role="tab" id="headingL10nmgrPanel">
-        <h2 class="panel-title">' . $title . '
-            <a role="button" data-toggle="collapse" data-bs-toggle="collapse" href="#l10nmgrPanel" aria-expanded="true" aria-controls="l10nmgrPanel" class="pull-right"><span class="caret"></span></a>
-        </h2>
-    </div>
-    <div id="l10nmgrPanel" class="panel-collapse collapse in show" role="tabpanel" aria-labelledby="headingL10nmgrPanel">
-        <div class="panel-body">
-            <div class="row">';
-                $this->content .= '
-    <div class="col-md-6">
-        <div class="form">
-            <div class="form-section">' .
-                    // @extensionScannerIgnoreLine
-                    self::getFuncMenu(
-                        $this->id,
-                        'SET[action]',
-                        $action,
-                        $this->MOD_MENU['action'] ?? [],
-                        '',
-                        $addParams,
-                        $this->getLanguageService()->getLL('general.export.choose.action.title')
-                    ) .
-                    // @extensionScannerIgnoreLine
-                    self::getFuncMenu(
-                        $this->id,
-                        'SET[lang]',
-                        (string)$this->sysLanguage,
-                        $this->MOD_MENU['lang'] ?? [],
-                        '',
-                        $addParams,
-                        $this->getLanguageService()->getLL('export.overview.targetlanguage.label'),
-                        (string)$this->previewLanguage
-                    ) .
-                    '</div><div class="form-section">' .
-                    // @extensionScannerIgnoreLine
-                    self::getFuncCheck(
-                        $this->id,
-                        'SET[onlyChangedContent]',
-                        $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
-                        '',
-                        $addParams,
-                        '',
-                        $this->getLanguageService()->getLL('export.xml.new.title')
-                    ) .
-                    // @extensionScannerIgnoreLine
-                    self::getFuncCheck(
-                        $this->id,
-                        'SET[noHidden]',
-                        $this->MOD_SETTINGS['noHidden'] ?? '',
-                        '',
-                        $addParams,
-                        '',
-                        $this->getLanguageService()->getLL('export.xml.noHidden.title')
-                    ) .
-                    '</div></div></div>';
-
-                // Render content:
-                if (!count($this->MOD_MENU['lang'])) {
-                    $this->content .= '<div><h2>ERROR<h2>' . $this->getLanguageService()->getLL('general.access.error.title') . '</div>';
-                } else {
-                    $this->moduleContent($L10nConfiguration);
-                }
-            }
-        }
-    }
-
-    /**
      * Returns a selector box "function menu" for a module
      * Requires the JS function jumpToUrl() to be available
      * See Inside TYPO3 for details about how to use / make Function menus
@@ -451,64 +334,6 @@ return false;
     }
 
     /**
-     * @param mixed $mainParams
-     * @param string $elementName
-     * @param mixed $currentValue
-     * @param array $menuItems
-     * @param string $script
-     * @param string $addParams
-     * @param string $label
-     * @param string $previewLanguage
-     * @return string
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
-     */
-    public static function getFuncMenu(
-        $mainParams,
-        string $elementName,
-        $currentValue,
-        array $menuItems,
-        string $script = '',
-        string $addParams = '',
-        string $label = '',
-        string $previewLanguage = ''
-    ): string {
-        if (empty($menuItems)) {
-            return '';
-        }
-        $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
-        $options = [];
-        foreach ($menuItems as $value => $text) {
-            if ($elementName === 'SET[lang]' && (int)$value === (int)$previewLanguage) {
-                continue;
-            }
-            $options[] = '<option value="' . htmlspecialchars((string)$value) . '"' . ((string)$currentValue === (string)$value ? ' selected="selected"' : '') . '>' . htmlspecialchars(
-                $text,
-                ENT_COMPAT,
-                'UTF-8',
-                false
-            ) . '</option>';
-        }
-        $label = $label !== '' ?
-            ('<label for="' . $elementName . '">' . htmlspecialchars($label) . '</label><br />') :
-            '';
-        if (!empty($options)) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
-            return '
-	<!-- Function Menu of module -->
-<div class="form-group mb-2">' .
-                $label .
-                '<select class="form-control clear-both" id="' . $elementName . '" name="' . $elementName . '" onchange="' . htmlspecialchars($onChange) . '">
-	' . implode('
-	', $options) . '
-	</select>
-	</div>
-	';
-        }
-        return '';
-    }
-
-    /**
      * Builds the URL to the current script with given arguments
      *
      * @param mixed $mainParams $id is the "&id=" parameter value to be sent to the module, but it can be also a parameter array which will be passed instead of the &id=...
@@ -557,7 +382,7 @@ return false;
      * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
-     * @see getFuncMenu()
+     * @see getFuncMenuNew()
      */
     public static function getFuncCheckNew(
         $mainParams,
@@ -578,52 +403,6 @@ return false;
             'tagParams' => ($tagParams ? ' ' . $tagParams : ''),
             'label' => htmlspecialchars($label),
         ];
-    }
-
-    /**
-     * Checkbox function menu.
-     * Works like ->getFuncMenu() but takes no $menuItem array since this is a simple checkbox.
-     *
-     * @param mixed $mainParams $id is the "&id=" parameter value to be sent to the module, but it can be also a parameter array which will be passed instead of the &id=...
-     * @param string $elementName The form elements name, probably something like "SET[...]
-     * @param string $currentValue The value to be selected currently.
-     * @param string $script The script to send the &id to, if empty it's automatically found
-     * @param string $addParams Additional parameters to pass to the script.
-     * @param string $tagParams Additional attributes for the checkbox input tag
-     * @param string $label
-     *
-     * @return string HTML code for checkbox
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
-     * @see getFuncMenu()
-     */
-    public static function getFuncCheck(
-        $mainParams,
-        string $elementName,
-        string $currentValue,
-        string $script = '',
-        string $addParams = '',
-        string $tagParams = '',
-        string $label = ''
-    ): string {
-        $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
-        $onClick = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+(this.checked?1:0),this);';
-        return
-            '<div class="form-group mb-2">' .
-            '<div class="checkbox">
-<label>
-<input' .
-            ' type="checkbox"' .
-            ' name="' . $elementName . '"' .
-            ($currentValue ? ' checked="checked"' : '') .
-            ' onclick="' . htmlspecialchars($onClick) . '"' .
-            ($tagParams ? ' ' . $tagParams : '') .
-            ' value="1"' .
-            ' />&nbsp;' .
-            htmlspecialchars($label) .
-            '</label>
-</div>
-</div>';
     }
 
     /**
