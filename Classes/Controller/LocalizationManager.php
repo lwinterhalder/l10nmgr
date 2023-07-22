@@ -326,6 +326,8 @@ return false;
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action];
 
+                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $L10nConfiguration->getId());
+
                 $this->content .= '<div class="panel panel-default expanded">
     <div class="panel-heading" role="tab" id="headingL10nmgrPanel">
         <h2 class="panel-title">' . $title . '
@@ -346,7 +348,7 @@ return false;
                         $action,
                         $this->MOD_MENU['action'] ?? [],
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        $addParams,
                         $this->getLanguageService()->getLL('general.export.choose.action.title')
                     ) .
                     // @extensionScannerIgnoreLine
@@ -356,7 +358,7 @@ return false;
                         (string)$this->sysLanguage,
                         $this->MOD_MENU['lang'] ?? [],
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        $addParams,
                         $this->getLanguageService()->getLL('export.overview.targetlanguage.label'),
                         (string)$this->previewLanguage
                     ) .
@@ -367,7 +369,7 @@ return false;
                         'SET[onlyChangedContent]',
                         $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        $addParams,
                         '',
                         $this->getLanguageService()->getLL('export.xml.new.title')
                     ) .
@@ -377,11 +379,12 @@ return false;
                         'SET[noHidden]',
                         $this->MOD_SETTINGS['noHidden'] ?? '',
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        $addParams,
                         '',
                         $this->getLanguageService()->getLL('export.xml.noHidden.title')
                     ) .
                     '</div></div></div>';
+
                 // Render content:
                 if (!count($this->MOD_MENU['lang'])) {
                     $this->content .= '<div><h2>ERROR<h2>' . $this->getLanguageService()->getLL('general.access.error.title') . '</div>';
