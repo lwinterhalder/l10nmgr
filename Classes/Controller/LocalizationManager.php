@@ -410,7 +410,6 @@ return false;
                 break;
             case 'export_excel':
                 $subcontent = $this->excelExportImportActionNew($l10NConfiguration);
-                //subcontent = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
                 break;
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
@@ -429,14 +428,8 @@ return false;
     protected function moduleContent(L10nConfiguration $l10NConfiguration): void
     {
         switch ($this->MOD_SETTINGS['action'] ?? '') {
-            case 'export_excel':
-                $subcontent = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
-                break;
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
-                break;
-            default:
-                $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
                 break;
         }
 
