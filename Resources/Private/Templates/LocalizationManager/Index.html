@@ -123,8 +123,10 @@
                 </div>
             </div>
             <f:if condition="{moduleContent.flashMessageHtml}">
-                <h2><f:translate key="{lll}misc.messages.title"></f:translate></h2>
                 <f:format.html>{moduleContent.flashMessageHtml}</f:format.html>
+            </f:if>
+            <f:if condition="{moduleContent.existingExportsOverview} != ''">
+                <f:format.html>{moduleContent.existingExportsOverview}</f:format.html>
             </f:if>
             <f:format.html>{moduleContent.internalFlashMessage}</f:format.html>
         </div>
