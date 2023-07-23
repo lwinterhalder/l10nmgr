@@ -467,4 +467,14 @@ class L10nHtmlListView extends AbstractExportView
         $value = GeneralUtility::getFileAbsFileName($value);
         return PathUtility::getAbsoluteWebPath($value);
     }
+
+    public function setForcedSourceLanguage(int $forceLanguage): void
+    {
+        // TODO: Implement setForcedSourceLanguage() method.
+    }
+
+    public function render(): string
+    {
+        // TODO: Implement render() method.
+    }
 }
