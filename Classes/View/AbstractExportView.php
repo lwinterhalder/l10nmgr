@@ -24,7 +24,6 @@ namespace Localizationteam\L10nmgr\View;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
@@ -115,6 +114,8 @@ abstract class AbstractExportView implements ExportViewInterface
      */
     protected int $forcedSourceLanguage = 0;
 
+    protected Typo3Version $typo3Version;
+
     /**
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
@@ -124,6 +125,7 @@ abstract class AbstractExportView implements ExportViewInterface
     {
         $this->sysLang = $sysLang;
         $this->l10ncfgObj = $l10ncfgObj;
+        $this->typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
         // Load system languages into menu:
         /** @var SiteFinder $siteFinder */
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
@@ -225,8 +227,6 @@ abstract class AbstractExportView implements ExportViewInterface
      */
     public function setFilename(): void
     {
-        $t3version = GeneralUtility::makeInstance(Typo3Version::class);
-
         $sourceLang = '';
         $targetLang = '';
         if ($this->exportType == '0') {
@@ -237,7 +237,7 @@ abstract class AbstractExportView implements ExportViewInterface
 
         $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
         if ($sourceLanguageConfiguration instanceof SiteLanguage) {
-            if ($t3version->getMajorVersion() < 12) {
+            if ($this->typo3Version->getMajorVersion() < 12) {
                 $sourceLang = $sourceLanguageConfiguration->getLocale() ?: $sourceLanguageConfiguration->getTwoLetterIsoCode();
             } else {
                 $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
@@ -245,7 +245,7 @@ abstract class AbstractExportView implements ExportViewInterface
         }
         $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
-            if ($t3version->getMajorVersion() < 12) {
+            if ($this->typo3Version->getMajorVersion() < 12) {
                 $targetLang = $targetLanguageConfiguration->getLocale() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
             } else {
                 $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
@@ -273,7 +273,7 @@ abstract class AbstractExportView implements ExportViewInterface
             ->where(
                 $queryBuilder->expr()->eq(
                     'l10ncfg_id',
-                    $queryBuilder->createNamedParameter((int)$this->l10ncfgObj->getData('uid'), PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->l10ncfgObj->getId(), PDO::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'exportType',
@@ -294,6 +294,8 @@ abstract class AbstractExportView implements ExportViewInterface
      * Renders a list of saved exports as HTML table.
      *
      * @return string HTML table
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function renderExports(): string
     {
@@ -314,15 +316,17 @@ abstract class AbstractExportView implements ExportViewInterface
                 $exportData['exportType'] ?? '',
                 $exportData['translation_lang'] ?? 0,
                 sprintf(
-                    '<a href="%suploads/tx_l10nmgr/jobs/out/%s">%s</a>',
+                    '<a href="%suploads/tx_l10nmgr/jobs/out/%s" target="_blank">%s</a>',
                     GeneralUtility::getIndpEnv('TYPO3_SITE_URL'),
                     $exportData['filename'] ?? '',
                     $exportData['filename'] ?? ''
                 )
             );
         }
-        return sprintf(
-            '
+
+        if (count($exports) > 0) {
+            return sprintf(
+                '
 <table class="table table-striped table-hover">
 	<thead>
 	<tr class="t3-row-header">
@@ -337,22 +341,26 @@ abstract class AbstractExportView implements ExportViewInterface
 %s
 	</tbody>
 </table>',
-            $this->getLanguageService()->getLL('export.overview.date.label'),
-            $this->getLanguageService()->getLL('export.overview.configuration.label'),
-            $this->getLanguageService()->getLL('export.overview.type.label'),
-            $this->getLanguageService()->getLL('export.overview.targetlanguage.label'),
-            $this->getLanguageService()->getLL(
-                'export.overview.filename.label'
-            ),
-            implode(chr(10), $content)
-        );
+                $this->getLanguageService()->getLL('export.overview.date.label'),
+                $this->getLanguageService()->getLL('export.overview.configuration.label'),
+                $this->getLanguageService()->getLL('export.overview.type.label'),
+                $this->getLanguageService()->getLL('export.overview.targetlanguage.label'),
+                $this->getLanguageService()->getLL(
+                    'export.overview.filename.label'
+                ),
+                implode(chr(10), $content)
+            );
+        }
+
+        return '';
     }
 
     /**
      * Fetches saved exports based on configuration, export format and target language.
      *
      * @return array Information about exports.
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Driver\Exception
      * @author Andreas Otto <andreas.otto@dkd.de>
      */
     protected function fetchExports(): array
