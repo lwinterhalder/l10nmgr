@@ -445,6 +445,23 @@ return false;
         return $info;
     }
 
+    protected function makePreviewLanguageMenu(): array
+    {
+        $selectOptions = ['0' => '-default-'];
+        $selectOptions += $this->MOD_MENU['lang'];
+
+        // @extensionScannerIgnoreLine
+        return self::getFuncMenu(
+            $this->id,
+            'export_xml_forcepreviewlanguage',
+            (string)$this->previewLanguage,
+            $selectOptions,
+            '',
+            '',
+            $this->getLanguageService()->getLL('export.xml.source-language.title')
+        );
+    }
+
     /**
      * @param L10nConfiguration $l10nConfiguration
      * @return array
@@ -464,20 +481,6 @@ return false;
         if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
             $this->l10nBaseService->setImportAsDefaultLanguage(true);
         }
-
-        $selectOptions = ['0' => '-default-'];
-        $selectOptions += $this->MOD_MENU['lang'];
-
-        // @extensionScannerIgnoreLine
-        $previewLanguageMenu = self::getFuncMenu(
-            $this->id,
-            'export_xml_forcepreviewlanguage',
-            (string)$this->previewLanguage,
-            $selectOptions,
-            '',
-            '',
-            $this->getLanguageService()->getLL('export.xml.source-language.title')
-        );
 
         $info = '';
         // Read uploaded file:
@@ -586,7 +589,7 @@ return false;
             'existingExportsOverview' => $existingExportsOverview,
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
-            'previewLanguageMenu' => $previewLanguageMenu,
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
         ];
@@ -861,6 +864,7 @@ return false;
             'existingExportsOverview' => $existingExportsOverview,
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
         ];
     }
 
