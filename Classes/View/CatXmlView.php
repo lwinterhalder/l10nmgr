@@ -25,7 +25,6 @@ namespace Localizationteam\L10nmgr\View;
 use Localizationteam\L10nmgr\Model\Tools\Utf8Tools;
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -40,7 +39,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @author Fabian Seltmann <fs@marketing-factory.de>
  * @author Andreas Otto <andreas.otto@dkd.de>
  */
-class CatXmlView extends AbstractExportView implements ExportViewInterface
+class CatXmlView extends AbstractExportView
 {
     /**
      * @var int $forcedSourceLanguage Overwrite the default language uid with the desired language to export
@@ -68,10 +67,7 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
     protected array $overrideParams = [];
 
     /**
-     * Render the simple XML export
-     *
-     * @return string Filename
-     * @throws SiteNotFoundException
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -310,11 +306,9 @@ class CatXmlView extends AbstractExportView implements ExportViewInterface
     }
 
     /**
-     * Force a new source language to export the content to translate
-     *
-     * @param int $id
+     * @inheritdoc
      */
-    public function setForcedSourceLanguage(int $id)
+    public function setForcedSourceLanguage(int $id): void
     {
         $this->forcedSourceLanguage = $id;
     }

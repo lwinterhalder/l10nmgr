@@ -32,7 +32,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @author Kasper Skaarhoj <kasperYYYY@typo3.com>
  */
-class ExcelXmlView extends AbstractExportView implements ExportViewInterface
+class ExcelXmlView extends AbstractExportView
 {
     //internal flags:
     /**
@@ -61,9 +61,7 @@ class ExcelXmlView extends AbstractExportView implements ExportViewInterface
     }
 
     /**
-     * Render the excel XML export
-     *
-     * @return string HTML content
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -248,11 +246,9 @@ class ExcelXmlView extends AbstractExportView implements ExportViewInterface
     }
 
     /**
-     * Force a new source language to export the content to translate
-     *
-     * @param int $id
+     * @inheritdoc
      */
-    public function setForcedSourceLanguage(int $id)
+    public function setForcedSourceLanguage(int $id): void
     {
         $this->forcedSourceLanguage = $id;
     }

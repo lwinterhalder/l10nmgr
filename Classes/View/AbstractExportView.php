@@ -52,7 +52,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
  *
  * @author Fabian Seltmann <fs@marketing-factory.de>
  **/
-abstract class AbstractExportView
+abstract class AbstractExportView implements ExportViewInterface
 {
     use BackendUserTrait;
     use LanguageServiceTrait;
@@ -164,9 +164,7 @@ abstract class AbstractExportView
     }
 
     /**
-     * Saves the information of the export in the database table 'tx_l10nmgr_sava_data'
-     *
-     * @return bool
+     * @inheritdoc
      */
     public function saveExportInformation(): bool
     {
@@ -212,9 +210,7 @@ abstract class AbstractExportView
     }
 
     /**
-     * Get filename
-     *
-     * @return string File name
+     * @inheritdoc
      */
     public function getFilename(): string
     {
@@ -266,10 +262,7 @@ abstract class AbstractExportView
     }
 
     /**
-     * Checks if an export exists
-     *
-     * @return bool
-     * @throws DBALException
+     * @inheritdoc
      */
     public function checkExports(): bool
     {
@@ -389,9 +382,7 @@ abstract class AbstractExportView
     }
 
     /**
-     * Renders a list of saved exports as text.
-     *
-     * @return string text
+     * @inheritdoc
      */
     public function renderExportsCli(): string
     {

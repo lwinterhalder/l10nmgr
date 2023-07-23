@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Localizationteam\L10nmgr\View;
 
+use Doctrine\DBAL\Exception as DBALException;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+
 /***************************************************************
  * Copyright notice
  * (c) 2018 B13
@@ -24,43 +28,52 @@ namespace Localizationteam\L10nmgr\View;
 interface ExportViewInterface
 {
     /**
-     * @param int $forceLanguage
-     * @return mixed
+     * Force a new source language to export the content to translate
      */
-    public function setForcedSourceLanguage(int $forceLanguage);
+    public function setForcedSourceLanguage(int $forceLanguage): void;
+
+    public function setModeOnlyChanged(): void;
+
+    public function setModeNoHidden(): void;
 
     /**
-     * @return mixed
+     * Saves the information of the export in the database table 'tx_l10nmgr_sava_data'
+     *
+     * @return bool
+     * @throws Exception
      */
-    public function setModeOnlyChanged();
+    public function saveExportInformation(): bool;
 
     /**
-     * @return mixed
+     * Render the simple XML export
+     *
+     * @return string
+     * @throws SiteNotFoundException
      */
-    public function setModeNoHidden();
+    public function render(): string;
 
     /**
-     * @return mixed
+     * Checks if an export exists
+     *
+     * @return bool
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function saveExportInformation();
+    public function checkExports(): bool;
 
     /**
-     * @return mixed
+     * Renders a list of saved exports as text.
+     *
+     * @return string
+     * @throws DBALException
      */
-    public function render();
+    public function renderExportsCli(): string;
 
     /**
-     * @return mixed
+     * Get filename
+     *
+     * @return string
+     * @throws Exception
      */
-    public function checkExports();
-
-    /**
-     * @return mixed
-     */
-    public function renderExportsCli();
-
-    /**
-     * @return mixed
-     */
-    public function getFileName();
+    public function getFileName(): string;
 }
