@@ -411,10 +411,15 @@
 				<target></target>
 			</trans-unit>
 			<trans-unit id="email.new_translation_job_attached.msg" xml:space="preserve" approved="yes">
-				<source>Attached is an XML file for translation (%1$s-%2$s)
-				from TYPO3 site at %3$s.
-			</source>
+				<source>Attached is an XML file for translation (%1$s-%2$s) from TYPO3 site at %3$s.</source>
 				<target></target>
+			</trans-unit>
+			<trans-unit id="general.download" xml:space="preserve">
+				<source>Download</source>
+				<target>Runterladen</target>
+			</trans-unit>
+			<trans-unit id="general.import.done" xml:space="preserve">
+				<source>Import fertig</source>
 			</trans-unit>
         </body>
     </file>

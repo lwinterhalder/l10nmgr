@@ -105,11 +105,8 @@
 				<target>Anzeigemodus:</target>
 			</trans-unit>
 			<trans-unit id="general.list.infodetail.incfcewithdefaultlanguage.title" xml:space="preserve" approved="yes">
-				<source>Include FCE width default language:
-			</source>
-				<target>FCE mit Standardsprache
-				einschließen:
-			</target>
+				<source>Include FCE width default language:</source>
+				<target>FCE mit Standardspracheeinschließen:</target>
 			</trans-unit>
         </body>
     </file>
