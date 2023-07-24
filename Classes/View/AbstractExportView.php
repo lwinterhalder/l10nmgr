@@ -540,4 +540,12 @@ abstract class AbstractExportView implements ExportViewInterface
             'key' => $key,
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setForcedSourceLanguage(int $forceLanguage): void
+    {
+        $this->forcedSourceLanguage = $forceLanguage;
+    }
 }

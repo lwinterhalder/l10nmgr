@@ -468,11 +468,6 @@ class L10nHtmlListView extends AbstractExportView
         return PathUtility::getAbsoluteWebPath($value);
     }
 
-    public function setForcedSourceLanguage(int $forceLanguage): void
-    {
-        // TODO: Implement setForcedSourceLanguage() method.
-    }
-
     public function render(): string
     {
         // TODO: Implement render() method.

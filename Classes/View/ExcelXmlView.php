@@ -234,12 +234,4 @@ class ExcelXmlView extends AbstractExportView
         }
         return $messages;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function setForcedSourceLanguage(int $id): void
-    {
-        $this->forcedSourceLanguage = $id;
-    }
 }

@@ -315,14 +315,6 @@ class CatXmlView extends AbstractExportView
     }
 
     /**
-     * @inheritdoc
-     */
-    public function setForcedSourceLanguage(int $id): void
-    {
-        $this->forcedSourceLanguage = $id;
-    }
-
-    /**
      * @param string $baseUrl
      */
     public function setBaseUrl(string $baseUrl)
