@@ -51,16 +51,6 @@ class ExcelXmlView extends AbstractExportView
     protected int $forcedSourceLanguage = 0;
 
     /**
-     * @param L10nConfiguration $l10ncfgObj
-     * @param int $sysLang
-     * @throws SiteNotFoundException
-     */
-    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
-    {
-        parent::__construct($l10ncfgObj, $sysLang);
-    }
-
-    /**
      * @inheritdoc
      */
     public function render(): string
