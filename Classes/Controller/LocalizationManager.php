@@ -629,16 +629,16 @@ return false;
     protected function catXMLExportImportAction(L10nConfiguration $l10nConfiguration): array
     {
         $internalFlashMessage = '';
-        $flashMessageHtml = '';
         $messagePlaceholder = '###MESSAGE###';
         $flashMessageRenderer = GeneralUtility::makeInstance(FlashMessageRendererResolver::class);
         $existingExportsOverview = '';
         $flashMessages = [];
 
-
         $importXml = GeneralUtility::_POST('import_xml');
-        $importAsDefaultLanguage = GeneralUtility::_POST('import_asdefaultlanguage');
-        $deleteLocalizationsBeforeImport = GeneralUtility::_POST('import_delL10N');
+        $exportXml = GeneralUtility::_POST('export_xml');
+        $importAsDefaultLanguage = (bool)(GeneralUtility::_POST('import_asdefaultlanguage') ?? false);
+        $deleteLocalizationsBeforeImport = (bool)(GeneralUtility::_POST('import_delL10N') ?? false);
+        $checkExports = (bool)(GeneralUtility::_POST('check_exports') ?? false);
 
         // Read uploaded file:
         if ($importXml && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
@@ -646,7 +646,7 @@ return false;
             /** @var TranslationDataFactory $factory */
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
 
-            if ($importAsDefaultLanguage == '1') {
+            if ($importAsDefaultLanguage) {
                 $this->l10nBaseService->setImportAsDefaultLanguage(true);
             }
 
@@ -673,7 +673,7 @@ return false;
                     $flashMessageRenderer->resolve()->render([$flashMessage]),
                 );
             } else {
-                if ($deleteLocalizationsBeforeImport == '1') {
+                if ($deleteLocalizationsBeforeImport) {
                     $delCount = $importManager->delL10N($importManager->getDelL10NDataFromCATXMLNodes($importManager->getXMLNodes()));
                     $message = sprintf(
                         $this->getLanguageService()->getLL('import.xml.delL10N.count.message'),
@@ -734,7 +734,7 @@ return false;
         }
 
         // If export of XML is asked for, do that (this will exit and push a file for download, or upload to FTP is option is checked)
-        if (GeneralUtility::_POST('export_xml')) {
+        if ($exportXml) {
             // Render the XML
             /** @var CatXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->sysLanguage);
@@ -753,7 +753,7 @@ return false;
             }
 
             // Check the export
-            if ((GeneralUtility::_POST('check_exports') ?? false) && $viewClass->checkExports()) {
+            if ($checkExports && $viewClass->checkExports()) {
                 $status = AbstractMessage::INFO;
                 $flashMessageData = [
                     'message' => $messagePlaceholder,
@@ -861,7 +861,7 @@ return false;
     }
 
     /**
-     * @return string
+     * @return array
      * @throws RouteNotFoundException
      */
     protected function getTabContentXmlDownloads(): array
