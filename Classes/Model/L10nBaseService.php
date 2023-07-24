@@ -436,119 +436,116 @@ class L10nBaseService implements LoggerAwareInterface
      */
     protected function _submitContentAsDefaultLanguageAndGetFlexFormDiff(array $accum, array $inputArray)
     {
-        if (is_array($inputArray)) {
-            // Initialize:
-            /** @var FlexFormTools $flexToolObj */
-            $flexToolObj = GeneralUtility::makeInstance(FlexFormTools::class);
-            $TCEmain_data = [];
-            $_flexFormDiffArray = [];
-            // Traverse:
-            foreach ($accum as $pId => $page) {
-                if (!empty($page['items'])) {
-                    foreach ($page['items'] as $table => $elements) {
-                        foreach ($elements as $elementUid => $data) {
-                            if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsDefault'])) {
-                                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsDefault'] as $hookObj) {
-                                    $parameters = [
-                                        'data' => $data,
-                                    ];
-                                    $data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
-                                }
+        // Initialize:
+        /** @var FlexFormTools $flexToolObj */
+        $flexToolObj = GeneralUtility::makeInstance(FlexFormTools::class);
+        $TCEmain_data = [];
+        $_flexFormDiffArray = [];
+        // Traverse:
+        foreach ($accum as $pId => $page) {
+            if (!empty($page['items'])) {
+                foreach ($page['items'] as $table => $elements) {
+                    foreach ($elements as $elementUid => $data) {
+                        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsDefault'])) {
+                            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsDefault'] as $hookObj) {
+                                $parameters = [
+                                    'data' => $data,
+                                ];
+                                $data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
                             }
-                            if (!empty($data['fields'])) {
-                                foreach ($data['fields'] as $key => $tData) {
-                                    if (is_array($tData)
-                                        && is_array($inputArray[$table][$elementUid])
-                                        && array_key_exists($key, $inputArray[$table][$elementUid])
+                        }
+                        if (!empty($data['fields'])) {
+                            foreach ($data['fields'] as $key => $tData) {
+                                if (is_array($tData)
+                                    && is_array($inputArray[$table][$elementUid])
+                                    && array_key_exists($key, $inputArray[$table][$elementUid])
+                                ) {
+                                    [$Ttable, $TuidString, $Tfield, $Tpath] = explode(':', $key);
+                                    [$Tuid, $Tlang, $TdefRecord] = explode('/', $TuidString);
+                                    if (!$this->createTranslationAlsoIfEmpty
+                                        && $inputArray[$table][$elementUid][$key] == ''
+                                        && $Tuid == 'NEW'
+                                        && $Tfield !== trim($GLOBALS['TCA'][$Ttable]['ctrl']['label'] ?? '')
                                     ) {
-                                        [$Ttable, $TuidString, $Tfield, $Tpath] = explode(':', $key);
-                                        [$Tuid, $Tlang, $TdefRecord] = explode('/', $TuidString);
-                                        if (!$this->createTranslationAlsoIfEmpty
-                                            && $inputArray[$table][$elementUid][$key] == ''
-                                            && $Tuid == 'NEW'
-                                            && $Tfield !== trim($GLOBALS['TCA'][$Ttable]['ctrl']['label'] ?? '')
-                                        ) {
-                                            //if data is empty and the field is not the label field of that particular table, do not save it
-                                            unset($inputArray[$table][$elementUid][$key]);
-                                            continue;
-                                        }
-                                        // If FlexForm, we set value in special way:
-                                        if ($Tpath) {
-                                            if (!is_array($TCEmain_data[$Ttable][$elementUid][$Tfield])) {
-                                                $TCEmain_data[$Ttable][$elementUid][$Tfield] = [];
-                                            }
-                                            //TCEMAINDATA is passed as reference here:
-                                            ArrayUtility::setValueByPath(
-                                                $TCEmain_data[$Ttable][$elementUid][$Tfield],
-                                                $Tpath,
-                                                $inputArray[$table][$elementUid][$key] ?? ''
-                                            );
-                                            $_flexFormDiffArray[$key] = [
-                                                'translated' => $inputArray[$table][$elementUid][$key] ?? '',
-                                                'default' => $tData['defaultValue'] ?? '',
-                                            ];
-                                        } else {
-                                            $TCEmain_data[$Ttable][$elementUid][$Tfield] = $inputArray[$table][$elementUid][$key] ?? '';
-                                        }
-                                        unset($inputArray[$table][$elementUid][$key]); // Unsetting so in the end we can see if $inputArray was fully processed.
+                                        //if data is empty and the field is not the label field of that particular table, do not save it
+                                        unset($inputArray[$table][$elementUid][$key]);
+                                        continue;
                                     }
-                                    //debug($tData,'fields not set for: '.$elementUid.'-'.$key);
-                                    //debug($inputArray[$table],'inputarray');
+                                    // If FlexForm, we set value in special way:
+                                    if ($Tpath) {
+                                        if (!is_array($TCEmain_data[$Ttable][$elementUid][$Tfield])) {
+                                            $TCEmain_data[$Ttable][$elementUid][$Tfield] = [];
+                                        }
+                                        //TCEMAINDATA is passed as reference here:
+                                        ArrayUtility::setValueByPath(
+                                            $TCEmain_data[$Ttable][$elementUid][$Tfield],
+                                            $Tpath,
+                                            $inputArray[$table][$elementUid][$key] ?? ''
+                                        );
+                                        $_flexFormDiffArray[$key] = [
+                                            'translated' => $inputArray[$table][$elementUid][$key] ?? '',
+                                            'default' => $tData['defaultValue'] ?? '',
+                                        ];
+                                    } else {
+                                        $TCEmain_data[$Ttable][$elementUid][$Tfield] = $inputArray[$table][$elementUid][$key] ?? '';
+                                    }
+                                    unset($inputArray[$table][$elementUid][$key]); // Unsetting so in the end we can see if $inputArray was fully processed.
                                 }
-                                if (is_array($inputArray[$table][$elementUid]) && !count($inputArray[$table][$elementUid])) {
-                                    unset($inputArray[$table][$elementUid]); // Unsetting so in the end we can see if $inputArray was fully processed.
-                                }
+                                //debug($tData,'fields not set for: '.$elementUid.'-'.$key);
+                                //debug($inputArray[$table],'inputarray');
                             }
-                            if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsDefault'])) {
-                                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsDefault'] as $hookObj) {
-                                    $parameters = [
-                                        'TCEmain_data' => $TCEmain_data,
-                                    ];
-                                    $TCEmain_data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
-                                }
+                            if (is_array($inputArray[$table][$elementUid]) && !count($inputArray[$table][$elementUid])) {
+                                unset($inputArray[$table][$elementUid]); // Unsetting so in the end we can see if $inputArray was fully processed.
                             }
                         }
-                        if (isset($inputArray[$table]) && is_array($inputArray[$table]) && !count($inputArray[$table])) {
-                            unset($inputArray[$table]); // Unsetting so in the end we can see if $inputArray was fully processed.
+                        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsDefault'])) {
+                            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsDefault'] as $hookObj) {
+                                $parameters = [
+                                    'TCEmain_data' => $TCEmain_data,
+                                ];
+                                $TCEmain_data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
+                            }
                         }
+                    }
+                    if (isset($inputArray[$table]) && is_array($inputArray[$table]) && !count($inputArray[$table])) {
+                        unset($inputArray[$table]); // Unsetting so in the end we can see if $inputArray was fully processed.
                     }
                 }
             }
-            $this->lastTCEMAINCommandsCount = 0;
-            // Now, submitting translation data:
-            /** @var DataHandler $tce */
-            $tce = GeneralUtility::makeInstance(DataHandler::class);
-            $tce->dontProcessTransformations = $this->emConfiguration->isImportDontProcessTransformations();
-            $tce->isImporting = true;
-            foreach (array_chunk($TCEmain_data, 100, true) as $dataPart) {
-                $tce->start(
-                    $dataPart,
-                    []
-                ); // check has been done previously that there is a backend user which is Admin and also in live workspace
-                $tce->process_datamap();
-            }
-            if (count($tce->errorLog)) {
-                $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain update errors: ' . implode(
-                    ', ',
-                    $tce->errorLog
-                ));
-            }
-            if (count($tce->autoVersionIdMap) && count($_flexFormDiffArray)) {
-                foreach ($_flexFormDiffArray as $key => $value) {
-                    [$Ttable, $Tuid, $Trest] = explode(':', $key, 3);
-                    if ($tce->autoVersionIdMap[$Ttable][$Tuid] ?? '') {
-                        $_flexFormDiffArray[$Ttable . ':' . $tce->autoVersionIdMap[$Ttable][$Tuid] . ':' . $Trest] = $value;
-                        unset($_flexFormDiffArray[$key]);
-                    }
-                }
-            }
-            // Should be empty now - or there were more information in the incoming array than there should be!
-            if (count($inputArray)) {
-                debug($inputArray, 'These fields were ignored since they were not in the configuration 1:');
-            }
-            return $_flexFormDiffArray;
         }
-        return false;
+        $this->lastTCEMAINCommandsCount = 0;
+        // Now, submitting translation data:
+        /** @var DataHandler $tce */
+        $tce = GeneralUtility::makeInstance(DataHandler::class);
+        $tce->dontProcessTransformations = $this->emConfiguration->isImportDontProcessTransformations();
+        $tce->isImporting = true;
+        foreach (array_chunk($TCEmain_data, 100, true) as $dataPart) {
+            $tce->start(
+                $dataPart,
+                []
+            ); // check has been done previously that there is a backend user which is Admin and also in live workspace
+            $tce->process_datamap();
+        }
+        if (count($tce->errorLog)) {
+            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain update errors: ' . implode(
+                ', ',
+                $tce->errorLog
+            ));
+        }
+        if (count($tce->autoVersionIdMap) && count($_flexFormDiffArray)) {
+            foreach ($_flexFormDiffArray as $key => $value) {
+                [$Ttable, $Tuid, $Trest] = explode(':', $key, 3);
+                if ($tce->autoVersionIdMap[$Ttable][$Tuid] ?? '') {
+                    $_flexFormDiffArray[$Ttable . ':' . $tce->autoVersionIdMap[$Ttable][$Tuid] . ':' . $Trest] = $value;
+                    unset($_flexFormDiffArray[$key]);
+                }
+            }
+        }
+        // Should be empty now - or there were more information in the incoming array than there should be!
+        if (count($inputArray)) {
+            debug($inputArray, 'These fields were ignored since they were not in the configuration 1:');
+        }
+        return $_flexFormDiffArray;
     }
 
     /**
