@@ -994,20 +994,19 @@ return false;
         // Load system languages into menu and check against allowed languages:
         /** @var TranslationConfigurationProvider $t8Tools */
         $t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
-        $sysL = $t8Tools->getSystemLanguages();
-        foreach ($sysL as $sL) {
-            if (!empty($targetLanguages) && !isset($targetLanguages[$sL['uid']])) {
+        $systemLanguages = $t8Tools->getSystemLanguages();
+        foreach ($systemLanguages as $systemLanguage) {
+            if (!empty($targetLanguages) && !isset($targetLanguages[$systemLanguage['uid']])) {
                 continue;
             }
             if (empty($this->MOD_MENU['lang'])) {
                 $this->MOD_MENU['lang'] = [];
             }
-            if ($sL['uid'] > 0 && $this->getBackendUser()->checkLanguageAccess($sL['uid'])) {
-                if ($this->emConfiguration->isEnableHiddenLanguages()) {
-                    $this->MOD_MENU['lang'][$sL['uid']] = $sL['title'];
-                } elseif (!($sL['hidden'] ?? false)) {
-                    $this->MOD_MENU['lang'][$sL['uid']] = $sL['title'];
-                }
+            if ($systemLanguage['uid'] > 0
+                && $this->emConfiguration->isEnableHiddenLanguages()
+                && $this->getBackendUser()->checkLanguageAccess($systemLanguage['uid'])
+            ) {
+                $this->MOD_MENU['lang'][$systemLanguage['uid']] = $systemLanguage['title'];
             }
         }
         parent::menuConfig();
