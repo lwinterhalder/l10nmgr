@@ -691,7 +691,9 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function excelExportImportAction(L10nConfiguration $l10ncfgObj): string
     {
-        if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
+        $importAsDefaultLanguage = (bool)(GeneralUtility::_POST('import_asdefaultlanguage') ?? false);
+
+        if ($importAsDefaultLanguage) {
             $this->l10nBaseService->setImportAsDefaultLanguage(true);
         }
         // Buttons:
@@ -862,6 +864,12 @@ class LocalizationModuleController extends BaseModule12
      */
     protected function catXMLExportImportAction(L10nConfiguration $l10ncfgObj): string
     {
+        $importXml = GeneralUtility::_POST('import_xml');
+        $exportXml = GeneralUtility::_POST('export_xml');
+        $importAsDefaultLanguage = (bool)(GeneralUtility::_POST('import_asdefaultlanguage') ?? false);
+        $deleteLocalizationsBeforeImport = (bool)(GeneralUtility::_POST('import_delL10N') ?? false);
+        $checkExports = (bool)(GeneralUtility::_POST('check_exports') ?? false);
+
         $menuItems = [
             '0' => [
                 'label' => $this->getLanguageService()->getLL('export.xml.headline.title'),
@@ -883,14 +891,13 @@ class LocalizationModuleController extends BaseModule12
         $info = $this->view->getDynamicTabMenu($menuItems, 'ddtabs');
         $actionInfo = '';
         // Read uploaded file:
-        if (GeneralUtility::_POST('import_xml') && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
+        if ($importXml && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
             $uploadedTempFile = GeneralUtility::upload_to_tempfile($_FILES['uploaded_import_file']['tmp_name']);
             /** @var TranslationDataFactory $factory */
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
-            //print "<pre>";
+            if ($importAsDefaultLanguage) {
             //var_dump($this->getBackendUser()->user);
             //print "</pre>";
-            if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
                 $this->l10nBaseService->setImportAsDefaultLanguage(true);
             }
             // Relevant processing of XML Import with the help of the Importmanager
@@ -904,7 +911,7 @@ class LocalizationModuleController extends BaseModule12
             if ($importManager->parseAndCheckXMLFile() === false) {
                 $actionInfo .= '<br /><br />' . $this->view->header($this->getLanguageService()->getLL('import.error.title')) . $importManager->getErrorMessages();
             } else {
-                if (GeneralUtility::_POST('import_delL10N') == '1') {
+                if ($deleteLocalizationsBeforeImport) {
                     $actionInfo .= $this->getLanguageService()->getLL('import.xml.delL10N.message') . '<br />';
                     $delCount = $importManager->delL10N($importManager->getDelL10NDataFromCATXMLNodes($importManager->getXMLNodes()));
                     $actionInfo .= sprintf(
@@ -940,7 +947,7 @@ class LocalizationModuleController extends BaseModule12
             GeneralUtility::unlink_tempfile($uploadedTempFile);
         }
         // If export of XML is asked for, do that (this will exit and push a file for download, or upload to FTP is option is checked)
-        if (GeneralUtility::_POST('export_xml')) {
+        if ($exportXml) {
             // Save user prefs
             $this->getBackendUser()->pushModuleData('l10nmgr/cm1/checkUTF8', GeneralUtility::_POST('check_utf8'));
             // Render the XML
@@ -957,7 +964,7 @@ class LocalizationModuleController extends BaseModule12
                 $viewClass->setModeNoHidden();
             }
             // Check the export
-            if (($this->MOD_SETTINGS['check_exports'] ?? false) && !$viewClass->checkExports()) {
+            if ($checkExports && $viewClass->checkExports()) {
                 /** @var FlashMessage $flashMessage */
                 $flashMessage = GeneralUtility::makeInstance(
                     FlashMessage::class,
