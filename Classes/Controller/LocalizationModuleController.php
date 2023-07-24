@@ -120,10 +120,8 @@ class LocalizationModuleController extends BaseModule12
 
     public function initialize(ServerRequestInterface $request): void
     {
-        $backendUser = $this->getBackendUser();
         $this->currentModule = $request->getAttribute('module');
         $this->MCONF['name'] = $this->currentModule->getIdentifier();
-
         $this->view = $this->moduleTemplateFactory->create($request);
 
         // @extensionScannerIgnoreLine
