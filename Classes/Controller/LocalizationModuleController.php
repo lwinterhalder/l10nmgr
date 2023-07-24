@@ -858,11 +858,7 @@ class LocalizationModuleController extends BaseModule12
         return $xmlView->render();
     }
 
-    /**
-     * @param L10nConfiguration $l10ncfgObj
-     * @return string
-     */
-    protected function catXMLExportImportAction(L10nConfiguration $l10ncfgObj): string
+    protected function catXMLExportImportAction(L10nConfiguration $l10nConfiguration): string
     {
         $importXml = GeneralUtility::_POST('import_xml');
         $exportXml = GeneralUtility::_POST('export_xml');
@@ -938,7 +934,7 @@ class LocalizationModuleController extends BaseModule12
                 $translationData->setPreviewLanguage($this->previewLanguage);
                 //$actionInfo.="<pre>".var_export($GLOBALS['BE_USER'],true)."</pre>";
                 unset($importManager);
-                $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
+                $this->l10nBaseService->saveTranslation($l10nConfiguration, $translationData);
                 $icon = $this->iconFactory->getIcon('status-dialog-notification', Icon::SIZE_SMALL)->render();
                 $actionInfo .= '<br /><br />' . $icon . 'Import done<br /><br />(Command count:' . $this->l10nBaseService->lastTCEMAINCommandsCount . ')';
             }
@@ -950,7 +946,7 @@ class LocalizationModuleController extends BaseModule12
             $this->getBackendUser()->pushModuleData('l10nmgr/cm1/checkUTF8', GeneralUtility::_POST('check_utf8'));
             // Render the XML
             /** @var CatXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10ncfgObj, $this->sysLanguage);
+            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->sysLanguage);
             $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -986,7 +982,7 @@ class LocalizationModuleController extends BaseModule12
 
                         /** @var NotificationService $notificationService */
                         $notificationService = GeneralUtility::makeInstance(NotificationService::class);
-                        $notificationService->sendMail($filename, $l10ncfgObj, $this->sysLanguage, $this->emConfiguration);
+                        $notificationService->sendMail($filename, $l10nConfiguration, $this->sysLanguage, $this->emConfiguration);
 
                         // Prepare a success message for display
                         $title = $this->getLanguageService()->getLL('export.ftp.success');
