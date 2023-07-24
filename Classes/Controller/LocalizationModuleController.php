@@ -83,21 +83,14 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 #[Controller]
 class LocalizationModuleController extends BaseModule12
 {
-    /**
-     * @var int Default language to export
-     */
+    /** @var int Default language to export */
     protected int $sysLanguage = 0; // Internal
 
-    /**
-     * @var int Forced source language to export
-     */
+    /** @var int Forced source language to export */
     public int $previewLanguage = 0;
 
     protected ModuleTemplate $view;
-    
-    /**
-     * @var array
-     */
+
     protected array $pageinfo;
 
     protected array $settings = [
