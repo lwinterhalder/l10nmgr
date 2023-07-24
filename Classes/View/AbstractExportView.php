@@ -129,7 +129,7 @@ abstract class AbstractExportView implements ExportViewInterface
         // Load system languages into menu:
         /** @var SiteFinder $siteFinder */
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-        $this->site = $siteFinder->getSiteByPageId((int)$l10ncfgObj->getData('pid'));
+        $this->site = $siteFinder->getSiteByPageId($l10ncfgObj->getPid());
         $this->getLanguageService()->includeLLFile('EXT:l10nmgr/Resources/Private/Language/Cli/locallang.xml');
     }
 
@@ -178,11 +178,11 @@ abstract class AbstractExportView implements ExportViewInterface
             'translation_lang' => $this->sysLang,
             'crdate' => $date,
             'tstamp' => $date,
-            'l10ncfg_id' => (int)$this->l10ncfgObj->getData('uid'),
-            'pid' => (int)$this->l10ncfgObj->getData('pid'),
-            'tablelist' => $this->l10ncfgObj->getData('tablelist'),
-            'title' => $this->l10ncfgObj->getData('title'),
-            'cruser_id' => (int)$this->l10ncfgObj->getData('cruser_id'),
+            'l10ncfg_id' => $this->l10ncfgObj->getUid(),
+            'pid' => $this->l10ncfgObj->getPid(),
+            'tablelist' => $this->l10ncfgObj->getTableList(),
+            'title' => $this->l10ncfgObj->getTitle(),
+            'cruser_id' => $this->l10ncfgObj->getCrUserId(),
             'filename' => $this->getFilename(),
             'exportType' => $this->exportType,
         ];
@@ -252,7 +252,7 @@ abstract class AbstractExportView implements ExportViewInterface
             }
         }
         if ($sourceLang !== '' && $targetLang !== '') {
-            $fileNamePrefix = (trim($this->l10ncfgObj->getData('filenameprefix'))) ? $this->l10ncfgObj->getData('filenameprefix') . '_' . $fileType : $fileType;
+            $fileNamePrefix = (trim($this->l10ncfgObj->getFileNamePrefix())) ? $this->l10ncfgObj->getFileNamePrefix() . '_' . $fileType : $fileType;
             // Setting filename:
             $filename = $fileNamePrefix . '_' . $sourceLang . '_to_' . $targetLang . '_' . date('dmy-His') . '.xml';
             $this->filename = $filename;
@@ -273,7 +273,7 @@ abstract class AbstractExportView implements ExportViewInterface
             ->where(
                 $queryBuilder->expr()->eq(
                     'l10ncfg_id',
-                    $queryBuilder->createNamedParameter($this->l10ncfgObj->getId(), PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->l10ncfgObj->getUid(), PDO::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'exportType',
@@ -373,7 +373,7 @@ abstract class AbstractExportView implements ExportViewInterface
             ->where(
                 $queryBuilder->expr()->eq(
                     'l10ncfg_id',
-                    $queryBuilder->createNamedParameter((int)$this->l10ncfgObj->getData('uid'), PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->l10ncfgObj->getUid(), PDO::PARAM_INT)
                 ),
                 $queryBuilder->expr()->eq(
                     'exportType',

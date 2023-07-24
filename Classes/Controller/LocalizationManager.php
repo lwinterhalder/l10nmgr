@@ -197,7 +197,7 @@ return false;
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action] ?? '';
 
-                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getId());
+                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getUid());
                 $selectMenus = [];
                 // @extensionScannerIgnoreLine
                 $selectMenus[] = self::getFuncMenu(

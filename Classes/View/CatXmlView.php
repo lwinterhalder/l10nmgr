@@ -81,7 +81,7 @@ class CatXmlView extends AbstractExportView
         $targetIso = '';
         if (empty($this->baseUrl)) {
             $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-            $this->baseUrl = (string)$siteFinder->getSiteByPageId((int)$this->l10ncfgObj->getData('pid'))->getRouter()->generateUri(0);
+            $this->baseUrl = (string)$siteFinder->getSiteByPageId($this->l10ncfgObj->getPid())->getRouter()->generateUri(0);
         }
         // Traverse the structure and generate XML output:
         foreach ($accum as $pId => $page) {
@@ -148,7 +148,7 @@ class CatXmlView extends AbstractExportView
         $XML = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $XML .= '<!DOCTYPE TYPO3L10N [ <!ENTITY nbsp " "> ]>' . "\n" . '<TYPO3L10N>' . "\n";
         $XML .= "\t" . '<head>' . "\n";
-        $XML .= "\t\t" . '<t3_l10ncfg translate="no">' . $this->l10ncfgObj->getData('uid') . '</t3_l10ncfg>' . "\n";
+        $XML .= "\t\t" . '<t3_l10ncfg translate="no">' . $this->l10ncfgObj->getUid() . '</t3_l10ncfg>' . "\n";
         $XML .= "\t\t" . '<t3_sysLang translate="no">' . $sysLang . '</t3_sysLang>' . "\n";
 
         $sourceLang = '';
@@ -303,8 +303,8 @@ class CatXmlView extends AbstractExportView
     protected function additionalHeaderData(): string
     {
         $additionalHeaderData = '';
-        if (!empty($this->l10ncfgObj->getData('metadata'))) {
-            $additionalHeaderDataArray = json_decode($this->l10ncfgObj->getData('metadata'));
+        if (!empty($this->l10ncfgObj->getMetaData())) {
+            $additionalHeaderDataArray = json_decode($this->l10ncfgObj->getMetaData());
             if (is_array($additionalHeaderDataArray) && !empty($additionalHeaderDataArray)) {
                 foreach ($additionalHeaderDataArray as $key => $value) {
                     $additionalHeaderData .= "\t\t" . '<' . $key . '>' . $value . '</' . $key . '>' . "\n";

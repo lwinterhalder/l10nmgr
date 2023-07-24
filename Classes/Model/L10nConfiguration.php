@@ -82,7 +82,7 @@ class L10nConfiguration
      *
      * @return int
      **/
-    public function getId(): int
+    public function getUid(): int
     {
         return (int)$this->getData('uid');
     }
@@ -105,6 +105,61 @@ class L10nConfiguration
         return $this->getData('targetLanguages');
     }
 
+    public function getForcedSourceLanguage(): int
+    {
+        return (int)$this->getData('forcedSourceLanguage');
+    }
+
+    public function overrideExistingTranslations(): bool
+    {
+        return (bool)$this->getData('overrideexistingtranslations');
+    }
+
+    public function preTranslateContent(): bool
+    {
+        return (bool)$this->getData('pretranslatecontent');
+    }
+
+    public function getTableList(): string
+    {
+        return $this->getData('tablelist');
+    }
+
+    public function getTitle(): string
+    {
+        return $this->getData('title');
+    }
+
+    public function getCrUserId(): int
+    {
+        return (int)$this->getData('cruser_id');
+    }
+
+    public function getFileNamePrefix(): string
+    {
+        return $this->getData('filenameprefix');
+    }
+
+    public function getMetaData(): string
+    {
+        return $this->getData('metadata');
+    }
+
+    public function getDepth(): int
+    {
+        return (int)$this->getData('depth');
+    }
+
+    public function getExclude(): string
+    {
+        return $this->getData('exclude');
+    }
+
+    public function getInclude(): string
+    {
+        return $this->getData('include');
+    }
+
     /**
      * get a field of the current cfgr record
      *
@@ -112,7 +167,7 @@ class L10nConfiguration
      *
      * @return string Value of the field
      **/
-    public function getData(string $key): string
+    private function getData(string $key): string
     {
         return $key === 'pid' && !empty($this->l10ncfg['depth']) && (int)$this->l10ncfg['depth'] === -1 && $this->sourcePid
             ? (string)$this->sourcePid

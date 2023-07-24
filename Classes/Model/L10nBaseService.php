@@ -128,7 +128,7 @@ class L10nBaseService implements LoggerAwareInterface
                 $processingObject->processBeforeSaving($l10ncfgObj, $translationObj, $this);
             }
         }
-        if (!$l10ncfgObj->getData('pretranslatecontent')) {
+        if (!$l10ncfgObj->preTranslateContent()) {
             $preTranslate = false;
         }
         if ($preTranslate) {
@@ -359,7 +359,7 @@ class L10nBaseService implements LoggerAwareInterface
         TranslationData $translationData
     ) {
         // feature is not enabled
-        if (!$configurationObject->getData('overrideexistingtranslations')) {
+        if (!$configurationObject->overrideExistingTranslations()) {
             return;
         }
         $inputArray = $translationData->getTranslationData();

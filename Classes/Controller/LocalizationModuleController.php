@@ -262,7 +262,7 @@ class LocalizationModuleController extends BaseModule12
             if ($this->id && $access) {
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action] ?? '';
-                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getId());
+                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getUid());
                 $userCanEditTranslations = count($this->MOD_MENU['lang'] ?? []) > 0;
 
                 // Render content:
@@ -312,8 +312,8 @@ class LocalizationModuleController extends BaseModule12
         if ($L10nConfiguration->isLoaded()) {
             // Setting page id
             // @extensionScannerIgnoreLine
-            $this->id = (int)$L10nConfiguration->getData('pid');
-            $forcedSourceLanguage = (int)$L10nConfiguration->getData('forcedSourceLanguage');
+            $this->id = $L10nConfiguration->getPid();
+            $forcedSourceLanguage = $L10nConfiguration->getForcedSourceLanguage();
             if ($forcedSourceLanguage > 0) {
                 $this->previewLanguage = $forcedSourceLanguage;
             }
@@ -347,7 +347,7 @@ class LocalizationModuleController extends BaseModule12
                         $action,
                         $this->MOD_MENU['action'] ?? [],
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getUid(),
                         $this->getLanguageService()->getLL('general.export.choose.action.title')
                     ) .
                     // @extensionScannerIgnoreLine
@@ -357,7 +357,7 @@ class LocalizationModuleController extends BaseModule12
                         (string)$this->sysLanguage,
                         $this->MOD_MENU['lang'] ?? [],
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getUid(),
                         $this->getLanguageService()->getLL('export.overview.targetlanguage.label'),
                         (string)$this->previewLanguage
                     ) .
@@ -368,7 +368,7 @@ class LocalizationModuleController extends BaseModule12
                         'SET[onlyChangedContent]',
                         $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getUid(),
                         '',
                         $this->getLanguageService()->getLL('export.xml.new.title')
                     ) .
@@ -378,7 +378,7 @@ class LocalizationModuleController extends BaseModule12
                         'SET[noHidden]',
                         $this->MOD_SETTINGS['noHidden'] ?? '',
                         '',
-                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getId(),
+                        '&srcPID=' . rawurlencode(GeneralUtility::_GET('srcPID')) . '&exportUID=' . $L10nConfiguration->getUid(),
                         '',
                         $this->getLanguageService()->getLL('export.xml.noHidden.title')
                     ) .

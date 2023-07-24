@@ -62,11 +62,11 @@ class L10nConfigurationDetailView
         }
 
         $configurationSettings = [
-            'header' => htmlspecialchars($this->l10ncfgObj->getData('title')) . ' [' . $this->l10ncfgObj->getData('uid') . ']',
-            'depth' => htmlspecialchars($this->l10ncfgObj->getData('depth')),
-            'tables' => htmlspecialchars($this->l10ncfgObj->getData('tablelist')),
-            'exclude' => htmlspecialchars($this->l10ncfgObj->getData('exclude')),
-            'include' => htmlspecialchars($this->l10ncfgObj->getData('include')),
+            'header' => htmlspecialchars($this->l10ncfgObj->getTitle()) . ' [' . $this->l10ncfgObj->getUid() . ']',
+            'depth' => $this->l10ncfgObj->getDepth(),
+            'tables' => htmlspecialchars($this->l10ncfgObj->getTableList()),
+            'exclude' => htmlspecialchars($this->l10ncfgObj->getExclude()),
+            'include' => htmlspecialchars($this->l10ncfgObj->getInclude()),
         ];
 
         return str_replace(',', ', ', $configurationSettings);
