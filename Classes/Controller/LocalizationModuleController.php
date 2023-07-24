@@ -896,8 +896,6 @@ class LocalizationModuleController extends BaseModule12
             /** @var TranslationDataFactory $factory */
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
             if ($importAsDefaultLanguage) {
-            //var_dump($this->getBackendUser()->user);
-            //print "</pre>";
                 $this->l10nBaseService->setImportAsDefaultLanguage(true);
             }
             // Relevant processing of XML Import with the help of the Importmanager
