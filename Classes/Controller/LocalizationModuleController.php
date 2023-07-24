@@ -94,14 +94,7 @@ class LocalizationModuleController extends BaseModule12
     public int $previewLanguage = 0;
 
     protected ModuleTemplate $view;
-
-    /**
-     * The name of the module
-     *
-     * @var string
-     */
-    protected string $moduleName = 'LocalizationManager';
-
+    
     /**
      * @var array
      */
@@ -136,9 +129,7 @@ class LocalizationModuleController extends BaseModule12
     {
         $backendUser = $this->getBackendUser();
         $this->currentModule = $request->getAttribute('module');
-        $this->MCONF = [
-            'name' => $this->currentModule->getIdentifier(),
-        ];
+        $this->MCONF['name'] = $this->currentModule->getIdentifier();
 
         $this->view = $this->moduleTemplateFactory->create($request);
 
