@@ -268,7 +268,7 @@ class Import extends L10nCommand
                 if (empty($importManager->headerData['t3_previewId'])) {
                     $pageIds = $importManager->getPidsFromCATXMLNodes($importManager->getXMLNodes());
                 } else {
-                    $pageIds[0] = $importManager->headerData['t3_previewId'] ?? 0;
+                    $pageIds[0] = $importManager->headerData['t3_previewId'];
                 }
                 /** @var MkPreviewLinkService $mkPreviewLinks */
                 $mkPreviewLinks = GeneralUtility::makeInstance(
