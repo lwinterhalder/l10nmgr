@@ -139,7 +139,7 @@ class LocalizationModuleController extends BaseModule12
     {
         $this->initialize($request);
 
-        $this->mainNew();
+        $this->main();
 
         return $this->view->renderResponse('LocalizationModule/Index');
     }
@@ -152,7 +152,7 @@ class LocalizationModuleController extends BaseModule12
     {
         $selectMenus = [];
         // @extensionScannerIgnoreLine
-        $selectMenus[] = self::getFuncMenuNew(
+        $selectMenus[] = self::getFuncMenu(
             $this->id,
             'SET[action]',
             $action,
@@ -163,7 +163,7 @@ class LocalizationModuleController extends BaseModule12
         );
 
         // @extensionScannerIgnoreLine
-        $selectMenus[] = self::getFuncMenuNew(
+        $selectMenus[] = self::getFuncMenu(
             $this->id,
             'SET[lang]',
             (string)$this->sysLanguage,
@@ -175,7 +175,7 @@ class LocalizationModuleController extends BaseModule12
 
         $checkBoxes = [];
         // @extensionScannerIgnoreLine
-        $checkBoxes[] = self::getFuncCheckNew(
+        $checkBoxes[] = self::getFuncCheck(
             $this->id,
             'SET[onlyChangedContent]',
             $this->MOD_SETTINGS['onlyChangedContent'] ?? '',
@@ -185,7 +185,7 @@ class LocalizationModuleController extends BaseModule12
             $this->getLanguageService()->getLL('export.xml.new.title')
         );
         // @extensionScannerIgnoreLine
-        $checkBoxes[] = self::getFuncCheckNew(
+        $checkBoxes[] = self::getFuncCheck(
             $this->id,
             'SET[noHidden]',
             $this->MOD_SETTINGS['noHidden'] ?? '',
@@ -207,7 +207,7 @@ class LocalizationModuleController extends BaseModule12
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    protected function mainNew()
+    protected function main(): void
     {
         $backendUser = $this->getBackendUser();
 
@@ -241,7 +241,7 @@ class LocalizationModuleController extends BaseModule12
                 // Render content:
                 $moduleContent = [];
                 if ($userCanEditTranslations) {
-                    $moduleContent = $this->moduleContentNew($l10nConfiguration);
+                    $moduleContent = $this->moduleContent($l10nConfiguration);
                 }
 
                 // Create and render view to show details for the current L10N Manager configuration
@@ -281,7 +281,7 @@ class LocalizationModuleController extends BaseModule12
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    public static function getFuncMenuNew(
+    public static function getFuncMenu(
         $mainParams,
         string $elementName,
         string $currentValue,
@@ -366,7 +366,7 @@ class LocalizationModuleController extends BaseModule12
      * @throws RouteNotFoundException
      * @see getFuncMenu()
      */
-    public static function getFuncCheckNew(
+    public static function getFuncCheck(
         $mainParams,
         string $elementName,
         string $currentValue,
@@ -393,7 +393,7 @@ class LocalizationModuleController extends BaseModule12
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    protected function moduleContentNew(L10nConfiguration $l10NConfiguration): array
+    protected function moduleContent(L10nConfiguration $l10NConfiguration): array
     {
         $subcontent = [];
 
@@ -403,10 +403,10 @@ class LocalizationModuleController extends BaseModule12
                 $subcontent = $this->linkOverviewAndOnlineTranslationAction($l10NConfiguration, $subcontent);
                 break;
             case 'export_excel':
-                $subcontent = $this->excelExportImportActionNew($l10NConfiguration);
+                $subcontent = $this->excelExportImportAction($l10NConfiguration);
                 break;
             case 'export_xml':
-                $subcontent = $this->exportImportXmlActionNew($l10NConfiguration);
+                $subcontent = $this->exportImportXmlAction($l10NConfiguration);
                 break;
             default:
                 $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
@@ -448,7 +448,7 @@ class LocalizationModuleController extends BaseModule12
         $selectOptions += $this->MOD_MENU['lang'];
 
         // @extensionScannerIgnoreLine
-        return self::getFuncMenuNew(
+        return self::getFuncMenu(
             $this->id,
             'export_xml_forcepreviewlanguage',
             (string)$this->previewLanguage,
@@ -460,12 +460,12 @@ class LocalizationModuleController extends BaseModule12
     }
 
     /**
-     * @param L10nConfiguration $l10ncfgObj
+     * @param L10nConfiguration $l10nConfiguration
      * @return array[]
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \TYPO3\CMS\Core\Exception
      */
-    protected function excelExportImportActionNew(L10nConfiguration $l10ncfgObj): array
+    protected function excelExportImportAction(L10nConfiguration $l10nConfiguration): array
     {
         $existingExportsOverview = '';
         $isImport = false;
@@ -495,7 +495,7 @@ class LocalizationModuleController extends BaseModule12
             $translationData->setLanguage($this->sysLanguage);
             $translationData->setPreviewLanguage($this->previewLanguage);
             GeneralUtility::unlink_tempfile($uploadedTempFile);
-            $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
+            $this->l10nBaseService->saveTranslation($l10nConfiguration, $translationData);
             $importSuccess = true;
 
             $status = AbstractMessage::INFO;
@@ -515,7 +515,7 @@ class LocalizationModuleController extends BaseModule12
         if ($exportExcel) {
             // Render the XML
             /** @var ExcelXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10ncfgObj, $this->sysLanguage);
+            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
             $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -608,7 +608,7 @@ class LocalizationModuleController extends BaseModule12
         return $xmlView->render();
     }
 
-    protected function catXMLExportImportActionNew(L10nConfiguration $l10nConfiguration): array
+    protected function catXMLExportImportAction(L10nConfiguration $l10nConfiguration): array
     {
         $internalFlashMessage = '';
         $messagePlaceholder = '###MESSAGE###';
@@ -1046,14 +1046,14 @@ class LocalizationModuleController extends BaseModule12
      * @param L10nConfiguration $l10NConfiguration
      * @return string
      */
-    protected function exportImportXmlActionNew(L10nConfiguration $l10NConfiguration): array
+    protected function exportImportXmlAction(L10nConfiguration $l10NConfiguration): array
     {
         $prefs['utf8'] = GeneralUtility::_POST('check_utf8');
         $prefs['noxmlcheck'] = GeneralUtility::_POST('no_check_xml');
         $prefs['check_exports'] = GeneralUtility::_POST('check_exports');
         $this->getBackendUser()->pushModuleData('l10nmgr/cm1/prefs', $prefs);
 
-        return $this->catXMLExportImportActionNew($l10NConfiguration);
+        return $this->catXMLExportImportAction($l10NConfiguration);
     }
 
     /**
