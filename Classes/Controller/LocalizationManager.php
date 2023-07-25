@@ -1002,11 +1002,12 @@ return false;
             if (empty($this->MOD_MENU['lang'])) {
                 $this->MOD_MENU['lang'] = [];
             }
-            if ($systemLanguage['uid'] > 0
-                && $this->emConfiguration->isEnableHiddenLanguages()
-                && $this->getBackendUser()->checkLanguageAccess($systemLanguage['uid'])
-            ) {
-                $this->MOD_MENU['lang'][$systemLanguage['uid']] = $systemLanguage['title'];
+            if ($systemLanguage['uid'] > 0 && $this->getBackendUser()->checkLanguageAccess($systemLanguage['uid'])) {
+                if ($this->emConfiguration->isEnableHiddenLanguages()) {
+                    $this->MOD_MENU['lang'][$systemLanguage['uid']] = $systemLanguage['title'];
+                } elseif (!($systemLanguage['hidden'] ?? false)) {
+                    $this->MOD_MENU['lang'][$systemLanguage['uid']] = $systemLanguage['title'];
+                }
             }
         }
         parent::menuConfig();
