@@ -293,8 +293,8 @@ abstract class AbstractExportView implements ExportViewInterface
     /**
      * Renders a list of saved exports as HTML table.
      *
+     * @todo Migrate to Fluid
      * @return string HTML table
-     * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Driver\Exception
      */
     public function renderExports(): string
