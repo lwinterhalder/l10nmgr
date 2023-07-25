@@ -144,14 +144,14 @@ class ConfigurationModuleController
     {
         // Get the available configurations
         $l10nConfigurations = $this->getAllConfigurations();
-        foreach ($l10nConfigurations as $key => $l10nConfiguation) {
+        foreach ($l10nConfigurations as $key => $l10nConfiguration) {
             $l10nConfigurations[$key]['link'] = (string)$this->uriBuilder->buildUriFromRoute($this->currentModule->getIdentifier() . '.localize', [
-                    'id' => $l10nConfiguation['pid'] ?? 0,
+                    'id' => $l10nConfiguration['pid'] ?? 0,
                     // @extensionScannerIgnoreLine
                     'srcPID' => $this->id,
-                    'exportUID' => $l10nConfiguation['uid'] ?? 0,
+                    'exportUID' => $l10nConfiguration['uid'] ?? 0,
                 ]);
-            $pagePath = BackendUtility::getRecordPath($l10nConfiguation['pid'] ?? 0, '1', 20, 50);
+            $pagePath = BackendUtility::getRecordPath($l10nConfiguration['pid'] ?? 0, '1', 20, 50);
             $l10nConfigurations[$key]['path'] = (is_array($pagePath)) ? ($pagePath[1] ?? '') : $pagePath;
         }
 
