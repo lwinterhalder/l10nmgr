@@ -131,9 +131,12 @@ class LocalizationModuleController extends BaseModule12
      * Injects the request object for the current request or subrequest
      * Then checks for module functions that have hooked in, and renders menu etc.
      *
+     * @param ServerRequestInterface $request
      * @return ResponseInterface the response with the content
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \TYPO3\CMS\Core\Exception
      */
     public function handleRequest(ServerRequestInterface $request): ResponseInterface
     {
@@ -206,6 +209,8 @@ class LocalizationModuleController extends BaseModule12
      *
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \TYPO3\CMS\Core\Exception
      */
     protected function main(): void
     {
@@ -390,8 +395,10 @@ class LocalizationModuleController extends BaseModule12
     /**
      * Creating module content
      *
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
+     * @param L10nConfiguration $l10NConfiguration
+     * @return array
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws \TYPO3\CMS\Core\Exception
      */
     protected function moduleContent(L10nConfiguration $l10NConfiguration): array
     {
@@ -416,10 +423,6 @@ class LocalizationModuleController extends BaseModule12
         return $subcontent;
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @return array
-     */
     protected function inlineEditAction(L10nConfiguration $l10NConfiguration): array
     {
         // simple init of translation object:
@@ -440,7 +443,6 @@ class LocalizationModuleController extends BaseModule12
 
         return $info;
     }
-
 
     protected function makePreviewLanguageMenu(): array
     {
@@ -838,10 +840,6 @@ class LocalizationModuleController extends BaseModule12
         ];
     }
 
-    /**
-     * @return array
-     * @throws RouteNotFoundException
-     */
     protected function getTabContentXmlDownloads(): array
     {
         $files = [];
@@ -864,10 +862,6 @@ class LocalizationModuleController extends BaseModule12
         return $files;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function downloadSetting(ServerRequestInterface $request): ResponseInterface
     {
         $settingId = $request->getQueryParams()['setting'];
@@ -882,10 +876,6 @@ class LocalizationModuleController extends BaseModule12
             ->withBody($body);
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     protected function getSetting(string $key): string
     {
         return $this->settings[$key] ?? '';
@@ -990,9 +980,6 @@ class LocalizationModuleController extends BaseModule12
         parent::menuConfig();
     }
 
-    /**
-     * @return L10nConfiguration
-     */
     protected function getL10NConfiguration(): L10nConfiguration
     {
         /** @var L10nConfiguration $l10nConfiguration */
@@ -1003,11 +990,6 @@ class LocalizationModuleController extends BaseModule12
         return $l10nConfiguration;
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @param array $result
-     * @return array
-     */
     protected function linkOverviewAndOnlineTranslationAction(
         L10nConfiguration $l10NConfiguration,
         array $result
@@ -1042,10 +1024,6 @@ class LocalizationModuleController extends BaseModule12
         ];
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @return string
-     */
     protected function exportImportXmlAction(L10nConfiguration $l10NConfiguration): array
     {
         $prefs['utf8'] = GeneralUtility::_POST('check_utf8');
@@ -1056,10 +1034,6 @@ class LocalizationModuleController extends BaseModule12
         return $this->catXMLExportImportAction($l10NConfiguration);
     }
 
-    /**
-     * @param L10nConfiguration $l10nConfiguration
-     * @return array
-     */
     protected function renderConfigurationTable(L10nConfiguration $l10nConfiguration): array
     {
         /** @var L10nConfigurationDetailView $l10nmgrconfigurationView */
