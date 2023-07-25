@@ -144,6 +144,7 @@ class LocalizationModuleController extends BaseModule12
         switch ($this->MOD_SETTINGS['action'] ?? '') {
             case 'inlineEdit':
             case 'link':
+            case 'export_excel':
                 // TODO: Rename this to main()
                 $this->mainNew();
 
@@ -158,6 +159,10 @@ class LocalizationModuleController extends BaseModule12
 
     }
 
+    /**
+     * @throws ResourceNotFoundException
+     * @throws RouteNotFoundException
+     */
     protected function makeFunctionMenu(string $action, string $addParams): array
     {
         $selectMenus = [];
@@ -224,9 +229,9 @@ class LocalizationModuleController extends BaseModule12
         // Get language to export/import
         $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
-        $this->view->setTitle('L10N Manager');
-
-        $this->view->setForm('<form action="" method="post" enctype="multipart/form-data">');
+        $this->view
+            ->setTitle('L10N Manager')
+            ->setForm('<form action="" method="post" enctype="multipart/form-data">');
 
         // Find l10n configuration record
         $l10nConfiguration = $this->getL10NConfiguration();
@@ -239,12 +244,13 @@ class LocalizationModuleController extends BaseModule12
                 $this->id,
                 $backendUser->getPagePermsClause(Permission::PAGE_SHOW)
             );
+
             $access = is_array($this->pageinfo);
             // @extensionScannerIgnoreLine
             if ($this->id && $access) {
                 $action = (string)($this->MOD_SETTINGS['action'] ?? '');
                 $title = $this->MOD_MENU['action'][$action] ?? '';
-                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getUid());
+
                 $userCanEditTranslations = count($this->MOD_MENU['lang'] ?? []) > 0;
 
                 // Render content:
@@ -256,6 +262,7 @@ class LocalizationModuleController extends BaseModule12
                 // Create and render view to show details for the current L10N Manager configuration
                 $configurationTable = $this->renderConfigurationTable($l10nConfiguration);
 
+                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getUid());
                 $functionMenu = $this->makeFunctionMenu($action, $addParams);
 
                 $this->view->assignMultiple([
@@ -618,7 +625,7 @@ class LocalizationModuleController extends BaseModule12
                 $subcontent = $this->linkOverviewAndOnlineTranslationAction($l10NConfiguration, $subcontent);
                 break;
             case 'export_excel':
-                $subcontent = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
+                $subcontent = $this->excelExportImportActionNew($l10NConfiguration);
                 break;
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
@@ -640,18 +647,8 @@ class LocalizationModuleController extends BaseModule12
     protected function moduleContent(L10nConfiguration $l10NConfiguration): void
     {
         switch ($this->MOD_SETTINGS['action'] ?? '') {
-            case 'inlineEdit':
-            case 'link':
-                $subcontent = '';
-                break;
-            case 'export_excel':
-                $subcontent = $this->excelExportImportAction($l10NConfiguration) . '</div></div></div></div></div><div class="row">';
-                break;
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration) . '</div></div></div></div>';
-                break;
-            default:
-                $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
                 break;
         }
 
@@ -683,56 +680,78 @@ class LocalizationModuleController extends BaseModule12
         return $info;
     }
 
+
+    protected function makePreviewLanguageMenu(): array
+    {
+        $selectOptions = ['0' => '-default-'];
+        $selectOptions += $this->MOD_MENU['lang'];
+
+        // @extensionScannerIgnoreLine
+        return self::getFuncMenuNew(
+            $this->id,
+            'export_xml_forcepreviewlanguage',
+            (string)$this->previewLanguage,
+            $selectOptions,
+            '',
+            '',
+            $this->getLanguageService()->getLL('export.xml.source-language.title')
+        );
+    }
+
     /**
      * @param L10nConfiguration $l10ncfgObj
-     * @return string
+     * @return array[]
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    protected function excelExportImportAction(L10nConfiguration $l10ncfgObj): string
+    protected function excelExportImportActionNew(L10nConfiguration $l10ncfgObj): array
     {
+        $existingExportsOverview = '';
+        $isImport = false;
+        $importSuccess = false;
+        $internalFlashMessage = '';
+        $flashMessageHtml = '';
+        $messagePlaceholder = '###MESSAGE###';
+        $flashMessageRenderer = GeneralUtility::makeInstance(FlashMessageRendererResolver::class);
+
         $importAsDefaultLanguage = (bool)(GeneralUtility::_POST('import_asdefaultlanguage') ?? false);
+        $importExcel = GeneralUtility::_POST('import_excel');
+        $exportExcel = GeneralUtility::_POST('export_excel');
+        $checkExports = GeneralUtility::_POST('check_exports') ?? false;
 
         if ($importAsDefaultLanguage) {
             $this->l10nBaseService->setImportAsDefaultLanguage(true);
         }
-        // Buttons:
-        $_selectOptions = ['0' => '-default-'];
-        $_selectOptions = $_selectOptions + $this->MOD_MENU['lang'];
-        $info = '<div class="form-section">' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="check_exports" /> ' . $this->getLanguageService()->getLL('export.xml.check_exports.title') .
-            '</label></div></div>' .
-            '<div class="form-group mb-2"><div class="checkbox"><label>' .
-            '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
-            '</label></div></div>' .
-            '</div><div class="form-section"><div class="form-group mb-2">
-<label>' . $this->getLanguageService()->getLL('export.xml.source-language.title') . '</label><br />' .
-            $this->_getSelectField('export_xml_forcepreviewlanguage', (string)$this->previewLanguage, $_selectOptions) .
-            '</div></div><div class="form-section"><div class="form-group mb-2">
-<label>' . $this->getLanguageService()->getLL('general.action.import.upload.title') . '</label><br />' .
-            '<input type="file" size="60" name="uploaded_import_file" />' .
-            '</div></div><div class="form-section"><div class="form-group mb-2">' .
-            '<input class="btn btn-default btn-info" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" /> ' .
-            '<input class="btn btn-default btn-success" type="submit" value="' . $this->getLanguageService()->getLL('general.action.export.xml.button.title') . '" name="export_excel" /> ' .
-            '<input class="btn btn-default btn-warning" type="submit" value="' . $this->getLanguageService()->getLL('general.action.import.xml.button.title') . '" name="import_excel" />
-</div></div></div>';
+
         // Read uploaded file:
-        if (GeneralUtility::_POST('import_excel') && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
+        if ($importExcel && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
+            $isImport = true;
             $uploadedTempFile = GeneralUtility::upload_to_tempfile($_FILES['uploaded_import_file']['tmp_name']);
             /** @var TranslationDataFactory $factory */
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
-            //TODO: catch exeption
+            // TODO: catch exception
             $translationData = $factory->getTranslationDataFromExcelXMLFile($uploadedTempFile);
             $translationData->setLanguage($this->sysLanguage);
             $translationData->setPreviewLanguage($this->previewLanguage);
             GeneralUtility::unlink_tempfile($uploadedTempFile);
             $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
-            $icon = $this->iconFactory->getIcon('status-dialog-notification', Icon::SIZE_SMALL)->render();
-            $info .= '<br /><br />' . $icon . $this->getLanguageService()->getLL('import.success.message') . '<br /><br />';
+            $importSuccess = true;
+
+            $status = AbstractMessage::INFO;
+            $flashMessageData = [
+                'message' => $messagePlaceholder,
+                'title' => $this->getLanguageService()->getLL('import.success.message'),
+                'severity' => $status,
+            ];
+            $flashMessage = FlashMessage::createFromArray($flashMessageData);
+            $flashMessageHtml = str_replace(
+                $messagePlaceholder,
+                '',
+                $flashMessageRenderer->resolve()->render([$flashMessage])
+            );
         }
         // If export of XML is asked for, do that (this will exit and push a file for download)
-        if (GeneralUtility::_POST('export_excel')) {
+        if ($exportExcel) {
             // Render the XML
             /** @var ExcelXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10ncfgObj, $this->sysLanguage);
@@ -746,65 +765,72 @@ class LocalizationModuleController extends BaseModule12
             if ($this->MOD_SETTINGS['noHidden'] ?? false) {
                 $viewClass->setModeNoHidden();
             }
-            //Check the export
-            if (($this->MOD_SETTINGS['check_exports'] ?? false) && !$viewClass->checkExports()) {
-                /** @var FlashMessage $flashMessage */
-                $flashMessage = GeneralUtility::makeInstance(
-                    FlashMessage::class,
-                    '###MESSAGE###',
-                    $this->getLanguageService()->getLL('export.process.duplicate.title'),
-                    AbstractMessage::INFO
-                );
-                $info .= str_replace(
-                    '###MESSAGE###',
+
+            // Check the export
+            if ($checkExports && $viewClass->checkExports()) {
+                $status = AbstractMessage::INFO;
+                $flashMessageData = [
+                    'message' => $messagePlaceholder,
+                    'title' => $this->getLanguageService()->getLL('export.process.duplicate.title'),
+                    'severity' => $status,
+                ];
+                $flashMessage = FlashMessage::createFromArray($flashMessageData);
+                $flashMessageHtml = str_replace(
+                    $messagePlaceholder,
                     $this->getLanguageService()->getLL('export.process.duplicate.message'),
-                    GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
-                        ->resolve()
-                        ->render([$flashMessage])
+                    $flashMessageRenderer->resolve()->render([$flashMessage])
                 );
-                $info .= $viewClass->renderExports();
+
+                $existingExportsOverview = $viewClass->renderExports();
             } else {
                 try {
-                    $filename = $this->downloadXML($viewClass);
                     // Prepare a success message for display
-                    $link = sprintf(
-                        '<a href="%s" target="_blank">%s</a>',
-                        $filename,
-                        $filename
-                    );
                     $title = $this->getLanguageService()->getLL('export.download.success');
-                    $message = '###MESSAGE###';
                     $status = AbstractMessage::OK;
-                    /** @var FlashMessage $flashMessage */
-                    $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $status);
-                    $info .= str_replace(
-                        '###MESSAGE###',
+
+                    $flashMessageData = [
+                        'message' => $messagePlaceholder,
+                        'title' => $title,
+                        'severity' => $status,
+                    ];
+                    $flashMessage = FlashMessage::createFromArray($flashMessageData);
+
+                    $filename = $this->downloadXML($viewClass);
+                    $link = sprintf('<a href="%s" target="_blank">%s</a>', $filename, $filename);
+                    $flashMessageHtml = str_replace(
+                        $messagePlaceholder,
                         sprintf($this->getLanguageService()->getLL('export.download.success.detail'), $link),
-                        GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
-                            ->resolve()
-                            ->render([$flashMessage])
+                        $flashMessageRenderer->resolve()->render([$flashMessage])
                     );
                 } catch (Exception $e) {
                     // Prepare an error message for display
-                    $title = $this->getLanguageService()->getLL('export.download.error');
-                    $message = '###MESSAGE###';
                     $status = AbstractMessage::ERROR;
-                    /** @var FlashMessage $flashMessage */
-                    $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $status);
-                    $info .= str_replace(
-                        '###MESSAGE###',
+                    $flashMessageData = [
+                        'message' => $messagePlaceholder,
+                        'title' => $this->getLanguageService()->getLL('export.download.error'),
+                        'severity' => $status,
+                    ];
+                    $flashMessage = FlashMessage::createFromArray($flashMessageData);
+                    $flashMessageHtml = str_replace(
+                        $messagePlaceholder,
                         $e->getMessage() . ' (' . $e->getCode() . ')',
-                        GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
-                            ->resolve()
-                            ->render([$flashMessage])
+                        $flashMessageRenderer->resolve()->render([$flashMessage])
                     );
                 }
-                /** @var FlashMessage $flashMessage */
-                $info .= $viewClass->renderInternalMessagesAsFlashMessage((string)$status);
+
+                $internalFlashMessage = $viewClass->renderInternalMessagesAsFlashMessage((string)$status);
                 $viewClass->saveExportInformation();
             }
         }
-        return $info;
+
+        return [
+            'existingExportsOverview' => $existingExportsOverview,
+            'isImport' => $isImport,
+            'importSuccess' => $importSuccess,
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
+            'flashMessageHtml' => $flashMessageHtml,
+            'internalFlashMessage' => $internalFlashMessage,
+        ];
     }
 
     /**
