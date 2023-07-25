@@ -415,9 +415,6 @@ class LocalizationModuleController extends BaseModule12
             case 'export_xml':
                 $subcontent = $this->exportImportXmlAction($l10NConfiguration);
                 break;
-            default:
-                $subcontent = '<input class="btn btn-default" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" />';
-                break;
         }
 
         return $subcontent;
