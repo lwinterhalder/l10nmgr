@@ -61,10 +61,10 @@
                             </div>
                             <f:switch expression="{moduleAction}">
                                 <f:case value="export_excel">
-                                    <f:render section="exportExcel" arguments="{_all}"/>
+                                    <f:render partial="LocalizationModule/Modules/ExportExcel" section="exportExcel" arguments="{_all}"/>
                                 </f:case>
                                 <f:case value="export_xml">
-                                    <f:render section="exportXml" arguments="{_all}"/>
+                                    <f:render partial="LocalizationModule/Modules/ExportXml" section="exportXml" arguments="{_all}"/>
                                 </f:case>
                                 <f:defaultCase>
                                     <div class="col-md-6">
@@ -77,129 +77,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </f:section>
-
-        <f:section name="exportExcel">
-            <div class="col-md-6">
-                <div class="form-section">
-                    <div class="form-group mb-2">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" value="1" name="check_exports" />
-                                <f:translate key="{lll}export.xml.check_exports.title" />
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group mb-2">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" value="1" name="import_asdefaultlanguage" />
-                                <f:translate key="{lll}import.xml.asdefaultlanguage.title"/>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <div class="form-group mb-2">
-                        <label for="{moduleContent.previewLanguageMenu.elementName}">
-                            {moduleContent.previewLanguageMenu.label}
-                        </label><br />
-                        <select class="form-control" id="{moduleContent.previewLanguageMenu.elementName}" name="{moduleContent.previewLanguageMenu.elementName}">
-                            <f:for each="{moduleContent.previewLanguageMenu.options}" as="option" key="key">
-                                <option value="{option.value}" {f:if(condition: '{option.selected} == true', then: 'selected')}>{option.label}</option>
-                            </f:for>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <div class="form-group mb-2">
-                        <label><f:translate key="{lll}general.action.import.upload.title"/></label><br />
-                            <input type="file" size="60" name="uploaded_import_file" />
-                    </div>
-                </div>
-                <div class="form-section">
-                    <div class="form-group mb-2">
-                        <input class="btn btn-default btn-info" type="submit" value="{f:translate(key:'{lll}general.action.refresh.button.title')}" name="_" />
-                        <input class="btn btn-default btn-success" type="submit" value="{f:translate(key:'{lll}general.action.export.xml.button.title')}" name="export_excel" />
-                        <input class="btn btn-default btn-warning" type="submit" value="{f:translate(key:'{lll}general.action.import.xml.button.title')}" name="import_excel" />
-                    </div>
-                </div>
-                <f:if condition="{moduleContent.flashMessageHtml}">
-                    <f:format.raw>{moduleContent.flashMessageHtml}</f:format.raw>
-                </f:if>
-                <f:if condition="{moduleContent.existingExportsOverview} != ''">
-                    <f:format.raw>{moduleContent.existingExportsOverview}</f:format.raw>
-                </f:if>
-                <f:format.raw>{moduleContent.internalFlashMessage}</f:format.raw>
-            </div>
-        </f:section>
-
-        <f:section name="exportXml">
-            <div class="col-md-6">
-                <div role="tabpanel">
-                    <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs-tab" data-store-last-tab="1">
-                        <li role="presentation" class="t3js-tabmenu-item">
-                            <a href="#tab-1" title="" aria-controls="tab-1" role="tab" data-bs-toggle="tab" aria-selected="true" class="active">
-                                <f:translate key="{lll}export.xml.headline.title"></f:translate>
-                            </a>
-                        </li>
-                        <li role="presentation" class="t3js-tabmenu-item">
-                            <a href="#tab-2" title="" aria-controls="tab-2" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
-                                <f:translate key="{lll}import.xml.headline.title"></f:translate>
-                            </a>
-                        </li>
-                        <li role="presentation" class="t3js-tabmenu-item">
-                            <a href="#tab-3" title="" aria-controls="tab-3" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
-                                <f:translate key="{lll}file.settings.downloads.title"></f:translate>
-                            </a>
-                        </li>
-                        <li role="presentation" class="t3js-tabmenu-item">
-                            <a href="#tab-4" title="" aria-controls="tab-5" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
-                                <f:translate key="{lll}l10nmgr.documentation.title"></f:translate>
-                            </a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="tab-1">
-                            <div class="panel panel-tab">
-                                <div class="panel-body">
-                                    <f:render partial="LocalizationManager/TabContentXmlExport" section="export" arguments="{_all}"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="tab-2">
-                            <div class="panel panel-tab">
-                                <div class="panel-body">
-                                    <f:render partial="LocalizationManager/TabContentXmlExport" section="import" arguments="{_all}"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="tab-3">
-                            <div class="panel panel-tab">
-                                <div class="panel-body">
-                                    <f:render partial="LocalizationManager/TabContentXmlExport" section="downloadSettingsFiles" arguments="{_all}"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="tab-4">
-                            <div class="panel panel-tab">
-                                <div class="panel-body">
-                                    <a class="btn btn-success" href="https://docs.typo3.org/p/localizationteam/l10nmgr/11.0/en-us/" target="_new">
-                                        <f:translate key="{lll}general.download"/>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <f:for each="{moduleContent.flashMessages}" as="flashMessage">
-                    <f:format.raw>{flashMessage}</f:format.raw>
-                </f:for>
-                <f:if condition="{moduleContent.existingExportsOverview} != ''">
-                    <f:format.raw>{moduleContent.existingExportsOverview}</f:format.raw>
-                </f:if>
-                <f:format.raw>{moduleContent.internalFlashMessage}</f:format.raw>
             </div>
         </f:section>
 

@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+        data-namespace-typo3-fluid="true"
+        lang="en"
+>
+
+    <f:section name="exportXml">
+        <div class="col-md-6">
+            <div role="tabpanel">
+                <ul class="nav nav-tabs t3js-tabs" role="tablist" id="tabs-tab" data-store-last-tab="1">
+                    <li role="presentation" class="t3js-tabmenu-item">
+                        <a href="#tab-1" title="" aria-controls="tab-1" role="tab" data-bs-toggle="tab" aria-selected="true" class="active">
+                            <f:translate key="{lll}export.xml.headline.title"></f:translate>
+                        </a>
+                    </li>
+                    <li role="presentation" class="t3js-tabmenu-item">
+                        <a href="#tab-2" title="" aria-controls="tab-2" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
+                            <f:translate key="{lll}import.xml.headline.title"></f:translate>
+                        </a>
+                    </li>
+                    <li role="presentation" class="t3js-tabmenu-item">
+                        <a href="#tab-3" title="" aria-controls="tab-3" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
+                            <f:translate key="{lll}file.settings.downloads.title"></f:translate>
+                        </a>
+                    </li>
+                    <li role="presentation" class="t3js-tabmenu-item">
+                        <a href="#tab-4" title="" aria-controls="tab-5" role="tab" data-bs-toggle="tab" aria-selected="true" class="">
+                            <f:translate key="{lll}l10nmgr.documentation.title"></f:translate>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="tab-1">
+                        <div class="panel panel-tab">
+                            <div class="panel-body">
+                                <f:render partial="LocalizationManager/TabContentXmlExport" section="export" arguments="{_all}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="tab-2">
+                        <div class="panel panel-tab">
+                            <div class="panel-body">
+                                <f:render partial="LocalizationManager/TabContentXmlExport" section="import" arguments="{_all}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="tab-3">
+                        <div class="panel panel-tab">
+                            <div class="panel-body">
+                                <f:render partial="LocalizationManager/TabContentXmlExport" section="downloadSettingsFiles" arguments="{_all}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="tab-4">
+                        <div class="panel panel-tab">
+                            <div class="panel-body">
+                                <a class="btn btn-success" href="https://docs.typo3.org/p/localizationteam/l10nmgr/11.0/en-us/" target="_new">
+                                    <f:translate key="{lll}general.download"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <f:for each="{moduleContent.flashMessages}" as="flashMessage">
+                <f:format.raw>{flashMessage}</f:format.raw>
+            </f:for>
+            <f:if condition="{moduleContent.existingExportsOverview} != ''">
+                <f:format.raw>{moduleContent.existingExportsOverview}</f:format.raw>
+            </f:if>
+            <f:format.raw>{moduleContent.internalFlashMessage}</f:format.raw>
+        </div>
+    </f:section>
+</html>

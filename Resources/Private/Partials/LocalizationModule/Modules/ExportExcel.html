@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+        data-namespace-typo3-fluid="true"
+        lang="en"
+>
+    <f:section name="exportExcel">
+        <div class="col-md-6">
+            <div class="form-section">
+                <div class="form-group mb-2">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="1" name="check_exports" />
+                            <f:translate key="{lll}export.xml.check_exports.title" />
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group mb-2">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="1" name="import_asdefaultlanguage" />
+                            <f:translate key="{lll}import.xml.asdefaultlanguage.title"/>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="form-group mb-2">
+                    <label for="{moduleContent.previewLanguageMenu.elementName}">
+                        {moduleContent.previewLanguageMenu.label}
+                    </label><br />
+                    <select class="form-control" id="{moduleContent.previewLanguageMenu.elementName}" name="{moduleContent.previewLanguageMenu.elementName}">
+                        <f:for each="{moduleContent.previewLanguageMenu.options}" as="option" key="key">
+                            <option value="{option.value}" {f:if(condition: '{option.selected} == true', then: 'selected')}>{option.label}</option>
+                        </f:for>
+                    </select>
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="form-group mb-2">
+                    <label><f:translate key="{lll}general.action.import.upload.title"/></label><br />
+                        <input type="file" size="60" name="uploaded_import_file" />
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="form-group mb-2">
+                    <input class="btn btn-default btn-info" type="submit" value="{f:translate(key:'{lll}general.action.refresh.button.title')}" name="_" />
+                    <input class="btn btn-default btn-success" type="submit" value="{f:translate(key:'{lll}general.action.export.xml.button.title')}" name="export_excel" />
+                    <input class="btn btn-default btn-warning" type="submit" value="{f:translate(key:'{lll}general.action.import.xml.button.title')}" name="import_excel" />
+                </div>
+            </div>
+            <f:if condition="{moduleContent.flashMessageHtml}">
+                <f:format.raw>{moduleContent.flashMessageHtml}</f:format.raw>
+            </f:if>
+            <f:if condition="{moduleContent.existingExportsOverview} != ''">
+                <f:format.raw>{moduleContent.existingExportsOverview}</f:format.raw>
+            </f:if>
+            <f:format.raw>{moduleContent.internalFlashMessage}</f:format.raw>
+        </div>
+    </f:section>
+</html>
