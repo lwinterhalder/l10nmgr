@@ -639,6 +639,8 @@ return false;
         $importAsDefaultLanguage = (bool)(GeneralUtility::_POST('import_asdefaultlanguage') ?? false);
         $deleteLocalizationsBeforeImport = (bool)(GeneralUtility::_POST('import_delL10N') ?? false);
         $checkExports = (bool)(GeneralUtility::_POST('check_exports') ?? false);
+        $makePreviewLinks = (bool)(GeneralUtility::_POST('make_preview_link') ?? false);
+        $ftpUpload = (bool)(GeneralUtility::_POST('ftp_upload') ?? false);
 
         // Read uploaded file:
         if ($importXml && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
@@ -693,7 +695,7 @@ return false;
                         $flashMessageRenderer->resolve()->render([$flashMessage]),
                     );
                 }
-                if (GeneralUtility::_POST('make_preview_link') == '1' && ExtensionManagementUtility::isLoaded('workspaces')) {
+                if ($makePreviewLinks && ExtensionManagementUtility::isLoaded('workspaces')) {
                     $pageIds = $importManager->getPidsFromCATXMLNodes($importManager->getXMLNodes());
                     $actionInfo .= '<b>' . $this->getLanguageService()->getLL('import.xml.preview_links.title') . '</b><br />';
                     /** @var MkPreviewLinkService $mkPreviewLinks */
@@ -769,7 +771,7 @@ return false;
                 $existingExportsOverview = $viewClass->renderExports();
             } else {
                 // Upload to FTP
-                if (GeneralUtility::_POST('ftp_upload') == '1') {
+                if ($ftpUpload) {
                     try {
                         $filename = $this->uploadToFtp($viewClass);
 
