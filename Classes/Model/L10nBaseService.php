@@ -437,8 +437,6 @@ class L10nBaseService implements LoggerAwareInterface
     protected function _submitContentAsDefaultLanguageAndGetFlexFormDiff(array $accum, array $inputArray)
     {
         // Initialize:
-        /** @var FlexFormTools $flexToolObj */
-        $flexToolObj = GeneralUtility::makeInstance(FlexFormTools::class);
         $TCEmain_data = [];
         $_flexFormDiffArray = [];
         // Traverse:

@@ -1685,8 +1685,7 @@ class Tools
      */
     public function flushTranslations(string $table, int $uid, bool $exec = false): array
     {
-        /** @var FlexFormTools $flexToolObj */
-        $flexToolObj = GeneralUtility::makeInstance(FlexFormTools::class);
+        GeneralUtility::makeInstance(FlexFormTools::class);
         $TCEmain_data = [];
         $TCEmain_cmd = [];
         // Simply collecting information about indexing on a page to assess what has to be flushed. Maybe this should move to be an API in
