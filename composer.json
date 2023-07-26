@@ -102,21 +102,26 @@
 		"sort-packages": true,
 		"process-timeout": 1000,
 		"vendor-dir": ".Build/vendor",
+		"bin-dir": ".Build/bin",
 		"allow-plugins": {
 			"typo3/class-alias-loader": true,
 			"typo3/cms-composer-installers": true
 		}
 	},
 	"scripts": {
-		"php:fix": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
+		"phpcsFixer": ".Build/bin/php-cs-fixer",
+		"phpstan": ".Build/bin/phpstan",
+		"phpunit": ".Build/bin/phpunit",
+		"phpcs": ".Build/bin/phpcs",
+		"php:fix": "@phpcsFixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
 		"ci:php:lint": "find *.php Classes Configuration Tests -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
-		"ci:php:fixer": ".Build/vendor/bin/php-cs-fixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
-		"ci:php:stan": ".Build/vendor/bin/phpstan analyze --no-progress -c phpstan.neon",
-		"phpstan:baseline": ".Build/vendor/bin/phpstan analyze --generate-baseline=phpstan-baseline.neon",
-		"test:unit": ".Build/vendor/bin/phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
-		"test:functional": ".Build/vendor/bin/phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
-		"phpcs:testphp:81": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp,public",
-		"phpcs:testphp:82": ".Build/vendor/bin/phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp,public",
+		"ci:php:fixer": "@phpcsFixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
+		"ci:php:stan": "@phpstan analyze --no-progress -c phpstan.neon",
+		"phpstan:baseline": "@phpstan analyze --generate-baseline=phpstan-baseline.neon",
+		"test:unit": "@phpunit -c .Build/phpunit/UnitTests.xml Tests/Unit/",
+		"test:functional": "@phpunit -c .Build/phpunit/FunctionalTests.xml Tests/Functional/",
+		"phpcs:testphp:81": "@phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.1 --ignore=.Build,Documentation-GENERATED-temp,public",
+		"phpcs:testphp:82": "@phpcs -p . --standard=PHPCompatibility --runtime-set testVersion 8.2 --ignore=.Build,Documentation-GENERATED-temp,public",
 		"typo3:docs:render": [
 			"docker compose run --rm t3docmake"
 		],
