@@ -177,7 +177,8 @@ class TranslationTasks extends BaseModule
             $cells = '<td class="bgColor2 tableheader">Element:</td>';
             foreach ($languages as $l) {
                 if ($l >= 1) {
-                    $baseRecordFlag = '<img src="' . htmlspecialchars($GLOBALS['BACK_PATH'] . $this->sysLanguages[$l]['flagIcon']) . '" alt="' . htmlspecialchars((string)$this->sysLanguages[$l]['title']) . '" title="' . htmlspecialchars((string)$this->sysLanguages[$l]['title']) . '" />';
+                    $title = htmlspecialchars($this->sysLanguages[$l]['title']);
+                    $baseRecordFlag = '<img src="' . htmlspecialchars($GLOBALS['BACK_PATH'] . $this->sysLanguages[$l]['flagIcon']) . '" alt="' . $title . '" title="' . $title . '" />';
                     $cells .= '<td class="bgColor2 tableheader">' . $baseRecordFlag . '</td>';
                 }
             }

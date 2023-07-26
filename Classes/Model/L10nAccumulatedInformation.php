@@ -525,7 +525,7 @@ class L10nAccumulatedInformation
                 ->where(
                     $queryBuilder->expr()->eq(
                         'pid',
-                        $queryBuilder->createNamedParameter((int)$uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
                     )
                 )
                 ->orderBy('uid')

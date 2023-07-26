@@ -719,7 +719,7 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
-                        $queryBuilder->createNamedParameter((int)$uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
                     ),
                     $queryBuilder->expr()->or(
                         $queryBuilder->expr()->lte(
@@ -735,7 +735,7 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
-                        $queryBuilder->createNamedParameter((int)$uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
                     ),
                     $queryBuilder->expr()->lte(
                         $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
@@ -1671,7 +1671,7 @@ class Tools
             ->where(
                 $queryBuilder->expr()->eq(
                     'workspace',
-                    $queryBuilder->createNamedParameter((int)$ws, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($ws, PDO::PARAM_INT)
                 )
             )
             ->executeStatement();

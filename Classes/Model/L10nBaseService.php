@@ -1025,7 +1025,7 @@ class L10nBaseService implements LoggerAwareInterface
                         : null,
                         $queryBuilder->expr()->eq(
                             'sys_language_uid',
-                            $queryBuilder->createNamedParameter((int)$Tlang, PDO::PARAM_INT)
+                            $queryBuilder->createNamedParameter($Tlang, PDO::PARAM_INT)
                         )
                     )
                     ->executeQuery()
