@@ -51,10 +51,6 @@ class XmlTools implements LoggerAwareInterface
      */
     public static function xml2tree(string $string, int $depth = 999, array $parserOptions = [])
     {
-        // Disables the functionality to allow external entities to be loaded when parsing the XML, must be kept
-        if (PHP_VERSION_ID < 80000) {
-            $previousValueOfEntityLoader = libxml_disable_entity_loader(true);
-        }
         $parser = xml_parser_create();
         $vals = [];
         $index = [];
@@ -64,9 +60,6 @@ class XmlTools implements LoggerAwareInterface
             xml_parser_set_option($parser, $option, $value);
         }
         xml_parse_into_struct($parser, $string, $vals, $index);
-        if (PHP_VERSION_ID < 80000) {
-            libxml_disable_entity_loader($previousValueOfEntityLoader);
-        }
         if (xml_get_error_code($parser)) {
             return 'Line ' . xml_get_current_line_number($parser) . ': ' . xml_error_string(xml_get_error_code($parser));
         }

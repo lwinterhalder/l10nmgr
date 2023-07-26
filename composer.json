@@ -73,6 +73,7 @@
 		"ext-pdo": "*",
 		"ext-ftp": "*",
 		"ext-xml": "*",
+		"php": ">=8.1",
 		"typo3/cms-backend": "^11.5 || ^12.4",
 		"typo3/cms-core": "^11.5 || ^12.4",
 		"typo3/cms-fluid": "^11.5 || ^12.4",
@@ -106,6 +107,9 @@
 		"allow-plugins": {
 			"typo3/class-alias-loader": true,
 			"typo3/cms-composer-installers": true
+		},
+		"platform": {
+			"php": "8.1.1"
 		}
 	},
 	"scripts": {
