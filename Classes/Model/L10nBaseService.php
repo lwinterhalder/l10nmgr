@@ -440,7 +440,7 @@ class L10nBaseService implements LoggerAwareInterface
         $TCEmain_data = [];
         $_flexFormDiffArray = [];
         // Traverse:
-        foreach ($accum as $pId => $page) {
+        foreach ($accum as $page) {
             if (!empty($page['items'])) {
                 foreach ($page['items'] as $table => $elements) {
                     foreach ($elements as $elementUid => $data) {
