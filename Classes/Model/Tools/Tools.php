@@ -632,7 +632,7 @@ class Tools
      * @param int $languageID Language ID of the record
      * @return array Empty if the input record is not one that can be translated. Otherwise an array holding information about the status.
      */
-    public function indexDetailsRecord(string $table, int $uid, int $languageID = 0)
+    public function indexDetailsRecord(string $table, int $uid, int $languageID = 0): array
     {
         $rec = $table == 'pages'
             ? BackendUtility::getRecord($table, $uid)
