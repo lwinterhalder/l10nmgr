@@ -110,7 +110,7 @@ class ConfigurationManager extends BaseModule
      * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
      * @throws Exception
      */
-    public function main()
+    public function main(): void
     {
         $backendUser = $this->getBackendUser();
 

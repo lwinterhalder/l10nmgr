@@ -156,7 +156,7 @@ class LocalizationManager extends BaseModule
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
-    protected function main()
+    protected function main(): void
     {
         $backendUser = $this->getBackendUser();
 

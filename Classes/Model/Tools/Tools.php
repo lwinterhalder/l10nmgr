@@ -280,7 +280,7 @@ class Tools
                     $GLOBALS['is_HIDE_L10N_SIBLINGS'] = $is_HIDE_L10N_SIBLINGS;
                     array_walk_recursive(
                         $TCEformsCfg['displayCond'],
-                        function ($i, $k) {
+                        function ($i, $k): void {
                             if (str_starts_with($i, 'HIDE_L10N_SIBLINGS')) {
                                 $GLOBALS['is_HIDE_L10N_SIBLINGS'] = true;
                             }

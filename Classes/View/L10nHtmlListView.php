@@ -88,12 +88,12 @@ class L10nHtmlListView extends AbstractExportView
         parent::__construct($l10ncfgObj, $sysLang);
     }
 
-    public function setModeWithInlineEdit()
+    public function setModeWithInlineEdit(): void
     {
         $this->modeWithInlineEdit = true;
     }
 
-    public function setModeShowEditLinks()
+    public function setModeShowEditLinks(): void
     {
         $this->modeShowEditLinks = true;
     }

@@ -634,7 +634,7 @@ class Import extends L10nCommand
     /**
      * Cleans up after the import process, as needed
      */
-    protected function importCleanUp()
+    protected function importCleanUp(): void
     {
         // Clean up directory into which ZIP archives were uncompressed, if any
         if (!empty($this->directoryToCleanUp)) {
@@ -649,7 +649,7 @@ class Import extends L10nCommand
      * @throws DBALException
      * @throws DBALException
      */
-    protected function sendMailNotification()
+    protected function sendMailNotification(): void
     {
         // Send mail only if notifications are active and at least one file was imported
         if ($this->emConfiguration->isEnableNotification() && count($this->filesImported) > 0) {

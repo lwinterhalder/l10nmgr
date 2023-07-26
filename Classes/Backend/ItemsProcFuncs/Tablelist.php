@@ -36,7 +36,7 @@ class Tablelist implements SingletonInterface
      *
      * @param array $params The array of parameters that is used to render the item list
      */
-    public function populateAvailableTables(array &$params)
+    public function populateAvailableTables(array &$params): void
     {
         $this->tcaItemsProcessor->populateAvailableTables($params);
 

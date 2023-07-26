@@ -89,7 +89,7 @@ class TranslationTasks extends BaseModule
      * Main function of the module. Write the content to $this->content
      * If you chose "web" as main module, you will need to consider the $this->id parameter which will contain the uid-number of the page clicked in the page tree
      */
-    public function main()
+    public function main(): void
     {
         // Draw the header.
         $this->module = GeneralUtility::makeInstance(DocumentTemplate::class);
@@ -126,7 +126,7 @@ class TranslationTasks extends BaseModule
      * Generates the module content
      * @throws DBALException
      */
-    protected function moduleContent()
+    protected function moduleContent(): void
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tx_l10nmgr_priorities');

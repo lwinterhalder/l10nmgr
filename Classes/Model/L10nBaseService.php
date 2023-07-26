@@ -120,7 +120,7 @@ class L10nBaseService implements LoggerAwareInterface
         L10nConfiguration $l10ncfgObj,
         TranslationData $translationObj,
         bool $preTranslate = true
-    ) {
+    ): void {
         // Provide a hook for specific manipulations before saving
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'] as $classReference) {
@@ -166,7 +166,7 @@ class L10nBaseService implements LoggerAwareInterface
      *
      * @param TranslationData $translationData
      */
-    protected function preTranslateAllContent(TranslationData $translationData)
+    protected function preTranslateAllContent(TranslationData $translationData): void
     {
         $inputArray = $translationData->getTranslationData();
         $pageUids = array_keys((array)($inputArray['pages'] ?? []));
@@ -181,7 +181,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param int $pageUid
      * @param int $targetLanguageUid
      */
-    protected function translateContentOnPage(int $pageUid, int $targetLanguageUid)
+    protected function translateContentOnPage(int $pageUid, int $targetLanguageUid): void
     {
         // Check if the page itself was translated already, if not, translate it
         $translatedPageRecords = BackendUtility::getRecordLocalization('pages', $pageUid, $targetLanguageUid);
@@ -357,7 +357,7 @@ class L10nBaseService implements LoggerAwareInterface
     protected function remapInputDataForExistingTranslations(
         L10nConfiguration $configurationObject,
         TranslationData $translationData
-    ) {
+    ): void {
         // feature is not enabled
         if (!$configurationObject->overrideExistingTranslations()) {
             return;
@@ -421,7 +421,7 @@ class L10nBaseService implements LoggerAwareInterface
      *
      * @param bool $importAsDefaultLanguage
      */
-    public function setImportAsDefaultLanguage(bool $importAsDefaultLanguage)
+    public function setImportAsDefaultLanguage(bool $importAsDefaultLanguage): void
     {
         $this->importAsDefaultLanguage = $importAsDefaultLanguage;
     }
@@ -1004,7 +1004,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param string $childrenField
      * @throws DBALException
      */
-    protected function recursivelyCheckForRelationParents(array $element, int $Tlang, string $parentField, string $childrenField)
+    protected function recursivelyCheckForRelationParents(array $element, int $Tlang, string $parentField, string $childrenField): void
     {
         $this->depthCounter++;
         if ($this->depthCounter < 100 && !isset($this->checkedParentRecords[$parentField][$element['uid']])) {
