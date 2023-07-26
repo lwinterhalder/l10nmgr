@@ -207,7 +207,6 @@ class CatXmlView extends AbstractExportView
             $dataForTranslation = $tData['defaultValue'] ?? '';
         }
         $xmlTool = GeneralUtility::makeInstance(XmlTools::class);
-        $_isTransformedXML = false;
         // Following checks are not enough! Fields that could be transformed to be XML conform are not transformed! textpic fields are not isRTE=1!!! No idea why...
         //DZ 2010-09-08
         // > if > else loop instead of ||
