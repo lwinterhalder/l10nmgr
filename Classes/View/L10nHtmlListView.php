@@ -342,9 +342,8 @@ class L10nHtmlListView extends AbstractExportView
                 BackendUtility::getLinkToDataHandlerAction('&cmd[' . $table . '][' . ($data['translationInfo']['uid'] ?? 0) . '][localize]=' . $sysLang)
             );
         }
-        $editLink = ' - <a href="' . $href . '"><em>' . $linkText . '</em></a>';
 
-        return $editLink;
+        return ' - <a href="' . $href . '"><em>' . $linkText . '</em></a>';
     }
 
     /**
