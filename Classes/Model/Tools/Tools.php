@@ -509,11 +509,15 @@ class Tools
     {
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
-        $translValue = (string)ArrayUtility::getValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
-        $diffDefaultValue = (string)ArrayUtility::getValueByPath(
-            $this->_callBackParams_translationDiffsourceXMLArray,
-            $structurePath
-        );
+        if (!empty($this->_callBackParams_translationXMLArray)) {
+            $translValue = (string)ArrayUtility::getValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
+        }
+        if (!empty($this->_callBackParams_translationDiffsourceXMLArray)) {
+            $diffDefaultValue = (string)ArrayUtility::getValueByPath(
+                $this->_callBackParams_translationDiffsourceXMLArray,
+                $structurePath
+            );
+        }
         $previewLanguageValues = [];
         foreach ($this->previewLanguages as $prevSysUid) {
             if (!empty($this->_callBackParams_previewLanguageXMLArrays[$prevSysUid])) {
@@ -528,7 +532,7 @@ class Tools
             $key,
             $dsArr['TCEforms'] ?? [],
             $dataValue,
-            $translValue,
+            $translValue ?? '',
             $diffDefaultValue,
             $previewLanguageValues,
             $this->_callBackParams_currentRow
@@ -1011,10 +1015,7 @@ class Tools
                                 && $transOrigPointerField !== $field
                                 && $transOrigDiffSourceField !== $field
                             ) {
-                                $key = $translationTable . ':' . BackendUtility::wsMapId(
-                                    $translationTable,
-                                    $translationUID
-                                ) . ':' . $field;
+                                $key = $translationTable . ':' . BackendUtility::wsMapId($translationTable,$translationUID) . ':' . $field;
                                 if (!empty($cfg['config']['type']) && $cfg['config']['type'] === 'flex') {
                                     $dataStructArray = $this->_getFlexFormMetaDataForContentElement(
                                         $table,
@@ -1031,19 +1032,28 @@ class Tools
                                         /** @var FlexFormTools $flexObj */
                                         $flexObj = GeneralUtility::makeInstance(FlexFormTools::class);
                                         $this->_callBackParams_keyForTranslationDetails = $key;
-                                        $this->_callBackParams_translationXMLArray = (array)GeneralUtility::xml2array(
-                                            $translationRecord[$field] ?? ''
-                                        );
+                                        if (!empty($translationRecord[$field])) {
+                                            $xmlArray = GeneralUtility::xml2array($translationRecord[$field]);
+                                            if (is_array($xmlArray)) {
+                                                $this->_callBackParams_translationXMLArray = $xmlArray;
+                                            }
+                                        }
                                         if (is_array($translationRecord)) {
                                             $diffsource = unserialize($translationRecord['l18n_diffsource'] ?? '');
-                                            $this->_callBackParams_translationDiffsourceXMLArray = (array)GeneralUtility::xml2array(
-                                                $diffsource[$field] ?? ''
-                                            );
+                                            if (!empty($diffsource[$field])) {
+                                                $xmlArray = GeneralUtility::xml2array($diffsource[$field]);
+                                                if (is_array($xmlArray)) {
+                                                    $this->_callBackParams_translationDiffsourceXMLArray = $xmlArray;
+                                                }
+                                            }
                                         }
                                         foreach ($this->previewLanguages as $prevSysUid) {
-                                            $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid] = GeneralUtility::xml2array(
-                                                $prevLangRec[$prevSysUid][$field] ?? ''
-                                            );
+                                            if (!empty($prevLangRec[$prevSysUid][$field])) {
+                                                $xmlArray = GeneralUtility::xml2array($prevLangRec[$prevSysUid][$field]);
+                                                if (is_array($xmlArray)) {
+                                                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid] = $xmlArray;
+                                                }
+                                            }
                                         }
                                         $this->_callBackParams_currentRow = $row;
                                         $flexObj->traverseFlexFormXMLData(
