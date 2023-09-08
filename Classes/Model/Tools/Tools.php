@@ -509,9 +509,11 @@ class Tools
     {
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
+        $translValue = '';
         if (!empty($this->_callBackParams_translationXMLArray)) {
             $translValue = (string)ArrayUtility::getValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
         }
+        $diffDefaultValue = '';
         if (!empty($this->_callBackParams_translationDiffsourceXMLArray)) {
             $diffDefaultValue = (string)ArrayUtility::getValueByPath(
                 $this->_callBackParams_translationDiffsourceXMLArray,
@@ -532,7 +534,7 @@ class Tools
             $key,
             $dsArr['TCEforms'] ?? [],
             $dataValue,
-            $translValue ?? '',
+            $translValue,
             $diffDefaultValue,
             $previewLanguageValues,
             $this->_callBackParams_currentRow
