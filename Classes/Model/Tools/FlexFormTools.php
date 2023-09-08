@@ -192,7 +192,8 @@ class FlexFormTools extends \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools
                 }
                 return $this->getArrayValueByPath($pathArray, $array[$key]);
             }
-            return $array;
+            $null = null;
+            return $null;
         }
     }
 
