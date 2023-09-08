@@ -166,4 +166,34 @@ class FlexFormTools extends \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools
             }
         }
     }
+
+    /***********************************
+     *
+     * Multi purpose functions
+     *
+     ***********************************/
+    /**
+     * Get a value from a multi-dimensional array by giving a path "../../.." pointing to the element
+     *
+     * @param string $pathArray The path pointing to the value field, eg. test/2/title to access $array['test'][2]['title']
+     * @param array $array Array to get value from. Passed by reference so the value returned can be used to change the value in the array!
+     * @return mixed Value returned
+     */
+    public function &getArrayValueByPath($pathArray, &$array)
+    {
+        if (!is_array($pathArray)) {
+            $pathArray = explode('/', $pathArray);
+        }
+        if (is_array($array) && !empty($pathArray)) {
+            $key = array_shift($pathArray);
+            if (isset($array[$key])) {
+                if (empty($pathArray)) {
+                    return $array[$key];
+                }
+                return $this->getArrayValueByPath($pathArray, $array[$key]);
+            }
+            return $array;
+        }
+    }
+
 }

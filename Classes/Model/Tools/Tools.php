@@ -170,8 +170,8 @@ class Tools
      * @throws DBALException
      */
     public function __construct(
-        protected readonly TranslationConfigurationProvider $t8Tools,
-        protected readonly ConnectionPool $connectionPool,
+        protected TranslationConfigurationProvider $t8Tools,
+        protected ConnectionPool $connectionPool,
     ) {
         // Find all system languages:
         // TODO: Refactor this to SiteConfiguration and get the languages from there. Its unclear to present me how to get the current page ID but future me will figure that out.
@@ -197,14 +197,14 @@ class Tools
             // So, find translated value:
             $baseStructPath = substr($structurePath, 0, -3);
             $structurePath = $baseStructPath . ($this->detailsOutput['ISOcode'] ?? '');
-            $translValue = (string)ArrayUtility::getValueByPath($pObj->traverseFlexFormXMLData_Data, $structurePath);
+            $translValue = (string)$pObj->getArrayValueByPath($structurePath, $pObj->traverseFlexFormXMLData_Data);
             // Generate preview values:
             $previewLanguageValues = [];
             foreach ($this->previewLanguages as $prevSysUid) {
                 $sysLanguages = $this->sysLanguages[$prevSysUid] ?? [];
-                $previewLanguageValues[$prevSysUid] = ArrayUtility::getValueByPath(
-                    $pObj->traverseFlexFormXMLData_Data,
-                    $baseStructPath . ($sysLanguages['ISOcode'] ?? '')
+                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
+                    $baseStructPath . ($sysLanguages['ISOcode'] ?? ''),
+                    $pObj->traverseFlexFormXMLData_Data
                 );
             }
             $table = $PA['table'] ?? '';
@@ -224,9 +224,9 @@ class Tools
             }
             // Look for diff-value inside the XML (new way):
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['BE']['flexFormXMLincludeDiffBase'])) {
-                $diffDefaultValue = (string)ArrayUtility::getValueByPath(
-                    $pObj->traverseFlexFormXMLData_Data,
-                    $structurePath . '.vDEFbase'
+                $diffDefaultValue = (string)$pObj->getArrayValueByPath(
+                    $structurePath . '.vDEFbase',
+                    $pObj->traverseFlexFormXMLData_Data
                 );
             } else {
                 // Set diff-value from l10n-cfg record (deprecated)
@@ -511,21 +511,21 @@ class Tools
         //echo $dataValue.'<hr>';
         $translValue = '';
         if (!empty($this->_callBackParams_translationXMLArray)) {
-            $translValue = (string)ArrayUtility::getValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
+            $translValue = (string)$pObj->getArrayValueByPath($structurePath, $this->_callBackParams_translationXMLArray);
         }
         $diffDefaultValue = '';
         if (!empty($this->_callBackParams_translationDiffsourceXMLArray)) {
-            $diffDefaultValue = (string)ArrayUtility::getValueByPath(
-                $this->_callBackParams_translationDiffsourceXMLArray,
-                $structurePath
+            $diffDefaultValue = (string)$pObj->getArrayValueByPath(
+                $structurePath,
+                $this->_callBackParams_translationDiffsourceXMLArray
             );
         }
         $previewLanguageValues = [];
         foreach ($this->previewLanguages as $prevSysUid) {
             if (!empty($this->_callBackParams_previewLanguageXMLArrays[$prevSysUid])) {
-                $previewLanguageValues[$prevSysUid] = ArrayUtility::getValueByPath(
-                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid],
-                    $structurePath
+                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
+                    $structurePath,
+                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid]
                 );
             }
         }
