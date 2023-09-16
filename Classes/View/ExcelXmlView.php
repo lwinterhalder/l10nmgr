@@ -49,6 +49,22 @@ class ExcelXmlView extends AbstractExportView
     protected int $forcedSourceLanguage = 0;
 
     /**
+     * @var bool $onlyForcedSourceLanguage Overwrite the default language uid with the desired language to export only if available
+     */
+    protected bool $onlyForcedSourceLanguage = false;
+
+    /**
+     * ExcelXmlView constructor.
+     * @param L10nConfiguration $l10ncfgObj
+     * @param int $sysLang
+     * @throws SiteNotFoundException
+     */
+    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
+    {
+        parent::__construct($l10ncfgObj, $sysLang);
+    }
+
+    /**
      * @inheritdoc
      */
     public function render(): string
@@ -231,5 +247,18 @@ class ExcelXmlView extends AbstractExportView
             $messages .= "\n\t\t\t" . '<Row>' . "\n\t\t\t\t" . '<Cell ss:Index="2" ss:StyleID="s26"><Data ss:Type="String">Key</Data></Cell>' . "\n\t\t\t\t" . '<Cell ss:StyleID="s27"><Data ss:Type="String">' . ($messageInformation['key'] ?? '') . '</Data></Cell>' . "\n\t\t\t" . '</Row>';
         }
         return $messages;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setForcedSourceLanguage(int $id): void
+    {
+        $this->forcedSourceLanguage = $id;
+    }
+
+    public function setOnlyForcedSourceLanguage()
+    {
+        $this->onlyForcedSourceLanguage = true;
     }
 }

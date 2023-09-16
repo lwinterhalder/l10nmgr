@@ -603,6 +603,171 @@ return false;
     }
 
     /**
+     * @param L10nConfiguration $l10ncfgObj
+     * @return string
+     * @throws ResourceNotFoundException
+     * @throws RouteNotFoundException
+     */
+    protected function excelExportImportAction(L10nConfiguration $l10ncfgObj): string
+    {
+        if (GeneralUtility::_POST('import_asdefaultlanguage') == '1') {
+            $this->l10nBaseService->setImportAsDefaultLanguage(true);
+        }
+        // Buttons:
+        $_selectOptions = ['0' => '-default-'];
+        $_selectOptions = $_selectOptions + $this->MOD_MENU['lang'];
+        $info = '<div class="form-section">' .
+                '<div class="form-group mb-2"><div class="checkbox"><label>' .
+                '<input type="checkbox" value="1" name="check_exports" /> ' . $this->getLanguageService()->getLL('export.xml.check_exports.title') .
+                '</label></div></div>' .
+                '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
+            '</label></div></div>' .
+            '</div><div class="form-section"><div class="form-group mb-2">
+<label>' . $this->getLanguageService()->getLL('export.xml.source-language.title') . '</label><br />' .
+            $this->_getSelectField('export_xml_forcepreviewlanguage', (string)$this->previewLanguage, $_selectOptions) .
+            '</div><div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" /> ' . $this->getLanguageService()->getLL('export.xml.source-language-only.title') .
+            '</label></div></div></div><div class="form-section"><div class="form-group mb-2">
+<label>' . $this->getLanguageService()->getLL('general.action.import.upload.title') . '</label><br />' .
+            '<input type="file" size="60" name="uploaded_import_file" />' .
+            '</div></div><div class="form-section"><div class="form-group mb-2">' .
+            '<input class="btn btn-default btn-info" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" /> ' .
+            '<input class="btn btn-default btn-success" type="submit" value="' . $this->getLanguageService()->getLL('general.action.export.xml.button.title') . '" name="export_excel" /> ' .
+            '<input class="btn btn-default btn-warning" type="submit" value="' . $this->getLanguageService()->getLL('general.action.import.xml.button.title') . '" name="import_excel" />
+</div></div></div>';
+        // Read uploaded file:
+        if (GeneralUtility::_POST('import_excel') && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
+            $uploadedTempFile = GeneralUtility::upload_to_tempfile($_FILES['uploaded_import_file']['tmp_name']);
+            /** @var TranslationDataFactory $factory */
+            $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
+            //TODO: catch exeption
+            $translationData = $factory->getTranslationDataFromExcelXMLFile($uploadedTempFile);
+            $translationData->setLanguage($this->sysLanguage);
+            $translationData->setPreviewLanguage($this->previewLanguage);
+            GeneralUtility::unlink_tempfile($uploadedTempFile);
+            $this->l10nBaseService->saveTranslation($l10ncfgObj, $translationData);
+            $icon = $this->iconFactory->getIcon('status-dialog-notification', Icon::SIZE_SMALL)->render();
+            $info .= '<br /><br />' . $icon . $this->getLanguageService()->getLL('import.success.message') . '<br /><br />';
+        }
+        // If export of XML is asked for, do that (this will exit and push a file for download)
+        if (GeneralUtility::_POST('export_excel')) {
+            // Render the XML
+            /** @var ExcelXmlView $viewClass */
+            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10ncfgObj, $this->sysLanguage);
+            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            if ($export_xml_forcepreviewlanguage > 0) {
+                $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
+            }
+            $export_xml_forcepreviewlanguage_only = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage_only');
+            if ($export_xml_forcepreviewlanguage_only > 0) {
+                $viewClass->setOnlyForcedSourceLanguage();
+            }
+            if ($this->MOD_SETTINGS['onlyChangedContent'] ?? false) {
+                $viewClass->setModeOnlyChanged();
+            }
+            if ($this->MOD_SETTINGS['noHidden'] ?? false) {
+                $viewClass->setModeNoHidden();
+            }
+            //Check the export
+            if (GeneralUtility::_POST('check_exports') && !$viewClass->checkExports()) {
+                /** @var FlashMessage $flashMessage */
+                $flashMessage = GeneralUtility::makeInstance(
+                    FlashMessage::class,
+                    '###MESSAGE###',
+                    $this->getLanguageService()->getLL('export.process.duplicate.title'),
+                    AbstractMessage::INFO
+                );
+                $info .= str_replace(
+                    '###MESSAGE###',
+                    $this->getLanguageService()->getLL('export.process.duplicate.message'),
+                    GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
+                        ->resolve()
+                        ->render([$flashMessage])
+                );
+                $info .= $viewClass->renderExports();
+            } else {
+                try {
+                    $filename = $this->downloadXML($viewClass);
+                    // Prepare a success message for display
+                    $link = sprintf(
+                        '<a href="%s" target="_blank">%s</a>',
+                        $filename,
+                        $filename
+                    );
+                    $title = $this->getLanguageService()->getLL('export.download.success');
+                    $message = '###MESSAGE###';
+                    $status = AbstractMessage::OK;
+                    /** @var FlashMessage $flashMessage */
+                    $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $status);
+                    $info .= str_replace(
+                        '###MESSAGE###',
+                        sprintf($this->getLanguageService()->getLL('export.download.success.detail'), $link),
+                        GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
+                            ->resolve()
+                            ->render([$flashMessage])
+                    );
+                } catch (Exception $e) {
+                    // Prepare an error message for display
+                    $title = $this->getLanguageService()->getLL('export.download.error');
+                    $message = '###MESSAGE###';
+                    $status = AbstractMessage::ERROR;
+                    /** @var FlashMessage $flashMessage */
+                    $flashMessage = GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $status);
+                    $info .= str_replace(
+                        '###MESSAGE###',
+                        $e->getMessage() . ' (' . $e->getCode() . ')',
+                        GeneralUtility::makeInstance(FlashMessageRendererResolver::class)
+                            ->resolve()
+                            ->render([$flashMessage])
+                    );
+                }
+                /** @var FlashMessage $flashMessage */
+                $info .= $viewClass->renderInternalMessagesAsFlashMessage((string)$status);
+                $viewClass->saveExportInformation();
+            }
+        }
+        return $info;
+    }
+
+    /**
+     * @param string $elementName
+     * @param string $currentValue
+     * @param array $menuItems
+     * @return string
+     */
+    protected function _getSelectField(string $elementName, string $currentValue, array $menuItems): string
+    {
+        $options = [];
+        $return = '';
+        foreach ($menuItems as $value => $label) {
+            $options[] = '<option value="' . htmlspecialchars((string)$value) . '"' . (!strcmp(
+                $currentValue,
+                (string)$value
+            ) ? ' selected="selected"' : '') . '>' . htmlspecialchars(
+                (string)$label,
+                ENT_COMPAT,
+                'UTF-8',
+                false
+            ) . '</option>';
+        }
+        if (count($options) > 0) {
+            $return = '
+	<select class="form-control" name="' . $elementName . '" ' . ($currentValue ? 'disabled="disabled"' : '') . '>
+	' . implode('
+	', $options) . '
+	</select>
+	';
+        }
+
+        if ($currentValue) {
+            $return .= '<input type="hidden" name="' . $elementName . '" value="' . $currentValue . '" />';
+        }
+
+        return $return;
+    }
+
+    /**
      * Sends download header and calls render method of the view.
      * Used for excelXML and CATXML.
      *
@@ -745,7 +910,10 @@ return false;
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
             }
-
+            $export_xml_forcepreviewlanguage_only = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage_only');
+            if ($export_xml_forcepreviewlanguage_only > 0) {
+                $viewClass->setOnlyForcedSourceLanguage();
+            }
             if ($this->MOD_SETTINGS['onlyChangedContent'] ?? false) {
                 $viewClass->setModeOnlyChanged();
             }
@@ -863,7 +1031,68 @@ return false;
     }
 
     /**
-     * @return array
+     * @return string
+     */
+    protected function getTabContentXmlExport(): string
+    {
+        $_selectOptions = ['0' => '-default-'];
+        $_selectOptions = $_selectOptions + ($this->MOD_MENU['lang'] ?? []);
+        $tabContentXmlExport = '<div class="form-section">' .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="check_exports" /> ' . $this->getLanguageService()->getLL('export.xml.check_exports.title') .
+            '</label></div></div>' .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" checked="checked" name="no_check_xml" /> ' . $this->getLanguageService()->getLL('export.xml.no_check_xml.title') .
+            '</label></div></div>' .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="check_utf8" /> ' . $this->getLanguageService()->getLL('export.xml.checkUtf8.title') .
+            '</label></div></div>' .
+            '</div><div class="form-section">' .
+            '<div class="form-group mb-2">' .
+            '<label>' . $this->getLanguageService()->getLL('export.xml.source-language.title') . '</label><br />' .
+            $this->_getSelectField('export_xml_forcepreviewlanguage', (string)$this->previewLanguage, $_selectOptions) .
+            '</div><div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" /> ' . $this->getLanguageService()->getLL('export.xml.source-language-only.title') .
+            '</label></div></div></div>';
+        // Add the option to send to FTP server, if FTP information is defined
+        if ($this->emConfiguration->hasFtpCredentials()) {
+            $tabContentXmlExport .= '<input type="checkbox" value="1" name="ftp_upload" id="tx_l10nmgr_ftp_upload" />
+<label for="tx_l10nmgr_ftp_upload">' . $this->getLanguageService()->getLL('export.xml.ftp.title') . '</label><br />';
+        }
+        $tabContentXmlExport .= '<div class="form-section"><input class="btn btn-default btn-info" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" /> ' .
+            '<input class="btn btn-default btn-success" type="submit" value="Export" name="export_xml" /><br class="clearfix">&nbsp;</div>';
+        return $tabContentXmlExport;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getTabContentXmlImport(): string
+    {
+        return '<div class="form-section">' .
+            (
+                ExtensionManagementUtility::isLoaded('workspaces') ? (
+                    '<div class="form-group mb-2"><div class="checkbox"><label>' .
+                '<input type="checkbox" value="1" name="make_preview_link" /> ' . $this->getLanguageService()->getLL('import.xml.make_preview_link.title') .
+                '</label></div></div>'
+                ) : ''
+            ) .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="import_delL10N" /> ' . $this->getLanguageService()->getLL('import.xml.delL10N.title') .
+            '</label></div></div>' .
+            '<div class="form-group mb-2"><div class="checkbox"><label>' .
+            '<input type="checkbox" value="1" name="import_asdefaultlanguage" /> ' . $this->getLanguageService()->getLL('import.xml.asdefaultlanguage.title') .
+            '</label></div></div></div>' .
+            '<div class="form-section"><div class="form-group mb-2">' .
+            '<input type="file" size="60" name="uploaded_import_file" />' .
+            '</div></div>' .
+            '<div class="form-section">' .
+            '<input class="btn btn-info" type="submit" value="' . $this->getLanguageService()->getLL('general.action.refresh.button.title') . '" name="_" /> ' .
+            '<input class="btn btn-warning" type="submit" value="Import" name="import_xml" />' .
+            '<br class="clearfix">&nbsp;</div>';
+    }
+
+    /**
      * @throws RouteNotFoundException
      */
     protected function getTabContentXmlDownloads(): array
