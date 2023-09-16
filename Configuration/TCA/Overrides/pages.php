@@ -3,7 +3,6 @@
 defined('TYPO3') || die();
 
 use Localizationteam\L10nmgr\Constants;
-use Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 ExtensionManagementUtility::addTCAcolumns('pages', [
@@ -61,16 +60,6 @@ ExtensionManagementUtility::addTCAcolumns('pages', [
             'default' => Constants::L10NMGR_CONFIGURATION_DEFAULT,
         ],
     ],
-    'l10nmgr_language_restriction' => [
-        'exclude' => 1,
-        'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:sys_language.restrictions',
-        'config' => [
-            'type' => 'select',
-            'renderType' => 'selectMultipleSideBySide',
-            'itemsProcFunc' => LanguageRestrictionRegistry::class . '->populateAvailableSiteLanguages',
-            'maxitems' => 9999,
-        ],
-    ],
 ]);
 
 ExtensionManagementUtility::addFieldsToPalette(
@@ -85,4 +74,7 @@ ExtensionManagementUtility::addToAllTCAtypes(
     'after:l18n_cfg'
 );
 
-ExtensionManagementUtility::addToAllTCAtypes('pages', 'l10nmgr_language_restriction', '', 'after:l18n_cfg');
+\Localizationteam\L10nmgr\Utility\L10nmgrExtensionManagementUtility::makeTranslationsRestrictable(
+    'core',
+    'pages'
+);

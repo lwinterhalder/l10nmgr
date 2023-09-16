@@ -287,8 +287,6 @@ class LanguageRestrictionRegistry implements SingletonInterface
         ];
 
         // Merge changes to TCA configuration
-        // TODO: The empty() check can be removed as the mergeRecursiveWithOverrule() takes care in case of an empty
-        // TODO: overrule array.
         if (!empty($fieldConfigurationOverride)) {
             ArrayUtility::mergeRecursiveWithOverrule($fieldConfiguration, $fieldConfigurationOverride);
         }
