@@ -41,7 +41,6 @@ use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidParentRowRootExceptio
 use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidPointerFieldValueException;
 use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidTcaException;
 use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -130,11 +129,6 @@ class Tools
     protected array $flexFormDiff = []; // System languages records, loaded by constructor
 
     /**
-     * @var array|null
-     */
-    protected ?array $sys_languages = [];
-
-    /**
      * @var array
      */
     protected array $indexFilterObjects = [];
@@ -170,14 +164,9 @@ class Tools
      * @throws DBALException
      */
     public function __construct(
-        protected TranslationConfigurationProvider $t8Tools,
-        protected ConnectionPool $connectionPool,
-    ) {
-        // Find all system languages:
-        // TODO: Refactor this to SiteConfiguration and get the languages from there. Its unclear to present me how to get the current page ID but future me will figure that out.
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_language');
-        $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAllAssociative();
+        protected TranslationConfigurationProvider $t8Tools
+    )
+    {
     }
 
     /**
@@ -201,9 +190,8 @@ class Tools
             // Generate preview values:
             $previewLanguageValues = [];
             foreach ($this->previewLanguages as $prevSysUid) {
-                $sysLanguages = $this->sysLanguages[$prevSysUid] ?? [];
                 $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
-                    $baseStructPath . ($sysLanguages['ISOcode'] ?? ''),
+                    $baseStructPath,
                     $pObj->traverseFlexFormXMLData_Data
                 );
             }
@@ -634,9 +622,6 @@ class Tools
     /**
      * Creating localization index for a single record (which must be default/international language and an online version!)
      *
-     * @todo In case of reactivation of the ClickMenu, this needs to be refactored as well. The table `sys_language` does not
-     * @todo anymore and the languages has to be taken from the SiteConfiguration.
-     *
      * @param string $table Table name
      * @param int $uid Record UID
      * @param int $languageID Language ID of the record
@@ -653,7 +638,7 @@ class Tools
             if ($this->bypassFilter || $this->filterIndex($table, $uid, $pid)) {
                 BackendUtility::workspaceOL($table, $rec);
                 $items = [];
-                foreach ($this->sys_languages as $r) {
+                foreach ($this->getSystemLanguages($pid) as $r) {
                     if (is_null($languageID) || !empty($r['uid']) && $r['uid'] === $languageID) {
                         $items['fullDetails'][$r['uid']] = $this->translationDetails(
                             $table,
@@ -929,7 +914,7 @@ class Tools
         if (is_array($tInfo)) {
             // Initialize some more:
             $this->detailsOutput['translationInfo'] = $tInfo;
-            $this->sysLanguages = $this->getSystemLanguages();
+            $this->sysLanguages = $this->getSystemLanguages((int)$row['pid']);
             $this->detailsOutput['ISOcode'] = $this->sysLanguages[$sysLang]['ISOcode'] ?? '';
             // decide how translations are stored:
             // there are three ways: flexformInternalTranslation (for FCE with langChildren)
@@ -1256,12 +1241,13 @@ class Tools
     }
 
     /**
+     * @param int $pid
      * @return array
      */
-    protected function getSystemLanguages(): array
+    public function getSystemLanguages(int $pid = 0): array
     {
         if (empty(self::$systemLanguages)) {
-            self::$systemLanguages = $this->t8Tools->getSystemLanguages();
+            self::$systemLanguages = $this->t8Tools->getSystemLanguages($pid);
         }
         return self::$systemLanguages;
     }

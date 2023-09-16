@@ -169,7 +169,7 @@ class TranslationTasks extends BaseModule
         $this->l10nMgrTools = GeneralUtility::makeInstance(Tools::class);
         $this->l10nMgrTools->verbose = false; // Otherwise it will show records which has fields but none editable.
         $inputRecord = BackendUtility::getRecord($firstEl[0], $firstEl[1], 'pid');
-        $this->sysLanguages = $this->l10nMgrTools->t8Tools->getSystemLanguages($firstEl[0] == 'pages' ? $firstEl[1] : $inputRecord['pid']);
+        $this->sysLanguages = $this->l10nMgrTools->getSystemLanguages($firstEl[0] == 'pages' ? $firstEl[1] : $inputRecord['pid']);
         $languages = $this->getLanguages($languageList, $this->sysLanguages);
         if (count($languages)) {
             $tRows = [];

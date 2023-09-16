@@ -465,144 +465,6 @@ return false;
     }
 
     /**
-     * @param L10nConfiguration $l10nConfiguration
-     * @return array
-     * @throws ResourceNotFoundException
-     * @throws RouteNotFoundException
-     */
-    protected function excelExportImportAction(L10nConfiguration $l10nConfiguration): array
-    {
-        $existingExportsOverview = '';
-        $isImport = false;
-        $importSuccess = false;
-        $internalFlashMessage = '';
-        $flashMessageHtml = '';
-        $messagePlaceholder = '###MESSAGE###';
-        $flashMessageRenderer = GeneralUtility::makeInstance(FlashMessageRendererResolver::class);
-
-        $importAsDefaultLanguage = GeneralUtility::_POST('import_asdefaultlanguage');
-        $importExcel = GeneralUtility::_POST('import_excel');
-        $exportExcel = GeneralUtility::_POST('export_excel');
-        $checkExports = GeneralUtility::_POST('check_exports');
-
-        if ($importAsDefaultLanguage == '1') {
-            $this->l10nBaseService->setImportAsDefaultLanguage(true);
-        }
-
-        // Read uploaded file:
-        if ($importExcel && !empty($_FILES['uploaded_import_file']['tmp_name']) && is_uploaded_file($_FILES['uploaded_import_file']['tmp_name'])) {
-            $isImport = true;
-            $uploadedTempFile = GeneralUtility::upload_to_tempfile($_FILES['uploaded_import_file']['tmp_name']);
-            /** @var TranslationDataFactory $factory */
-            $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
-            // TODO: catch exception
-            $translationData = $factory->getTranslationDataFromExcelXMLFile($uploadedTempFile);
-            $translationData->setLanguage($this->sysLanguage);
-            $translationData->setPreviewLanguage($this->previewLanguage);
-            GeneralUtility::unlink_tempfile($uploadedTempFile);
-            $this->l10nBaseService->saveTranslation($l10nConfiguration, $translationData);
-            $importSuccess = true;
-
-            $status = AbstractMessage::INFO;
-            $flashMessageData = [
-                'message' => $messagePlaceholder,
-                'title' => $this->getLanguageService()->getLL('import.success.message'),
-                'severity' => $status,
-            ];
-            $flashMessage = FlashMessage::createFromArray($flashMessageData);
-            $flashMessageHtml = str_replace(
-                $messagePlaceholder,
-                '',
-                $flashMessageRenderer->resolve()->render([$flashMessage])
-            );
-        }
-
-        // If export of XML is asked for, do that (this will exit and push a file for download)
-        if ($exportExcel) {
-            // Render the XML
-            /** @var ExcelXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
-            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
-
-            if ($export_xml_forcepreviewlanguage > 0) {
-                $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
-            }
-
-            if ($this->MOD_SETTINGS['onlyChangedContent'] ?? false) {
-                $viewClass->setModeOnlyChanged();
-            }
-
-            if ($this->MOD_SETTINGS['noHidden'] ?? false) {
-                $viewClass->setModeNoHidden();
-            }
-
-            // Check the export
-            if ($checkExports && $viewClass->checkExports()) {
-                $status = AbstractMessage::INFO;
-                $flashMessageData = [
-                    'message' => $messagePlaceholder,
-                    'title' => $this->getLanguageService()->getLL('export.process.duplicate.title'),
-                    'severity' => $status,
-                ];
-                $flashMessage = FlashMessage::createFromArray($flashMessageData);
-                $flashMessageHtml = str_replace(
-                    $messagePlaceholder,
-                    $this->getLanguageService()->getLL('export.process.duplicate.message'),
-                    $flashMessageRenderer->resolve()->render([$flashMessage])
-                );
-
-                $existingExportsOverview = $viewClass->renderExports();
-            } else {
-                try {
-                    // Prepare a success message for display
-                    $title = $this->getLanguageService()->getLL('export.download.success');
-                    $status = AbstractMessage::OK;
-
-                    $flashMessageData = [
-                        'message' => $messagePlaceholder,
-                        'title' => $title,
-                        'severity' => $status,
-                    ];
-                    $flashMessage = FlashMessage::createFromArray($flashMessageData);
-
-                    $filename = $this->downloadXML($viewClass);
-                    $link = sprintf('<a href="%s" target="_blank">%s</a>', $filename, $filename);
-                    $flashMessageHtml = str_replace(
-                        $messagePlaceholder,
-                        sprintf($this->getLanguageService()->getLL('export.download.success.detail'), $link),
-                        $flashMessageRenderer->resolve()->render([$flashMessage])
-                    );
-                } catch (Exception $e) {
-                    // Prepare an error message for display
-                    $status = AbstractMessage::ERROR;
-                    $flashMessageData = [
-                        'message' => $messagePlaceholder,
-                        'title' => $this->getLanguageService()->getLL('export.download.error'),
-                        'severity' => $status,
-                    ];
-                    $flashMessage = FlashMessage::createFromArray($flashMessageData);
-                    $flashMessageHtml = str_replace(
-                        $messagePlaceholder,
-                        $e->getMessage() . ' (' . $e->getCode() . ')',
-                        $flashMessageRenderer->resolve()->render([$flashMessage])
-                    );
-                }
-                $internalFlashMessage = $viewClass->renderInternalMessagesAsFlashMessage((string) $status);
-                $viewClass->saveExportInformation();
-            }
-        }
-
-        return [
-            'existingExportsOverview' => $existingExportsOverview,
-            'isImport' => $isImport,
-            'importSuccess' => $importSuccess,
-            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
-            'flashMessageHtml' => $flashMessageHtml,
-            'internalFlashMessage' => $internalFlashMessage,
-        ];
-    }
-
-    /**
      * @param L10nConfiguration $l10ncfgObj
      * @return string
      * @throws ResourceNotFoundException
@@ -798,6 +660,7 @@ return false;
         $flashMessageRenderer = GeneralUtility::makeInstance(FlashMessageRendererResolver::class);
         $existingExportsOverview = '';
         $flashMessages = [];
+        $actionInfo = '';
 
         $importXml = GeneralUtility::_POST('import_xml');
         $exportXml = GeneralUtility::_POST('export_xml');
@@ -1225,7 +1088,7 @@ return false;
         // Load system languages into menu and check against allowed languages:
         /** @var TranslationConfigurationProvider $t8Tools */
         $t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
-        $systemLanguages = $t8Tools->getSystemLanguages();
+        $systemLanguages = $t8Tools->getSystemLanguages((int)$configuration['pid']);
         foreach ($systemLanguages as $systemLanguage) {
             if (!empty($targetLanguages) && !isset($targetLanguages[$systemLanguage['uid']])) {
                 continue;
