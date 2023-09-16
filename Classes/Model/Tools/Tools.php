@@ -41,6 +41,7 @@ use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidParentRowRootExceptio
 use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidPointerFieldValueException;
 use TYPO3\CMS\Core\Configuration\FlexForm\Exception\InvalidTcaException;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\QueryHelper;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -164,9 +165,11 @@ class Tools
      * @throws DBALException
      */
     public function __construct(
-        protected TranslationConfigurationProvider $t8Tools
+        protected TranslationConfigurationProvider $t8Tools,
+        protected ConnectionPool $connectionPool,
     )
     {
+
     }
 
     /**
