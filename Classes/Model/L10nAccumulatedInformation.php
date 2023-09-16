@@ -39,6 +39,7 @@ use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\RootlineUtility;
+use TYPO3\CMS\Core\Utility\StringUtility;
 
 /**
  * l10nAccumulatedInformation
@@ -259,15 +260,7 @@ class L10nAccumulatedInformation
                 }
             }
             if (!empty($treeElement['row'][Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                /** @var LanguageRestrictionCollection $languageIsRestricted */
-                $languageIsRestricted = LanguageRestrictionCollection::load(
-                    $sysLang,
-                    true,
-                    'pages',
-                    $pageId,
-                );
-
-                if ($languageIsRestricted->hasItem((int)$pageId)) {
+                if (GeneralUtility::inList($treeElement['row'][Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
                     $this->excludeIndex['pages:' . $pageId] = 1;
                     continue;
                 }
@@ -317,14 +310,7 @@ class L10nAccumulatedInformation
                                 continue;
                             }
                             if (!empty($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                                /** @var LanguageRestrictionCollection $languageIsRestricted */
-                                $languageIsRestricted = LanguageRestrictionCollection::load(
-                                    $sysLang,
-                                    true,
-                                    $table,
-                                    $rowUid,
-                                );
-                                if ($languageIsRestricted->hasItem($rowUid)) {
+                                if (GeneralUtility::inList($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
                                     $this->excludeIndex[$table . ':' . $rowUid] = 1;
                                     continue;
                                 }
