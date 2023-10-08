@@ -28,6 +28,8 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  */
 
 use Doctrine\DBAL\Exception as DBALException;
+use Localizationteam\L10nmgr\Constants;
+use Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use PDO;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
@@ -1760,5 +1762,77 @@ class Tools
             $errorLog = $tce->errorLog;
         }
         return [$remove, $TCEmain_cmd, $TCEmain_data, $errorLog];
+    }
+
+    private function getParentTables(string $table, array $row): array
+    {
+        $isInlineTable = (
+            is_array($inlineTablesConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['inlineTablesConfig'])
+            && array_key_exists(
+                $table,
+                $inlineTablesConfig
+            ));
+
+        if ($isInlineTable) {
+            // Parent fields:
+            return ['tt_content', $inlineTablesConfig[$table]['parentField']];
+        }
+
+        if ($table === 'sys_file_reference') {
+            return [$row['tablenames'], 'uid_foreign'];
+        }
+
+        return [null, null];
+    }
+
+    public function isParentItemHidden(string $table, array $row, int $sysLang): bool
+    {
+        [$parentTable, $parentField] = $this->getParentTables($table, $row);
+
+        if (!empty($parentTable) && !empty($parentField)) {
+            if ($parentTable === 'pages') {
+                return false;
+            }
+
+            $parent = BackendUtility::getRecordWSOL($parentTable, (int)$row[$parentField]);
+
+            if ($parent['hidden']) {
+                return true;
+            }
+
+            // Exclude item if parent is missing
+            if (!$parent) {
+                return true;
+            }
+
+            // Recursive call for nested inline elements and sys_file_references
+            return $this->isParentItemHidden($parentTable, $parent, $sysLang);
+        }
+
+        return false;
+    }
+
+    public function isParentItemExcluded(string $table, array $row, int $sysLang): bool
+    {
+        [$parentTable, $parentField] = $this->getParentTables($table, $row);
+
+        if (!empty($parentTable) && !empty($parentField)) {
+            $parent = BackendUtility::getRecordWSOL($parentTable, (int)$row[$parentField]);
+            if (!empty($parent[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
+                if (GeneralUtility::inList($parent[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
+                    return true;
+                }
+            }
+
+            // Exclude item if parent is missing
+            if (!$parent) {
+                return true;
+            }
+
+            // Recursive call for nested inline elements and sys_file_references
+            return $this->isParentItemExcluded($parentTable, $parent, $sysLang);
+        }
+
+        return false;
     }
 }

@@ -25,7 +25,6 @@ namespace Localizationteam\L10nmgr\Model;
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;
-use Localizationteam\L10nmgr\LanguageRestriction\Collection\LanguageRestrictionCollection;
 use Localizationteam\L10nmgr\Model\Dto\EmConfiguration;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
@@ -39,7 +38,6 @@ use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\RootlineUtility;
-use TYPO3\CMS\Core\Utility\StringUtility;
 
 /**
  * l10nAccumulatedInformation
@@ -318,6 +316,40 @@ class L10nAccumulatedInformation
                             BackendUtility::workspaceOL($table, $row);
                             if (empty($row)) {
                                 continue;
+                            }
+
+                            // Restrictions are only defined on default lang
+                            if ((int)$l10ncfg['applyExcludeToChildren'] === 1 && $t8Tools->isParentItemExcluded($table, $row, $sysLang)) {
+                                continue;
+                            }
+
+                            // Check parent state of inline Elements and sys_file_references using the row or the rowPrevLang variable
+                            if ((int)$l10ncfg['applyExcludeToChildren'] === 1 && $this->noHidden) {
+                                // Check hidden state in default language
+                                if ($t8Tools->isParentItemHidden($table, $row, $sysLang)) {
+                                    continue;
+                                }
+
+                                // Get translation overlay record to check for hidden parents in forced source language
+                                $prevLangInfo = $t8Tools->translationInfo(
+                                    $table,
+                                    $row['uid'],
+                                    $previewLanguage,
+                                    null,
+                                    '',
+                                    $previewLanguage
+                                );
+                                if (!empty($prevLangInfo) && $prevLangInfo['translations'][$previewLanguage]) {
+                                    $rowPrevLang = BackendUtility::getRecordWSOL(
+                                        $prevLangInfo['translation_table'],
+                                        $prevLangInfo['translations'][$previewLanguage]['uid']
+                                    );
+
+                                    // Hidden state for
+                                    if (!empty($rowPrevLang) && $t8Tools->isParentItemHidden($table, $rowPrevLang, $sysLang)) {
+                                        continue;
+                                    }
+                                }
                             }
 
                             $accum[$pageId]['items'][$table][$rowUid] = $t8Tools->translationDetails(

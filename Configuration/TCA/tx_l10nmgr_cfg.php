@@ -166,9 +166,17 @@ return [
                 'default' => 0,
             ],
         ],
+        'applyExcludeToChildren' => [
+            'exclude' => 1,
+            'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.applyExcludeToChildren',
+            'config' => [
+                'type' => 'check',
+                'default' => 0,
+            ],
+        ],
     ],
     'types' => [
-        0 => ['showitem' => 'title,filenameprefix, depth, pages, sourceLangStaticId, --palette--;;forcedSourceLanguageSettings, tablelist, exclude, include, metadata, displaymode, incfcewithdefaultlanguage, pretranslatecontent, overrideexistingtranslations, sortexports'],
+        0 => ['showitem' => 'title,filenameprefix, depth, pages, sourceLangStaticId, --palette--;;forcedSourceLanguageSettings, tablelist, exclude, include, metadata, displaymode, incfcewithdefaultlanguage, pretranslatecontent, overrideexistingtranslations, sortexports, applyExcludeToChildren'],
     ],
     'palettes' => [
         'forcedSourceLanguageSettings' => ['showitem' => 'forcedSourceLanguage, onlyForcedSourceLanguage'],
