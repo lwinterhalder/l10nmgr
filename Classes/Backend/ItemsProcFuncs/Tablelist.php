@@ -20,6 +20,7 @@ namespace Localizationteam\L10nmgr\Backend\ItemsProcFuncs;
 use TYPO3\CMS\Core\Hooks\TcaItemsProcessorFunctions;
 use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\DebugUtility;
 
 /**
  * Class/Function which manipulates the item-array for table/field tx_l10nmgr_cfg tablelist.
@@ -39,26 +40,21 @@ class Tablelist implements SingletonInterface
     {
         $this->tcaItemsProcessor->populateAvailableTables($params);
 
-        if ($this->typo3Version->getMajorVersion() < 12) {
-            $params = array_map(static function ($item) {
-                return [
-                    'label' => $item[0],
-                    'value' => $item[1],
-                    'icon' => $item[2],
-                ];
-            }, $params['items']);
-        }
-
-        $items = [];
-
         if (!empty($params['items'])) {
+            $typo3Version = $this->typo3Version->getMajorVersion();
             foreach ($params['items'] as $item) {
-                if (empty($item['value'])) {
-                    continue;
+                if ($typo3Version < 12) {
+                    if (empty($item[1])) {
+                        continue;
+                    }
+                    $tableName = $item[1];
+                } else {
+                    if (empty($item['value'])) {
+                        continue;
+                    }
+                    $tableName = $item['value'];
                 }
-
-                $tableName = $item['value'];
-                if (isset($GLOBALS['TCA'][$tableName]['ctrl']['languageField']) && !empty($GLOBALS['TCA'][$tableName]['ctrl']['languageField'])) {
+                if (!empty($GLOBALS['TCA'][$tableName]['ctrl']['languageField'])) {
                     $items[] = $item;
                 }
             }
