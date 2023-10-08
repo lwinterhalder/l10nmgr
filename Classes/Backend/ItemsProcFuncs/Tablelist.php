@@ -50,14 +50,17 @@ class Tablelist implements SingletonInterface
         }
 
         $items = [];
-        foreach ($params['items'] as $item) {
-            if (empty($item['value'])) {
-                continue;
-            }
 
-            $tableName = $item['value'];
-            if (isset($GLOBALS['TCA'][$tableName]['ctrl']['languageField']) && !empty($GLOBALS['TCA'][$tableName]['ctrl']['languageField'])) {
-                $items[] = $item;
+        if (!empty($params['items'])) {
+            foreach ($params['items'] as $item) {
+                if (empty($item['value'])) {
+                    continue;
+                }
+
+                $tableName = $item['value'];
+                if (isset($GLOBALS['TCA'][$tableName]['ctrl']['languageField']) && !empty($GLOBALS['TCA'][$tableName]['ctrl']['languageField'])) {
+                    $items[] = $item;
+                }
             }
         }
 
