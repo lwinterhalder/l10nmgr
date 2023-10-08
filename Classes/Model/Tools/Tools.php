@@ -947,8 +947,8 @@ class Tools
                             $translationRecord = [];
                         }
                         if ($translationRecord !== [] && !empty($GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField'])) {
-                            $diffArray = unserialize(
-                                $translationRecord[$GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField']] ?? ''
+                            $diffArray = json_decode(
+                                $translationRecord[$GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField']] ?? '', true
                             );
                         } else {
                             $diffArray = [];
@@ -1029,7 +1029,7 @@ class Tools
                                             }
                                         }
                                         if (is_array($translationRecord)) {
-                                            $diffsource = unserialize($translationRecord['l18n_diffsource'] ?? '');
+                                            $diffsource = json_decode($translationRecord['l18n_diffsource'] ?? '', true);
                                             if (!empty($diffsource[$field])) {
                                                 $xmlArray = GeneralUtility::xml2array($diffsource[$field]);
                                                 if (is_array($xmlArray)) {
