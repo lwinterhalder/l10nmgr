@@ -110,6 +110,11 @@ class L10nConfiguration
         return (int)$this->getData('forcedSourceLanguage');
     }
 
+    public function getOnlyForcedSourceLanguage(): bool
+    {
+        return (bool)$this->getData('onlyForcedSourceLanguage');
+    }
+
     public function overrideExistingTranslations(): bool
     {
         return (bool)$this->getData('overrideexistingtranslations');

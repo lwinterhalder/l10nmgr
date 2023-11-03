@@ -447,21 +447,28 @@ return false;
         return $info;
     }
 
-    protected function makePreviewLanguageMenu(): array
+    protected function makePreviewLanguageMenu(int $forcedSourceLanguage, bool $onlyForcedSourceLanguage): array
     {
         $selectOptions = ['0' => '-default-'];
         $selectOptions += $this->MOD_MENU['lang'];
 
+
+
         // @extensionScannerIgnoreLine
-        return self::getFuncMenu(
+        $previewLanguageMenu = self::getFuncMenu(
             $this->id,
             'export_xml_forcepreviewlanguage',
-            (string)$this->previewLanguage,
+            (string)($forcedSourceLanguage ?: $this->previewLanguage),
             $selectOptions,
             '',
             '',
             $this->getLanguageService()->getLL('export.xml.source-language.title')
         );
+        if ($forcedSourceLanguage) {
+            $previewLanguageMenu['forcedSourceLanguage'] = $forcedSourceLanguage;
+        }
+        $previewLanguageMenu['onlyForcedSourceLanguage'] = $onlyForcedSourceLanguage;
+        return $previewLanguageMenu;
     }
 
     /**
@@ -522,7 +529,11 @@ return false;
             // Render the XML
             /** @var ExcelXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
-            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            if (1 == 1) {
+                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            } else {
+                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            }
 
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -596,7 +607,10 @@ return false;
             'existingExportsOverview' => $existingExportsOverview,
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
-            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(
+                $l10nConfiguration->getForcedSourceLanguage(),
+                $l10nConfiguration->getOnlyForcedSourceLanguage()
+            ),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
         ];
@@ -898,7 +912,10 @@ return false;
             'existingExportsOverview' => $existingExportsOverview,
             'flashMessages' => $flashMessages,
             'internalFlashMessage' => $internalFlashMessage,
-            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(
+                $l10nConfiguration->getForcedSourceLanguage(),
+                $l10nConfiguration->getOnlyForcedSourceLanguage()
+            ),
             'workspacesLoaded' => ExtensionManagementUtility::isLoaded('workspaces')
         ];
     }

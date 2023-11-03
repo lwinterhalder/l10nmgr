@@ -102,7 +102,7 @@
                     <label for="{moduleContent.previewLanguageMenu.elementName}">
                         {moduleContent.previewLanguageMenu.label}
                     </label><br />
-                    <select class="form-control" id="{moduleContent.previewLanguageMenu.elementName}" name="{moduleContent.previewLanguageMenu.elementName}">
+                    <select class="form-control" id="{moduleContent.previewLanguageMenu.elementName}" name="{moduleContent.previewLanguageMenu.elementName}"{f:if(condition: '{moduleContent.previewLanguageMenu.forcedSourceLanguage}', then: ' disabled="disabled"')}>
                         <f:for each="{moduleContent.previewLanguageMenu.options}" as="option" key="key">
                             <option value="{option.value}" {f:if(condition: '{option.selected} == true', then: 'selected')}>{option.label}</option>
                         </f:for>
@@ -111,7 +111,14 @@
                 <div class="form-group mb-2">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" />
+                            <f:if condition="{moduleContent.previewLanguageMenu.onlyForcedSourceLanguage}">
+                                <f:then>
+                                    <input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" checked="checked" disabled="disabled" />
+                                </f:then>
+                                <f:else>
+                                    <input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" />
+                                </f:else>
+                            </f:if>
                             <f:translate key="{lll}export.xml.source-language-only.title"/>
                         </label>
                     </div>
