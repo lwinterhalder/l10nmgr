@@ -82,9 +82,6 @@
             <div class="form-group mb-2">
                 <div class="checkbox">
                     <label>
-                        <f:if condition="{moduleContent.previewLanguageMenu.forcedSourceLanguageOnly}">
-                            <f:variable name="checked" value=" checked=\"checked\" disabled=\"disabled\"" />
-                        </f:if>
                         <f:if condition="{moduleContent.previewLanguageMenu.onlyForcedSourceLanguage}">
                             <f:then>
                                 <input type="checkbox" value="1" name="export_xml_forcepreviewlanguage_only" checked="checked" disabled="disabled" />
