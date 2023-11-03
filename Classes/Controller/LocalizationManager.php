@@ -452,6 +452,8 @@ return false;
         $selectOptions = ['0' => '-default-'];
         $selectOptions += $this->MOD_MENU['lang'];
 
+
+
         // @extensionScannerIgnoreLine
         $previewLanguageMenu = self::getFuncMenu(
             $this->id,
