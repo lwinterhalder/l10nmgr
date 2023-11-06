@@ -441,21 +441,26 @@ class LocalizationModuleController extends BaseModule12
         return $info;
     }
 
-    protected function makePreviewLanguageMenu(): array
+    protected function makePreviewLanguageMenu(int $forcedSourceLanguage, bool $onlyForcedSourceLanguage): array
     {
         $selectOptions = ['0' => '-default-'];
         $selectOptions += $this->MOD_MENU['lang'];
 
         // @extensionScannerIgnoreLine
-        return self::getFuncMenu(
-            $this->id,
-            'export_xml_forcepreviewlanguage',
-            (string)$this->previewLanguage,
-            $selectOptions,
-            '',
-            '',
-            $this->getLanguageService()->getLL('export.xml.source-language.title')
+        $previewLanguageMenu =self::getFuncMenu(
+                $this->id,
+                'export_xml_forcepreviewlanguage',
+                (string)($forcedSourceLanguage ?: $this->previewLanguage),
+                $selectOptions,
+                '',
+                '',
+                $this->getLanguageService()->getLL('export.xml.source-language.title')
         );
+        if ($forcedSourceLanguage) {
+            $previewLanguageMenu['forcedSourceLanguage'] = $forcedSourceLanguage;
+        }
+        $previewLanguageMenu['onlyForcedSourceLanguage'] = $onlyForcedSourceLanguage;
+        return $previewLanguageMenu;
     }
 
     /**
@@ -587,7 +592,10 @@ class LocalizationModuleController extends BaseModule12
             'existingExportsOverview' => $existingExportsOverview,
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
-            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
+                'previewLanguageMenu' => $this->makePreviewLanguageMenu(
+                        $l10nConfiguration->getForcedSourceLanguage(),
+                        $l10nConfiguration->getOnlyForcedSourceLanguage()
+                ),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
         ];
@@ -832,7 +840,10 @@ class LocalizationModuleController extends BaseModule12
             'existingExportsOverview' => $existingExportsOverview,
             'flashMessages' => $flashMessages,
             'internalFlashMessage' => $internalFlashMessage,
-            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
+                'previewLanguageMenu' => $this->makePreviewLanguageMenu(
+                        $l10nConfiguration->getForcedSourceLanguage(),
+                        $l10nConfiguration->getOnlyForcedSourceLanguage()
+                ),
             'workspacesLoaded' => ExtensionManagementUtility::isLoaded('workspaces')
         ];
     }

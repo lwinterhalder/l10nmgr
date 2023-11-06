@@ -452,8 +452,6 @@ return false;
         $selectOptions = ['0' => '-default-'];
         $selectOptions += $this->MOD_MENU['lang'];
 
-
-
         // @extensionScannerIgnoreLine
         $previewLanguageMenu = self::getFuncMenu(
             $this->id,
@@ -529,11 +527,7 @@ return false;
             // Render the XML
             /** @var ExcelXmlView $viewClass */
             $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
-            if (1 == 1) {
-                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
-            } else {
-                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
-            }
+            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
 
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -608,8 +602,8 @@ return false;
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
             'previewLanguageMenu' => $this->makePreviewLanguageMenu(
-                $l10nConfiguration->getForcedSourceLanguage(),
-                $l10nConfiguration->getOnlyForcedSourceLanguage()
+            $l10nConfiguration->getForcedSourceLanguage(),
+            $l10nConfiguration->getOnlyForcedSourceLanguage()
             ),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
