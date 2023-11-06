@@ -110,9 +110,15 @@ abstract class AbstractExportView implements ExportViewInterface
     protected array $internalMessages = [];
 
     /**
-     * @var int
+     * @var int $forcedSourceLanguage Overwrite the default language uid with the desired language to export
      */
     protected int $forcedSourceLanguage = 0;
+
+    /**
+     * @var bool $onlyForcedSourceLanguage Overwrite the default language uid with the desired language to export only if available
+     */
+    protected bool $onlyForcedSourceLanguage = false;
+
 
     protected Typo3Version $typo3Version;
 
@@ -235,7 +241,8 @@ abstract class AbstractExportView implements ExportViewInterface
             $fileType = 'catxml';
         }
 
-        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
+        $sourceLanguageId =             $this->l10ncfgObj->getForcedSourceLanguage()  ?: 0;
+        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$sourceLanguageId] ?? null;
         if ($sourceLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
                 $sourceLang = $sourceLanguageConfiguration->getLocale() ?: $sourceLanguageConfiguration->getTwoLetterIsoCode();
@@ -544,8 +551,13 @@ abstract class AbstractExportView implements ExportViewInterface
     /**
      * @inheritdoc
      */
-    public function setForcedSourceLanguage(int $forceLanguage): void
+    public function setForcedSourceLanguage(int $id): void
     {
-        $this->forcedSourceLanguage = $forceLanguage;
+        $this->forcedSourceLanguage = $id;
+    }
+
+    public function setOnlyForcedSourceLanguage()
+    {
+        $this->onlyForcedSourceLanguage = true;
     }
 }

@@ -172,7 +172,7 @@ class L10nConfiguration
      *
      * @return string Value of the field
      **/
-    private function getData(string $key): string
+    public function getData(string $key): string
     {
         return $key === 'pid' && !empty($this->l10ncfg['depth']) && (int)$this->l10ncfg['depth'] === -1 && $this->sourcePid
             ? (string)$this->sourcePid

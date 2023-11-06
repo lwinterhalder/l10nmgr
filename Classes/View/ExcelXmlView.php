@@ -46,16 +46,6 @@ class ExcelXmlView extends AbstractExportView
     protected int $exportType = 0;
 
     /**
-     * @var int $forcedSourceLanguage Overwrite the default language uid with the desired language to export
-     */
-    protected int $forcedSourceLanguage = 0;
-
-    /**
-     * @var bool $onlyForcedSourceLanguage Overwrite the default language uid with the desired language to export only if available
-     */
-    protected bool $onlyForcedSourceLanguage = false;
-
-    /**
      * ExcelXmlView constructor.
      * @param L10nConfiguration $l10ncfgObj
      * @param int $sysLang
@@ -251,16 +241,4 @@ class ExcelXmlView extends AbstractExportView
         return $messages;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function setForcedSourceLanguage(int $id): void
-    {
-        $this->forcedSourceLanguage = $id;
-    }
-
-    public function setOnlyForcedSourceLanguage()
-    {
-        $this->onlyForcedSourceLanguage = true;
-    }
 }
