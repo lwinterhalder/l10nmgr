@@ -77,7 +77,7 @@ abstract class AbstractExportView implements ExportViewInterface
     /**
      * @var int The sys_language_uid of language to export
      */
-    protected int $sysLang;
+    protected int $targetLanguage;
 
     /**
      * @var bool
@@ -124,13 +124,14 @@ abstract class AbstractExportView implements ExportViewInterface
 
     /**
      * @param L10nConfiguration $l10ncfgObj
-     * @param int $sysLang
+     * @param int $targetLanguage
      * @throws SiteNotFoundException
      */
-    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
+    public function __construct(L10nConfiguration $l10ncfgObj, int $targetLanguage)
     {
-        $this->sysLang = $sysLang;
+        $this->targetLanguage = $targetLanguage;
         $this->l10ncfgObj = $l10ncfgObj;
+        $this->forcedSourceLanguage = $l10ncfgObj->getForcedSourceLanguage() ?: 0;
         $this->typo3Version = GeneralUtility::makeInstance(Typo3Version::class);
         // Load system languages into menu:
         /** @var SiteFinder $siteFinder */
@@ -181,7 +182,7 @@ abstract class AbstractExportView implements ExportViewInterface
         // query to insert the data in the database
         $field_values = [
             'source_lang' => $this->forcedSourceLanguage ?: 0,
-            'translation_lang' => $this->sysLang,
+            'translation_lang' => $this->targetLanguage,
             'crdate' => $date,
             'tstamp' => $date,
             'l10ncfg_id' => $this->l10ncfgObj->getUid(),
@@ -250,7 +251,7 @@ abstract class AbstractExportView implements ExportViewInterface
                 $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
             }
         }
-        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
+        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->targetLanguage] ?? null;
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
                 $targetLang = $targetLanguageConfiguration->getLocale() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
@@ -288,7 +289,7 @@ abstract class AbstractExportView implements ExportViewInterface
                 ),
                 $queryBuilder->expr()->eq(
                     'translation_lang',
-                    $queryBuilder->createNamedParameter($this->sysLang, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->targetLanguage, PDO::PARAM_INT)
                 )
             )
             ->executeQuery()
@@ -388,7 +389,7 @@ abstract class AbstractExportView implements ExportViewInterface
                 ),
                 $queryBuilder->expr()->eq(
                     'translation_lang',
-                    $queryBuilder->createNamedParameter($this->sysLang, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($this->targetLanguage, PDO::PARAM_INT)
                 )
             )
             ->orderBy('crdate', 'DESC')

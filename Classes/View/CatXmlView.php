@@ -66,8 +66,8 @@ class CatXmlView extends AbstractExportView
      */
     public function render(): string
     {
-        $sysLang = $this->sysLang;
-        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
+        $targetLanguage = $this->targetLanguage;
+        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($targetLanguage);
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
@@ -144,10 +144,19 @@ class CatXmlView extends AbstractExportView
         $XML .= '<!DOCTYPE TYPO3L10N [ <!ENTITY nbsp " "> ]>' . "\n" . '<TYPO3L10N>' . "\n";
         $XML .= "\t" . '<head>' . "\n";
         $XML .= "\t\t" . '<t3_l10ncfg translate="no">' . $this->l10ncfgObj->getUid() . '</t3_l10ncfg>' . "\n";
-        $XML .= "\t\t" . '<t3_sysLang translate="no">' . $sysLang . '</t3_sysLang>' . "\n";
+
+        $systemLang = '';
+        $systemLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
+        if ($systemLanguageConfiguration instanceof SiteLanguage) {
+            if ($this->typo3Version->getMajorVersion() < 12) {
+                $systemLang = $systemLanguageConfiguration->getLocale() ?: $systemLanguageConfiguration->getTwoLetterIsoCode();
+            } else {
+                $systemLang = $systemLanguageConfiguration->getLocale()->getName() ?: $systemLanguageConfiguration->getLocale()->getLanguageCode();
+            }
+        }
 
         $sourceLang = '';
-        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
+        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->forcedSourceLanguage] ?? null;
 
         if ($sourceLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
@@ -156,8 +165,9 @@ class CatXmlView extends AbstractExportView
                 $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
             }
         }
+
         $targetLang = '';
-        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
+        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->targetLanguage] ?? null;
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
                 $targetLang = $targetLanguageConfiguration->getLocale() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
@@ -165,6 +175,8 @@ class CatXmlView extends AbstractExportView
                 $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
             }
         }
+
+        $XML .= "\t\t" . '<t3_sysLang translate="no">' . $systemLang . '</t3_sysLang>' . "\n";
         $XML .= "\t\t" . '<t3_sourceLang translate="no">' . $sourceLang . '</t3_sourceLang>' . "\n";
         $XML .= "\t\t" . '<t3_targetLang translate="no">' . $targetLang . '</t3_targetLang>' . "\n";
         $XML .= "\t\t" . '<t3_baseURL translate="no">' . $this->baseUrl . '</t3_baseURL>' . "\n";

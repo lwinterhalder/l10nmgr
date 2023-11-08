@@ -48,12 +48,12 @@ class ExcelXmlView extends AbstractExportView
     /**
      * ExcelXmlView constructor.
      * @param L10nConfiguration $l10ncfgObj
-     * @param int $sysLang
+     * @param int $targetLanguage
      * @throws SiteNotFoundException
      */
-    public function __construct(L10nConfiguration $l10ncfgObj, int $sysLang)
+    public function __construct(L10nConfiguration $l10ncfgObj, int $targetLanguage)
     {
-        parent::__construct($l10ncfgObj, $sysLang);
+        parent::__construct($l10ncfgObj, $targetLanguage);
     }
 
     /**
@@ -61,8 +61,8 @@ class ExcelXmlView extends AbstractExportView
      */
     public function render(): string
     {
-        $sysLang = $this->sysLang;
-        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
+        $targetLanguage = $this->targetLanguage;
+        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($targetLanguage);
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
