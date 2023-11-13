@@ -227,7 +227,6 @@ class CatXmlImportManager
             );
         }
         if (!isset($this->headerData['t3_sysLang'])) {
-            //if (!isset($this->headerData['t3_sysLang']) || $this->headerData['t3_sysLang'] != $this->sysLang) {
             $error[] = sprintf(
                 $this->getLanguageService()->getLL('import.manager.error.language.message'),
                 $this->sysLang,
