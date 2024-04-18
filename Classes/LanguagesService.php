@@ -6,12 +6,11 @@ namespace Localizationteam\L10nmgr;
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use TYPO3\CMS\Core\Site\SiteFinder;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class LanguagesService
 {
     use BackendUserTrait;
-
-    public function __construct(protected readonly SiteFinder $siteFinder) {}
 
     /**
      * Provides a list of all languages available for ALL sites.
@@ -21,7 +20,8 @@ class LanguagesService
     public function getAll(): array
     {
         $allLanguages = [];
-        foreach ($this->siteFinder->getAllSites() as $site) {
+        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        foreach ($siteFinder->getAllSites() as $site) {
             foreach ($site->getAllLanguages() as $language) {
                 // @extensionScannerIgnoreLine
                 $languageId = $language->getLanguageId();
