@@ -945,7 +945,7 @@ class L10nBaseService implements LoggerAwareInterface
             if (count($tce->autoVersionIdMap) && count($_flexFormDiffArray)) {
                 $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': flexFormDiffArry: ' . implode(
                     ', ',
-                    $this->flexFormDiffArray
+                    $_flexFormDiffArray
                 ));
                 foreach ($_flexFormDiffArray as $key => $value) {
                     [$Ttable, $Tuid, $Trest] = explode(':', $key, 3);
