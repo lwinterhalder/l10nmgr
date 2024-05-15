@@ -96,6 +96,11 @@ class Tcemain
             //// Finally, we have found the "root record" and will check it:
             /** @var Tools $t8Tools */
             $t8Tools = GeneralUtility::makeInstance(Tools::class);
+            if ($table === 'pages') {
+                $t8Tools->setSiteLanguagesByPid((int)$liveRecord['uid']);
+            } else {
+                $t8Tools->setSiteLanguagesByPid((int)$liveRecord['pid']);
+            }
             $t8Tools->verbose = false; // Otherwise it will show records which has fields but none editable.
             // debug($t8Tools->indexDetailsRecord($table,$liveRecord['uid']));
             $t8Tools->updateIndexTableFromDetailsArray($t8Tools->indexDetailsRecord(

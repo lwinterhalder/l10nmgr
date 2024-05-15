@@ -50,6 +50,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
@@ -173,6 +174,10 @@ class Tools
     )
     {
 
+    }
+
+    public function setSiteLanguagesByPid(int $pid = 0):void {
+        $this->sys_languages = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pid)->getLanguages();
     }
 
     /**
@@ -649,13 +654,13 @@ class Tools
                         $items['fullDetails'][$r['uid']] = $this->translationDetails(
                             $table,
                             $rec,
-                            $r['uid'],
+                            $uid,
                             [],
                             $languageID
                         );
-                        $items['indexRecord'][$r['uid']] = $this->compileIndexRecord(
-                            $items['fullDetails'][$r['uid']],
-                            $r['uid'],
+                        $items['indexRecord'][$uid] = $this->compileIndexRecord(
+                            $items['fullDetails'][$uid],
+                            $uid,
                             $pid
                         );
                     }
