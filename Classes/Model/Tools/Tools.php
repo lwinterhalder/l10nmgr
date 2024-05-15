@@ -919,7 +919,6 @@ class Tools
     {
         // Initialize:
         $tInfo = $this->translationInfo($table, $row['uid'] ?? 0, $sysLang, null, '', $previewLanguage);
-        $tvInstalled = ExtensionManagementUtility::isLoaded('templavoila'); // TODO: Remove references to TemplaVoila
         $this->detailsOutput = [];
         $this->flexFormDiff = $flexFormDiff;
         if (is_array($tInfo)) {
@@ -1020,8 +1019,7 @@ class Tools
                                         $field,
                                         $row
                                     );
-                                    if (!$tvInstalled
-                                        ||
+                                    if (
                                         !empty($dataStructArray['meta']['langDisable'])
                                         && isset($dataStructArray['meta']['langDatabaseOverlay'])
                                         && (int)$dataStructArray['meta']['langDatabaseOverlay'] === 1
@@ -1054,13 +1052,13 @@ class Tools
                                             }
                                         }
                                         $this->_callBackParams_currentRow = $row;
-                                        $flexObj->traverseFlexFormXMLData(
+                                        /* $flexObj->traverseFlexFormXMLData(
                                             $table,
                                             $field,
                                             $row,
                                             $this,
                                             'translationDetails_flexFormCallBackForOverlay'
-                                        );
+                                        );*/
                                     }
                                     $this->detailsOutput['log'][] = 'Mode: useOverlay looking for flexform fields!';
                                 } else {
