@@ -565,6 +565,7 @@ class L10nBaseService implements LoggerAwareInterface
         $Tlang = '';
         $_flexFormDiffArray = [];
         $neverHideAtCopy = $this->emConfiguration->isEnableNeverHideAtCopy();
+
         // Traverse:
         foreach ($accum as $pId => $page) {
             if (!empty($page['items'])) {
