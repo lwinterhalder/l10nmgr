@@ -557,109 +557,66 @@ class L10nBaseService implements LoggerAwareInterface
      */
     protected function _submitContentAsTranslatedLanguageAndGetFlexFormDiff(array $accum, array $inputArray)
     {
-        if (is_array($inputArray)) {
-            // Initialize:
-            /** @var FlexFormTools $flexToolObj */
-            $flexToolObj = GeneralUtility::makeInstance(FlexFormTools::class);
-            $gridElementsInstalled = ExtensionManagementUtility::isLoaded('gridelements');
-            $fluxInstalled = ExtensionManagementUtility::isLoaded('flux');
-            $TCEmain_data = [];
-            $this->TCEmain_cmd = [];
-            $Tlang = '';
-            $_flexFormDiffArray = [];
-            $neverHideAtCopy = $this->emConfiguration->isEnableNeverHideAtCopy();
-            // Traverse:
-            foreach ($accum as $pId => $page) {
-                if (!empty($page['items'])) {
-                    foreach ($page['items'] as $table => $elements) {
-                        foreach ($elements as $elementUid => $data) {
-                            $element = $this->getRawRecord((string)$table, (int)$elementUid);
-                            if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsTranslated'])) {
-                                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsTranslated'] as $hookObj) {
-                                    $parameters = [
-                                        'data' => $data,
-                                    ];
-                                    $data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
-                                }
+        // Initialize:
+        $gridElementsInstalled = ExtensionManagementUtility::isLoaded('gridelements');
+        $fluxInstalled = ExtensionManagementUtility::isLoaded('flux');
+        $TCEmain_data = [];
+        $this->TCEmain_cmd = [];
+        $Tlang = '';
+        $_flexFormDiffArray = [];
+        $neverHideAtCopy = $this->emConfiguration->isEnableNeverHideAtCopy();
+        // Traverse:
+        foreach ($accum as $pId => $page) {
+            if (!empty($page['items'])) {
+                foreach ($page['items'] as $table => $elements) {
+                    foreach ($elements as $elementUid => $data) {
+                        $element = $this->getRawRecord((string)$table, (int)$elementUid);
+                        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsTranslated'])) {
+                            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['beforeDataFieldsTranslated'] as $hookObj) {
+                                $parameters = [
+                                    'data' => $data,
+                                ];
+                                $data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
                             }
-                            if (!empty($data['fields'])) {
-                                foreach ($data['fields'] as $key => $tData) {
-                                    if (is_array($tData)
-                                        && is_array($inputArray[$table][$elementUid] ?? null)
-                                        && array_key_exists($key, $inputArray[$table][$elementUid])
+                        }
+                        if (!empty($data['fields'])) {
+                            foreach ($data['fields'] as $key => $tData) {
+                                if (is_array($tData)
+                                    && is_array($inputArray[$table][$elementUid] ?? null)
+                                    && array_key_exists($key, $inputArray[$table][$elementUid])
+                                ) {
+                                    $explodedKey = explode(':', $key);
+                                    [$Ttable, $TuidString, $Tfield] = $explodedKey;
+                                    $Tpath = $explodedKey[3] ?? null;
+                                    $explodedTuidString = explode('/', $TuidString);
+                                    $Tuid = $explodedTuidString[0] ?? 0;
+                                    $Tlang = $explodedTuidString[1] ?? null;
+                                    if (!$this->createTranslationAlsoIfEmpty
+                                        && isset($inputArray[$table][$elementUid][$key])
+                                        && $inputArray[$table][$elementUid][$key] == ''
+                                        && $Tuid == 'NEW'
+                                        && $Tfield !== trim($GLOBALS['TCA'][$Ttable]['ctrl']['label'] ?? '')
                                     ) {
-                                        $explodedKey = explode(':', $key);
-                                        [$Ttable, $TuidString, $Tfield] = $explodedKey;
-                                        $Tpath = $explodedKey[3] ?? null;
-                                        $explodedTuidString = explode('/', $TuidString);
-                                        $Tuid = $explodedTuidString[0] ?? 0;
-                                        $Tlang = $explodedTuidString[1] ?? null;
-                                        if (!$this->createTranslationAlsoIfEmpty
-                                            && isset($inputArray[$table][$elementUid][$key])
-                                            && $inputArray[$table][$elementUid][$key] == ''
-                                            && $Tuid == 'NEW'
-                                            && $Tfield !== trim($GLOBALS['TCA'][$Ttable]['ctrl']['label'] ?? '')
-                                        ) {
-                                            //if data is empty and the field is not the label field of that particular table, do not save it
-                                            unset($inputArray[$table][$elementUid][$key]);
-                                            continue;
-                                        }
-                                        // If new element is required, we prepare for localization
-                                        if ($Tuid === 'NEW') {
-                                            if ($table === 'tt_content' && ($gridElementsInstalled === true || $fluxInstalled === true)) {
-                                                if (isset($this->TCEmain_cmd['tt_content'][$elementUid])) {
-                                                    unset($this->TCEmain_cmd['tt_content'][$elementUid]);
-                                                }
-                                                if (isset($element['colPos']) && (int)$element['colPos'] !== -2 && (int)$element['colPos'] !== -1 && (int)$element['colPos'] !== 18181) {
-                                                    $this->TCEmain_cmd['tt_content'][$elementUid]['localize'] = $Tlang;
-                                                } else {
-                                                    if (isset($element['tx_gridelements_container']) && $element['tx_gridelements_container'] > 0) {
-                                                        $this->depthCounter = 0;
-                                                        $this->recursivelyCheckForRelationParents(
-                                                            $element,
-                                                            (int)$Tlang,
-                                                            'tx_gridelements_container',
-                                                            'tx_gridelements_children'
-                                                        );
-                                                    }
-                                                    if (isset($element['tx_flux_parent']) && $element['tx_flux_parent'] > 0) {
-                                                        $this->depthCounter = 0;
-                                                        $this->recursivelyCheckForRelationParents(
-                                                            $element,
-                                                            (int)$Tlang,
-                                                            'tx_flux_parent',
-                                                            'tx_flux_children'
-                                                        );
-                                                    }
-                                                }
-                                            } elseif (!empty($inlineTablesConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['inlineTablesConfig'] ?? []) && array_key_exists(
-                                                $table,
-                                                $inlineTablesConfig
-                                            )) {
-                                                /*
-                                                 * Special handling for 1:n relations
-                                                 *
-                                                 * Example: Inline elements (1:n) with tt_content as parent
-                                                 *
-                                                 * Config example:
-                                                 * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['inlineTablesConfig'] = [
-                                                 *    'tx_myext_myelement' => [
-                                                 *       'parentField' => 'content',
-                                                 *       'childrenField' => 'myelements',
-                                                 *   ]];
-                                                 */
-                                                if (isset($this->TCEmain_cmd[$table][$elementUid])) {
-                                                    unset($this->TCEmain_cmd[$table][$elementUid]);
-                                                }
-                                                if (!empty($inlineTablesConfig[$table])
-                                                    && isset($element[$inlineTablesConfig[$table]['parentField']])
-                                                    && $element[$inlineTablesConfig[$table]['parentField']] > 0) {
+                                        //if data is empty and the field is not the label field of that particular table, do not save it
+                                        unset($inputArray[$table][$elementUid][$key]);
+                                        continue;
+                                    }
+                                    // If new element is required, we prepare for localization
+                                    if ($Tuid === 'NEW') {
+                                        if ($table === 'tt_content' && ($gridElementsInstalled === true || $fluxInstalled === true)) {
+                                            if (isset($this->TCEmain_cmd['tt_content'][$elementUid])) {
+                                                unset($this->TCEmain_cmd['tt_content'][$elementUid]);
+                                            }
+                                            if (isset($element['colPos']) && (int)$element['colPos'] !== -2 && (int)$element['colPos'] !== -1 && (int)$element['colPos'] !== 18181) {
+                                                $this->TCEmain_cmd['tt_content'][$elementUid]['localize'] = $Tlang;
+                                            } else {
+                                                if (isset($element['tx_gridelements_container']) && $element['tx_gridelements_container'] > 0) {
                                                     $this->depthCounter = 0;
                                                     $this->recursivelyCheckForRelationParents(
                                                         $element,
                                                         (int)$Tlang,
-                                                        $inlineTablesConfig[$table]['parentField'] ?? '',
-                                                        $inlineTablesConfig[$table]['childrenField'] ?? ''
+                                                        'tx_gridelements_container',
+                                                        'tx_gridelements_children'
                                                     );
                                                 }
                                             } elseif ($table === 'sys_file_reference') {
@@ -694,189 +651,120 @@ class L10nBaseService implements LoggerAwareInterface
                                                                         )
                                                                     )
                                                                 )
-                                                                ->executeQuery()
-                                                                ->fetch();
-                                                        }
-                                                        if (isset($parent['uid']) && $parent['uid'] > 0) {
-                                                            if (isset($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']])) {
-                                                                unset($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]);
-                                                            }
-                                                            // Save for localization
-                                                            if (empty($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize']['ids'])) {
-                                                                $this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize'] = [
-                                                                    'field' => $element['fieldname'],
-                                                                    'language' => $Tlang,
-                                                                    'action' => 'localize',
-                                                                    'ids' => [$elementUid],
-                                                                ];
-                                                            } else {
-                                                                // Add element to existing localization array
-                                                                $this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize']['ids'][] = $elementUid;
-                                                            }
-                                                        }
+                                                            )
+                                                            ->executeQuery()
+                                                            ->fetch();
                                                     }
-                                                }
-                                            } else {
-                                                //print "\nNEW\n";
-                                                if (isset($this->TCEmain_cmd[$table][$elementUid])) {
-                                                    unset($this->TCEmain_cmd[$table][$elementUid]);
-                                                }
-
-                                                //START add container support
-                                                if (ExtensionManagementUtility::isLoaded('container') && $table === 'tt_content' && $element['tx_container_parent'] > 0) {
-                                                    // localization is done by EXT:container, when container is localized, so localize cmd is not required
-                                                    // but mapping is required
-                                                    $this->childMappingArray[$table][$elementUid] = true;
-                                                } else {
-                                                    $this->TCEmain_cmd[$table][$elementUid]['localize'] = $Tlang;
-                                                }
-                                                //END add container support
-
-                                                if (!empty($GLOBALS['TCA'][$table]['columns'][$Tfield])) {
-                                                    $configuration = $GLOBALS['TCA'][$table]['columns'][$Tfield]['config'] ?? [];
-
-                                                    // Clear original slug field values to avoid weird autogenerated values for translated slugs
-                                                    if ($configuration['type'] === 'slug') {
-                                                        unset($inputArray[$table][$elementUid][$key]);
-                                                        continue;
-                                                    }
-                                                    if (!empty($configuration['foreign_table'])) {
-                                                        /** @var RelationHandler $relationHandler */
-                                                        // integrators have to make sure to configure fields of parent elements properly
-                                                        // so they will do translations of their children automatically when translated
-                                                        $relationHandler = GeneralUtility::makeInstance(RelationHandler::class);
-                                                        $relationHandler->start(
-                                                            $element[$Tfield],
-                                                            $configuration['foreign_table'],
-                                                            $configuration['MM'] ?? '',
-                                                            $elementUid,
-                                                            $table,
-                                                            $configuration
-                                                        );
-                                                        $relationHandler->processDeletePlaceholder();
-                                                        $referenceUids = $relationHandler->tableArray[$configuration['foreign_table']];
-                                                        if (!empty($referenceUids)) {
-                                                            foreach ($referenceUids as $referenceUid) {
-                                                                $this->childMappingArray[$configuration['foreign_table']][$referenceUid] = true;
-                                                                if ($table !== 'pages') {
-                                                                    unset($this->TCEmain_cmd[$configuration['foreign_table']][$referenceUid]);
-                                                                }
-                                                            }
+                                                    if (isset($parent['uid']) && $parent['uid'] > 0) {
+                                                        if (isset($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']])) {
+                                                            unset($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]);
+                                                        }
+                                                        // Save for localization
+                                                        if (empty($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize']['ids'])) {
+                                                            $this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize'] = [
+                                                                'field' => $element['fieldname'],
+                                                                'language' => $Tlang,
+                                                                'action' => 'localize',
+                                                                'ids' => [$elementUid],
+                                                            ];
+                                                        } else {
+                                                            // Add element to existing localization array
+                                                            $this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']]['inlineLocalizeSynchronize']['ids'][] = $elementUid;
                                                         }
                                                     }
                                                 }
                                             }
-                                            if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['importNewTceMainCmd'])) {
-                                                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['importNewTceMainCmd'] as $hookObj) {
-                                                    $parameters = [
-                                                        'data' => $data,
-                                                        'TCEmain_cmd' => $this->TCEmain_cmd,
-                                                    ];
-                                                    $this->TCEmain_cmd = GeneralUtility::callUserFunction(
-                                                        $hookObj,
-                                                        $parameters,
-                                                        $this
-                                                    );
-                                                }
-                                            }
-                                        }
-                                        // If FlexForm, we set value in special way:
-                                        if ($Tpath) {
-                                            if (!is_array($TCEmain_data[$Ttable][$TuidString][$Tfield])) {
-                                                $TCEmain_data[$Ttable][$TuidString][$Tfield] = [];
-                                            }
-                                            //TCEMAINDATA is passed as reference here:
-                                            ArrayUtility::setValueByPath(
-                                                $TCEmain_data[$Ttable][$TuidString][$Tfield],
-                                                $Tpath,
-                                                $inputArray[$table][$elementUid][$key] ?? ''
-                                            );
-                                            $_flexFormDiffArray[$key] = [
-                                                'translated' => $inputArray[$table][$elementUid][$key] ?? '',
-                                                'default' => $tData['defaultValue'] ?? '',
-                                            ];
                                         } else {
-                                            $TCEmain_data[$Ttable][$TuidString][$Tfield] = $inputArray[$table][$elementUid][$key] ?? '';
-                                        }
-                                        unset($inputArray[$table][$elementUid][$key]); // Unsetting so in the end we can see if $inputArray was fully processed.
-                                    }
-                                    //debug($tData,'fields not set for: '.$elementUid.'-'.$key);
-                                    //debug($inputArray[$table],'inputarray');
-                                }
-                                if (is_array($inputArray[$table][$elementUid] ?? null) && !count($inputArray[$table][$elementUid])) {
-                                    unset($inputArray[$table][$elementUid]); // Unsetting so in the end we can see if $inputArray was fully processed.
-                                }
-                            }
+                                            //print "\nNEW\n";
+                                            if (isset($this->TCEmain_cmd[$table][$elementUid])) {
+                                                unset($this->TCEmain_cmd[$table][$elementUid]);
+                                            }
 
-                            if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsTranslated'])) {
-                                foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['afterDataFieldsTranslated'] as $hookObj) {
-                                    $parameters = [
-                                        'TCEmain_data' => $TCEmain_data,
-                                        'TCEmain_cmd' => $this->TCEmain_cmd,
-                                    ];
-                                    $this->TCEmain_data = GeneralUtility::callUserFunction($hookObj, $parameters, $this);
+                                            //START add container support
+                                            if (ExtensionManagementUtility::isLoaded('container') && $table === 'tt_content' && $element['tx_container_parent'] > 0) {
+                                                // localization is done by EXT:container, when container is localized, so localize cmd is not required
+                                                // but mapping is required
+                                                $this->childMappingArray[$table][$elementUid] = true;
+                                            } else {
+                                                $this->TCEmain_cmd[$table][$elementUid]['localize'] = $Tlang;
+                                            }
+                                            //END add container support
+
+                                            if (!empty($GLOBALS['TCA'][$table]['columns'][$Tfield])) {
+                                                $configuration = $GLOBALS['TCA'][$table]['columns'][$Tfield]['config'] ?? [];
+
+                                                // Clear original slug field values to avoid weird autogenerated values for translated slugs
+                                                if ($configuration['type'] === 'slug') {
+                                                    unset($inputArray[$table][$elementUid][$key]);
+                                                    continue;
+                                                }
+                                                if (!empty($configuration['foreign_table'])) {
+                                                    /** @var RelationHandler $relationHandler */
+                                                    // integrators have to make sure to configure fields of parent elements properly
+                                                    // so they will do translations of their children automatically when translated
+                                                    $relationHandler = GeneralUtility::makeInstance(RelationHandler::class);
+                                                    $relationHandler->start(
+                                                        $element[$Tfield],
+                                                        $configuration['foreign_table'],
+                                                        $configuration['MM'] ?? '',
+                                                        $elementUid,
+                                                        $table,
+                                                        $configuration
+                                                    );
+                                                    $relationHandler->processDeletePlaceholder();
+                                                    $referenceUids = $relationHandler->tableArray[$configuration['foreign_table']];
+                                                    if (!empty($referenceUids)) {
+                                                        foreach ($referenceUids as $referenceUid) {
+                                                            $this->childMappingArray[$configuration['foreign_table']][$referenceUid] = true;
+                                                            if ($table !== 'pages') {
+                                                                unset($this->TCEmain_cmd[$configuration['foreign_table']][$referenceUid]);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['importNewTceMainCmd'])) {
+                                            foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['importNewTceMainCmd'] as $hookObj) {
+                                                $parameters = [
+                                                    'data' => $data,
+                                                    'TCEmain_cmd' => $this->TCEmain_cmd,
+                                                ];
+                                                $this->TCEmain_cmd = GeneralUtility::callUserFunction(
+                                                    $hookObj,
+                                                    $parameters,
+                                                    $this
+                                                );
+                                            }
+                                        }
+                                    }
+                                    // If FlexForm, we set value in special way:
+                                    if ($Tpath) {
+                                        if (!is_array($TCEmain_data[$Ttable][$TuidString][$Tfield])) {
+                                            $TCEmain_data[$Ttable][$TuidString][$Tfield] = [];
+                                        }
+                                        //TCEMAINDATA is passed as reference here:
+                                        ArrayUtility::setValueByPath(
+                                            $TCEmain_data[$Ttable][$TuidString][$Tfield],
+                                            $Tpath,
+                                            $inputArray[$table][$elementUid][$key] ?? ''
+                                        );
+                                        $_flexFormDiffArray[$key] = [
+                                            'translated' => $inputArray[$table][$elementUid][$key] ?? '',
+                                            'default' => $tData['defaultValue'] ?? '',
+                                        ];
+                                    } else {
+                                        $TCEmain_data[$Ttable][$TuidString][$Tfield] = $inputArray[$table][$elementUid][$key] ?? '';
+                                    }
+                                    unset($inputArray[$table][$elementUid][$key]); // Unsetting so in the end we can see if $inputArray was fully processed.
                                 }
+                                //debug($tData,'fields not set for: '.$elementUid.'-'.$key);
+                                //debug($inputArray[$table],'inputarray');
+                            }
+                            if (is_array($inputArray[$table][$elementUid] ?? null) && !count($inputArray[$table][$elementUid])) {
+                                unset($inputArray[$table][$elementUid]); // Unsetting so in the end we can see if $inputArray was fully processed.
                             }
                         }
-                        if (isset($inputArray[$table]) && is_array($inputArray[$table]) && !count($inputArray[$table])) {
-                            unset($inputArray[$table]); // Unsetting so in the end we can see if $inputArray was fully processed.
-                        }
-                    }
-                }
-            }
-            self::$targetLanguageID = (int)$Tlang;
-            // Execute CMD array: Localizing records:
-            /** @var DataHandler $tce */
-            $tce = GeneralUtility::makeInstance(DataHandler::class);
-            $tce->neverHideAtCopy = $neverHideAtCopy;
-            $tce->dontProcessTransformations = $this->emConfiguration->isImportDontProcessTransformations();
-            $tce->isImporting = true;
-            if (count($this->TCEmain_cmd)) {
-                $tce->start([], $this->TCEmain_cmd);
-                $tce->process_cmdmap();
-                if (count($tce->errorLog)) {
-                    debug($tce->errorLog, 'TCEmain localization errors:');
-                }
-            }
-            // Before remapping
-            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain_data before remapping: ' . json_encode($TCEmain_data));
-            // Remapping those elements which are new:
-            $this->lastTCEMAINCommandsCount = 0;
-            $slugFields = [];
-            // Find slug fields for each table
-            foreach (array_keys($TCEmain_data) as $table) {
-                if (!empty($GLOBALS['TCA'][$table]['columns'])) {
-                    foreach ($GLOBALS['TCA'][$table]['columns'] as $columnName => $column) {
-                        if (!empty($column['config']) && !empty($column['config']['type']) && $column['config']['type'] === 'slug') {
-                            $slugFields[$table][$columnName] = '';
-                        }
-                    }
-                }
-            }
-            foreach ($TCEmain_data as $table => $items) {
-                foreach ($items as $TuidString => $fields) {
-                    $explodedTuidString = explode('/', (string)$TuidString);
-                    $Tuid = $explodedTuidString[0] ?? '';
-                    $Tlang = $explodedTuidString[1] ?? null;
-                    $TdefRecord = $explodedTuidString[2] ?? null;
-                    $this->lastTCEMAINCommandsCount++;
-                    if ($Tuid === 'NEW') {
-                        // if there are slug fields and there is no translation value for them
-                        // make sure they will be empty to trigger automatic slug generation with translated values
-                        if (!empty($slugFields[$table])) {
-                            $fields = array_merge($slugFields[$table], $fields);
-                        }
-                        if (!empty($tce->copyMappingArray_merged[$table][$TdefRecord])) {
-                            $TCEmain_data[$table][BackendUtility::wsMapId(
-                                $table,
-                                $tce->copyMappingArray_merged[$table][$TdefRecord]
-                            )] = $fields;
-                        } else {
-                            if (!empty($this->childMappingArray[$table][$TdefRecord])) {
-                                if ($this->childMappingArray[$table][$TdefRecord] === true) {
-                                    /** @var QueryBuilder $queryBuilder */
-                                    $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-                                    $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
 
                                     $translatedRecordRaw = $queryBuilder
                                         ->select('*')
@@ -914,58 +802,153 @@ class L10nBaseService implements LoggerAwareInterface
                                 $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': Record "' . $table . ':' . $TdefRecord . '" was NOT localized as it should have been!');
                             }
                         }
-                        unset($TCEmain_data[$table][$TuidString]);
+                    }
+                    if (isset($inputArray[$table]) && is_array($inputArray[$table]) && !count($inputArray[$table])) {
+                        unset($inputArray[$table]); // Unsetting so in the end we can see if $inputArray was fully processed.
                     }
                 }
             }
-            // After remapping
-            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain_data after remapping: ' . json_encode($TCEmain_data));
-            // Now, submitting translation data:
-            /** @var DataHandler $tce */
-            $tce = GeneralUtility::makeInstance(DataHandler::class);
-            $tce->neverHideAtCopy = $neverHideAtCopy;
-            $tce->dontProcessTransformations = true;
-            $tce->isImporting = true;
-            foreach (array_chunk($TCEmain_data, 100, true) as $dataPart) {
-                $tce->start(
-                    $dataPart,
-                    []
-                ); // check has been done previously that there is a backend user which is Admin and also in live workspace
-                $tce->process_datamap();
-            }
-            self::$targetLanguageID = 0;
-            if (count($tce->errorLog)) {
-                $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain update errors: ' . implode(
-                    ', ',
-                    $tce->errorLog
-                ));
-            }
-            if (count($tce->autoVersionIdMap) && count($_flexFormDiffArray)) {
-                $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': flexFormDiffArry: ' . implode(
-                    ', ',
-                    $_flexFormDiffArray
-                ));
-                foreach ($_flexFormDiffArray as $key => $value) {
-                    [$Ttable, $Tuid, $Trest] = explode(':', $key, 3);
-                    if (!empty($tce->autoVersionIdMap[$Ttable][$Tuid])) {
-                        $_flexFormDiffArray[$Ttable . ':' . $tce->autoVersionIdMap[$Ttable][$Tuid] . ':' . $Trest] = $value;
-                        unset($_flexFormDiffArray[$key]);
-                    }
-                }
-                /** @phpstan-ignore-next-line */
-                $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': autoVersionIdMap: ' . $tce->autoVersionIdMap);
-                $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': _flexFormDiffArray: ' . implode(
-                    ', ',
-                    $_flexFormDiffArray
-                ));
-            }
-            // Should be empty now - or there were more information in the incoming array than there should be!
-            if (count($inputArray)) {
-                debug($inputArray, 'These fields were ignored since they were not in the configuration 2:');
-            }
-            return $_flexFormDiffArray;
         }
-        return false;
+        self::$targetLanguageID = (int)$Tlang;
+        // Execute CMD array: Localizing records:
+        /** @var DataHandler $tce */
+        $tce = GeneralUtility::makeInstance(DataHandler::class);
+        $tce->neverHideAtCopy = $neverHideAtCopy;
+        $tce->dontProcessTransformations = $this->emConfiguration->isImportDontProcessTransformations();
+        $tce->isImporting = true;
+        if (count($this->TCEmain_cmd)) {
+            $tce->start([], $this->TCEmain_cmd);
+            $tce->process_cmdmap();
+            if (count($tce->errorLog)) {
+                debug($tce->errorLog, 'TCEmain localization errors:');
+            }
+        }
+        // Before remapping
+        $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain_data before remapping: ' . json_encode($TCEmain_data));
+        // Remapping those elements which are new:
+        $this->lastTCEMAINCommandsCount = 0;
+        $slugFields = [];
+        // Find slug fields for each table
+        foreach (array_keys($TCEmain_data) as $table) {
+            if (!empty($GLOBALS['TCA'][$table]['columns'])) {
+                foreach ($GLOBALS['TCA'][$table]['columns'] as $columnName => $column) {
+                    if (!empty($column['config']) && !empty($column['config']['type']) && $column['config']['type'] === 'slug') {
+                        $slugFields[$table][$columnName] = '';
+                    }
+                }
+            }
+        }
+        foreach ($TCEmain_data as $table => $items) {
+            foreach ($items as $TuidString => $fields) {
+                $explodedTuidString = explode('/', (string)$TuidString);
+                $Tuid = $explodedTuidString[0] ?? '';
+                $Tlang = $explodedTuidString[1] ?? null;
+                $TdefRecord = $explodedTuidString[2] ?? null;
+                $this->lastTCEMAINCommandsCount++;
+                if ($Tuid === 'NEW') {
+                    // if there are slug fields and there is no translation value for them
+                    // make sure they will be empty to trigger automatic slug generation with translated values
+                    if (!empty($slugFields[$table])) {
+                        $fields = array_merge($slugFields[$table], $fields);
+                    }
+                    if (!empty($tce->copyMappingArray_merged[$table][$TdefRecord])) {
+                        $TCEmain_data[$table][BackendUtility::wsMapId(
+                            $table,
+                            $tce->copyMappingArray_merged[$table][$TdefRecord]
+                        )] = $fields;
+                    } else {
+                        if (!empty($this->childMappingArray[$table][$TdefRecord])) {
+                            if ($this->childMappingArray[$table][$TdefRecord] === true) {
+                                /** @var QueryBuilder $queryBuilder */
+                                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+                                $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
+
+                                $translatedRecordRaw = $queryBuilder
+                                    ->select('*')
+                                    ->from($table)
+                                    ->where(
+                                        !empty($GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField']) ?
+                                            $queryBuilder->expr()->eq(
+                                                $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'],
+                                                $queryBuilder->createNamedParameter((int)$TdefRecord, Connection::PARAM_INT)
+                                            )
+                                            : null,
+                                        $queryBuilder->expr()->eq(
+                                            'sys_language_uid',
+                                            $queryBuilder->createNamedParameter((int)$Tlang, Connection::PARAM_INT)
+                                        )
+                                    )
+                                    ->executeQuery()
+                                    ->fetch();
+
+                                if (!empty($translatedRecordRaw['uid'])) {
+                                    $this->childMappingArray[$table][$TdefRecord] = $translatedRecordRaw['uid'];
+                                }
+                            }
+                            if (!empty($this->childMappingArray[$table][$TdefRecord])) {
+                                if ($neverHideAtCopy
+                                    && !empty($GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled'])) {
+                                    $fields[$GLOBALS['TCA'][$table]['ctrl']['enablecolumns']['disabled']] = 0;
+                                }
+                                $TCEmain_data[$table][BackendUtility::wsMapId(
+                                    $table,
+                                    $this->childMappingArray[$table][$TdefRecord] ?? 0
+                                )] = $fields;
+                            }
+                        } else {
+                            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': Record "' . $table . ':' . $TdefRecord . '" was NOT localized as it should have been!');
+                        }
+                    }
+                    unset($TCEmain_data[$table][$TuidString]);
+                }
+            }
+        }
+        // After remapping
+        $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain_data after remapping: ' . json_encode($TCEmain_data));
+        // Now, submitting translation data:
+        /** @var DataHandler $tce */
+        $tce = GeneralUtility::makeInstance(DataHandler::class);
+        $tce->neverHideAtCopy = $neverHideAtCopy;
+        $tce->dontProcessTransformations = true;
+        $tce->isImporting = true;
+        foreach (array_chunk($TCEmain_data, 100, true) as $dataPart) {
+            $tce->start(
+                $dataPart,
+                []
+            ); // check has been done previously that there is a backend user which is Admin and also in live workspace
+            $tce->process_datamap();
+        }
+        self::$targetLanguageID = 0;
+        if (count($tce->errorLog)) {
+            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': TCEmain update errors: ' . implode(
+                ', ',
+                $tce->errorLog
+            ));
+        }
+        if (count($tce->autoVersionIdMap) && count($_flexFormDiffArray)) {
+            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': flexFormDiffArry: ' . implode(
+                ', ',
+                $_flexFormDiffArray
+            ));
+            foreach ($_flexFormDiffArray as $key => $value) {
+                [$Ttable, $Tuid, $Trest] = explode(':', $key, 3);
+                if (!empty($tce->autoVersionIdMap[$Ttable][$Tuid])) {
+                    $_flexFormDiffArray[$Ttable . ':' . $tce->autoVersionIdMap[$Ttable][$Tuid] . ':' . $Trest] = $value;
+                    unset($_flexFormDiffArray[$key]);
+                }
+            }
+            /** @phpstan-ignore-next-line */
+            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': autoVersionIdMap: ' . $tce->autoVersionIdMap);
+            $this->logger->debug(__FILE__ . ': ' . __LINE__ . ': _flexFormDiffArray: ' . implode(
+                ', ',
+                $_flexFormDiffArray
+            ));
+        }
+        // Should be empty now - or there were more information in the incoming array than there should be!
+        if (count($inputArray)) {
+            debug($inputArray, 'These fields were ignored since they were not in the configuration 2:');
+        }
+        return $_flexFormDiffArray;
     }
 
     /**

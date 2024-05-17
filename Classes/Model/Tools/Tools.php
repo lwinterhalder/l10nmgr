@@ -388,22 +388,20 @@ class Tools
     protected function _isRTEField(string $key, array $TCEformsCfg, array $contentRow): bool
     {
         $isRTE = false;
-        if (is_array($contentRow)) {
-            [$table, , $field] = explode(':', $key);
-            $TCAtype = BackendUtility::getTCAtypeValue($table, $contentRow);
-            // Check if the RTE is explicitly declared in the defaultExtras configuration
-            if (!empty($TCEformsCfg['config']['enableRichtext'])) {
+        [$table, , $field] = explode(':', $key);
+        $TCAtype = BackendUtility::getTCAtypeValue($table, $contentRow);
+        // Check if the RTE is explicitly declared in the defaultExtras configuration
+        if (!empty($TCEformsCfg['config']['enableRichtext'])) {
+            $isRTE = true;
+            // If not, then we must check per type configuration
+        } else {
+            if (
+                !empty($GLOBALS['TCA'][$table]['types'][$TCAtype]['columnsOverrides'][$field]['config']['enableRichtext'])
+            ) {
                 $isRTE = true;
-                // If not, then we must check per type configuration
             } else {
-                if (
-                    !empty($GLOBALS['TCA'][$table]['types'][$TCAtype]['columnsOverrides'][$field]['config']['enableRichtext'])
-                ) {
-                    $isRTE = true;
-                } else {
-                    $typesDefinition = static::getTCAtypes($table, $contentRow, true);
-                    $isRTE = !empty($typesDefinition[$field]['spec']['richtext']);
-                }
+                $typesDefinition = static::getTCAtypes($table, $contentRow, true);
+                $isRTE = !empty($typesDefinition[$field]['spec']['richtext']);
             }
         }
         return $isRTE;
@@ -611,17 +609,15 @@ class Tools
                 $items[$table][$pageId] = $this->indexDetailsRecord('pages', $pageId, $previewLanguage);
             } else {
                 $allRows = $this->getRecordsToTranslateFromTable($table, $pageId, $previewLanguage);
-                if (is_array($allRows)) {
-                    if (count($allRows)) {
-                        // Now, for each record, look for localization:
-                        foreach ($allRows as $row) {
-                            if (is_array($row) && !empty($row['uid'])) {
-                                $items[$table][$row['uid']] = $this->indexDetailsRecord(
-                                    $table,
-                                    $row['uid'],
-                                    $previewLanguage
-                                );
-                            }
+                if (count($allRows)) {
+                    // Now, for each record, look for localization:
+                    foreach ($allRows as $row) {
+                        if (is_array($row) && !empty($row['uid'])) {
+                            $items[$table][$row['uid']] = $this->indexDetailsRecord(
+                                $table,
+                                $row['uid'],
+                                $previewLanguage
+                            );
                         }
                     }
                 }
