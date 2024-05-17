@@ -137,14 +137,14 @@ class Export extends L10nCommand
         $format = $input->getOption('format');
 
         // get l10ncfg command line takes precedence over extensionConfiguration
-        $l10ncfg = $input->getOption('config');
-        $l10ncfgs = [];
-        if ($l10ncfg !== 'EXTCONF' && !empty($l10ncfg)) {
+        $l10nConfiguration = $input->getOption('config');
+        $l10nConfigurations = [];
+        if ($l10nConfiguration !== 'EXTCONF' && !empty($l10nConfiguration)) {
             //export single
-            $l10ncfgs = explode(',', $l10ncfg);
+            $l10nConfigurations = explode(',', $l10nConfiguration);
         } elseif (!empty($this->emConfiguration->getL10NmgrCfg())) {
             //export multiple
-            $l10ncfgs = explode(',', $this->emConfiguration->getL10NmgrCfg());
+            $l10nConfigurations = explode(',', $this->emConfiguration->getL10NmgrCfg());
         } else {
             $output->writeln('<error>' . $this->getLanguageService()->getLL('error.no_l10ncfg.msg') . '</error>');
             $error = true;
@@ -181,8 +181,8 @@ class Export extends L10nCommand
         if ($error) {
             return 1;
         }
-        foreach ($l10ncfgs as $l10ncfg) {
-            if (MathUtility::canBeInterpretedAsInteger($l10ncfg) === false) {
+        foreach ($l10nConfigurations as $l10nConfiguration) {
+            if (MathUtility::canBeInterpretedAsInteger($l10nConfiguration) === false) {
                 $output->writeln('<error>' . $this->getLanguageService()->getLL('error.l10ncfg_id_int.msg') . '</error>');
                 return 1;
             }
@@ -192,7 +192,7 @@ class Export extends L10nCommand
                     return 1;
                 }
                 try {
-                    $msg .= $this->exportXML((int)$l10ncfg, (int)$targetLanguageId, (string)$format, $input, $output);
+                    $msg .= $this->exportXML((int)$l10nConfiguration, (int)$targetLanguageId, (string)$format, $input, $output);
                 } catch (Exception $e) {
                     $output->writeln('<error>' . $e->getMessage() . '</error>');
                     return 1;
