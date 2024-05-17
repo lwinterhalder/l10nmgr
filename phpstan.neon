@@ -2,6 +2,7 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
+    phpVersion: 80200 # PHP 8.2
     parallel:
         # Don't be overly greedy on machines with more CPU's to be a good neighbor especially on CI
         maximumNumberOfProcesses: 5
