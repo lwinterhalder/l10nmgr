@@ -17,6 +17,14 @@ fix:
 stan:
 	composer ci:php:stan
 
+# rector: @ Run PHPRector on the files
+rector:
+	composer rector
+
+# rector-dry: @ Run PHPRector on the files
+rector-dry:
+	composer rector:dry
+
 # stan-baseline: @ Creates a new PHPStan baseline
 stan-baseline:
 	composer phpstan:baseline

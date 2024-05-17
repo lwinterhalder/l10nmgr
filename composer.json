@@ -84,6 +84,7 @@
 		"friendsoftypo3/phpstan-typo3": "^0.9",
 		"phpcompatibility/php-compatibility": "^9.3",
 		"phpstan/phpstan": "^1.10",
+		"ssch/typo3-rector": "^2.5",
 		"typo3/testing-framework": "^8.0"
 	},
 	"autoload": {
@@ -117,6 +118,8 @@
 		"phpstan": ".Build/bin/phpstan",
 		"phpunit": ".Build/bin/phpunit",
 		"phpcs": ".Build/bin/phpcs",
+		"rector": ".Build/bin/rector",
+		"rector:dry": ".Build/bin/rector --dry-run",
 		"php:fix": "@phpcsFixer --config=Configuration/php-cs-fixer.php fix Classes Tests",
 		"ci:php:lint": "find *.php Classes Configuration Tests -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
 		"ci:php:fixer": "@phpcsFixer --config=Configuration/php-cs-fixer.php fix --dry-run -v --show-progress=dots Classes Configuration Tests",
