@@ -1,17 +1,21 @@
 <?php
 
+use Localizationteam\L10nmgr\Controller\ConfigurationManager;
+use Localizationteam\L10nmgr\Controller\TranslationTasks;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 defined('TYPO3') or die();
 
 /**
  * Registers a Backend Module
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
+ExtensionManagementUtility::addModule(
     'web',
     'ConfigurationManager',
     '',
     '',
     [
-        'routeTarget' => \Localizationteam\L10nmgr\Controller\ConfigurationManager::class . '::mainAction',
+        'routeTarget' => ConfigurationManager::class . '::mainAction',
         'access'      => 'user,group',
         'name'        => 'web_ConfigurationManager',
         'icon'        => 'EXT:l10nmgr/Resources/Public/Icons/module-l10nmgr.svg',
@@ -22,7 +26,7 @@ defined('TYPO3') or die();
 /**
  * Registers a Backend Module
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
+ExtensionManagementUtility::addModule(
     'LocalizationManager',
     '',
     '',
@@ -39,7 +43,7 @@ defined('TYPO3') or die();
 /**
  * Registers a Backend Module
  */
-/*\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
+/*ExtensionManagementUtility::addModule(
     'user',
     'txl10nmgrM2',
     'top',
@@ -56,13 +60,13 @@ defined('TYPO3') or die();
 /**
  * Registers a Backend Module
  */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule(
+ExtensionManagementUtility::addModule(
     'LocalizationManager',
     'TranslationTasks',
     '',
     '',
     [
-        'routeTarget' => \Localizationteam\L10nmgr\Controller\TranslationTasks::class . '::mainAction',
+        'routeTarget' => TranslationTasks::class . '::mainAction',
         'access'      => 'user,group',
         'name'        => 'LocalizationManager_TranslationTasks',
         'icon'        => 'EXT:l10nmgr/Resources/Public/Icons/module-l10nmgr-tasks.svg',
@@ -71,13 +75,13 @@ defined('TYPO3') or die();
 );
 
 // Add context sensitive help (csh) for the Scheduler tasks
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
+ExtensionManagementUtility::addLLrefForTCAdescr(
     '_tasks_txl10nmgr',
     'EXT:l10nmgr/Resources/Private/Language/Task/locallang_csh_tasks.xlf'
 );
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_l10nmgr_cfg');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
+ExtensionManagementUtility::allowTableOnStandardPages('tx_l10nmgr_cfg');
+ExtensionManagementUtility::addLLrefForTCAdescr(
     'tx_l10nmgr_cfg',
     'EXT:l10nmgr/Resources/Private/Language/locallang_csh_l10nmgr.xlf'
 );
