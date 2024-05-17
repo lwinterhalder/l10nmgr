@@ -16,6 +16,12 @@ services:
   Localizationteam\L10nmgr\Model\L10nBaseService:
     public: true
 
+  Localizationteam\L10nmgr\Services\NotificationService:
+    public: true
+    arguments:
+      $siteFinder: '@TYPO3\CMS\Core\Site\SiteFinder'
+      $mailMessage: '@TYPO3\CMS\Core\Mail\MailMessage'
+
   Localizationteam\L10nmgr\Model\Tools\Tools:
     public: true
     arguments:
