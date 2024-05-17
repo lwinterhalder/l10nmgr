@@ -146,7 +146,7 @@ class ExcelXmlView extends AbstractExportView
 	<!-- Translation row: -->
 	<Row ss:StyleID="s25">
 	<Cell><Data ss:Type="String">' . htmlspecialchars('translation[' . $table . '][' . $elementUid . '][' . $key . ']') . '</Data></Cell>
-	<Cell ss:StyleID="s26"><Data ss:Type="String">' . htmlspecialchars((string)$fieldName) . '</Data></Cell>
+	<Cell ss:StyleID="s26"><Data ss:Type="String">' . htmlspecialchars($fieldName) . '</Data></Cell>
 	<Cell ss:StyleID="s27"><Data ss:Type="String">' . str_replace(
                                             chr(10),
                                             '&#10;',
@@ -171,7 +171,7 @@ class ExcelXmlView extends AbstractExportView
 <!-- Translation row: -->
 <Row ss:StyleID="s25">
 <Cell><Data ss:Type="String">' . htmlspecialchars('translation[' . $table . '][' . $elementUid . '][' . $key . ']') . '</Data></Cell>
-<Cell ss:StyleID="s26"><Data ss:Type="String">' . htmlspecialchars((string)$fieldName) . '</Data></Cell>
+<Cell ss:StyleID="s26"><Data ss:Type="String">' . htmlspecialchars($fieldName) . '</Data></Cell>
 <Cell ss:StyleID="s40"><Data ss:Type="String">' . $this->getLanguageService()->getLL('export.process.error.empty.message') . '!</Data></Cell>
 <Cell ss:StyleID="s39"><Data ss:Type="String"></Data></Cell>
 <Cell ss:StyleID="s27"><Data ss:Type="String"></Data></Cell>

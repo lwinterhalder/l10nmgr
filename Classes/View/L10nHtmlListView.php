@@ -159,7 +159,7 @@ class L10nHtmlListView extends AbstractExportView
                                     }
                                     if (!$this->modeOnlyChanged || !$noChangeFlag) {
                                         $fieldCells = [];
-                                        $fieldCells[] = '<b>' . htmlspecialchars((string)$fieldName) . '</b>' . (!empty($tData['msg']) ? '<br /><em>' . htmlspecialchars((string)$tData['msg']) . '</em>' : '');
+                                        $fieldCells[] = '<b>' . htmlspecialchars($fieldName) . '</b>' . (!empty($tData['msg']) ? '<br /><em>' . htmlspecialchars((string)$tData['msg']) . '</em>' : '');
                                         $fieldCells[] = nl2br(htmlspecialchars((string)($tData['defaultValue'] ?? '')));
                                         if ($this->modeWithInlineEdit) {
                                             $name = htmlspecialchars('translation[' . $table . '][' . $elementUid . '][' . $key . ']');
