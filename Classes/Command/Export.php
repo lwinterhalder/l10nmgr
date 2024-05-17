@@ -292,11 +292,11 @@ class Export extends L10nCommand
                 if ($this->emConfiguration->isEnableNotification()) {
                     if (empty($this->emConfiguration->getEmailRecipient())) {
                         $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.repient_missing.msg') . '</error>');
+                    } else {
+                        /** @var NotificationService $notificationService */
+                        $notificationService = GeneralUtility::makeInstance(NotificationService::class);
+                        $notificationService->sendMail($xmlFileName, $l10nmgrCfgObj, $targetLanguageId, $this->emConfiguration);
                     }
-
-                    /** @var NotificationService $notificationService */
-                    $notificationService = GeneralUtility::makeInstance(NotificationService::class);
-                    $notificationService->sendMail($xmlFileName, $l10nmgrCfgObj, $targetLanguageId, $this->emConfiguration);
                 } else {
                     $output->writeln('<error>' . $this->getLanguageService()->getLL('error.email.notification_disabled.msg') . '</error>');
                 }
