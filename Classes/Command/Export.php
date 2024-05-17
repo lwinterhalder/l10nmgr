@@ -229,7 +229,7 @@ class Export extends L10nCommand
         $sourcePid = $input->getOption('srcPID') ?? 0;
         $l10nmgrCfgObj->setSourcePid($sourcePid);
         if ($l10nmgrCfgObj->isLoaded()) {
-            if ($format == 'CATXML') {
+            if ($format === 'CATXML') {
                 /** @var CatXmlView $l10nmgrGetXML */
                 $l10nmgrGetXML = GeneralUtility::makeInstance(CatXmlView::class, $l10nmgrCfgObj, $targetLanguageId);
                 if ($input->hasOption('baseUrl')) {
@@ -243,7 +243,7 @@ class Export extends L10nCommand
                         'utf8' => (bool)$input->getOption('utf8'),
                     ]
                 );
-            } elseif ($format == 'EXCEL') {
+            } elseif ($format === 'EXCEL') {
                 $l10nmgrGetXML = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nmgrCfgObj, $targetLanguageId);
             } else {
                 throw new Exception("Wrong format. Use 'CATXML' or 'EXCEL'");
