@@ -13,7 +13,6 @@ $EM_CONF[$_EXTKEY] = [
     'category'         => 'module',
     'version'          => '12.0.0',
     'state'            => 'alpha',
-    'clearCacheOnLoad' => true,
     'author'           => 'Kasper Skaarhoej, Daniel Zielinski, Daniel Poetzinger, Fabian Seltmann, Andreas Otto, Jo Hasenau, Peter Russ, Stefano Kowalke',
     'author_email'     => 'kasperYYYY@typo3.com, info@loctimize.com, , , , info@cybercraft.de, pruss@uon.li, info@arroba-it.de',
     'author_company'   => 'Localization Manager Team',
