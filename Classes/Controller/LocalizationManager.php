@@ -300,8 +300,10 @@ return false;
         if (empty($menuItems)) {
             return [];
         }
+
         $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
         $options = [];
+
         foreach ($menuItems as $value => $text) {
             $options[] = [
                 'value' => htmlspecialchars((string)$value),
@@ -309,19 +311,16 @@ return false;
                 'label' => htmlspecialchars((string)$text, ENT_COMPAT, 'UTF-8', false),
             ];
         }
+
         $label = $label !== '' ? htmlspecialchars($label) : '';
-        if (count($options) > 0) {
-            $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
+        $onChange = 'jumpToUrl(' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value,this);';
 
-            return [
-                'label' => $label,
-                'elementName' => $elementName,
-                'onChange' => $onChange,
-                'options' => $options,
-            ];
-        }
-
-        return [];
+        return [
+            'label' => $label,
+            'elementName' => $elementName,
+            'onChange' => $onChange,
+            'options' => $options,
+        ];
     }
 
     /**

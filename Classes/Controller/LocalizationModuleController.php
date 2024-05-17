@@ -298,8 +298,10 @@ class LocalizationModuleController extends BaseModule12
         if (empty($menuItems)) {
             return [];
         }
+
         $scriptUrl = self::buildScriptUrl($mainParams, $addParams, $script);
         $options = [];
+
         foreach ($menuItems as $value => $text) {
             $options[] = [
                 'value' => htmlspecialchars((string)$value),
@@ -308,19 +310,15 @@ class LocalizationModuleController extends BaseModule12
             ];
         }
         $label = $label !== '' ? htmlspecialchars($label) : '';
-        if (count($options) > 0) {
-            $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
+        $onChange = 'window.location=' . GeneralUtility::quoteJSvalue($scriptUrl . '&' . $elementName . '=') . '+this.options[this.selectedIndex].value';
 
-            return [
-                'label' => $label,
-                'url' => $scriptUrl . '&' . $elementName . '=${value}',
-                'elementName' => $elementName,
-                'onChange' => $onChange,
-                'options' => $options,
-            ];
-        }
-
-        return [];
+        return [
+            'label' => $label,
+            'url' => $scriptUrl . '&' . $elementName . '=${value}',
+            'elementName' => $elementName,
+            'onChange' => $onChange,
+            'options' => $options,
+        ];
     }
 
     /**
