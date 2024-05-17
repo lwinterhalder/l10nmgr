@@ -225,14 +225,12 @@ class L10nConfiguration
                 if ($depth > 0) {
                     $tree->getTree($page['uid'] ?? 0, $depth);
                 } else {
-                    if (!empty($treeStartingRecords)) {
-                        foreach ($treeStartingRecords as $page) {
-                            $HTML = $iconFactory->getIconForRecord('pages', $page, Icon::SIZE_SMALL)->render();
-                            $tree->tree[] = [
-                                'row' => $page,
-                                'HTML' => $HTML,
-                            ];
-                        }
+                    foreach ($treeStartingRecords as $page) {
+                        $HTML = $iconFactory->getIconForRecord('pages', $page, Icon::SIZE_SMALL)->render();
+                        $tree->tree[] = [
+                            'row' => $page,
+                            'HTML' => $HTML,
+                        ];
                     }
                 }
             }
