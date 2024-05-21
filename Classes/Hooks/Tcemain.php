@@ -65,7 +65,7 @@ class Tcemain
         // Check if
         // debug(array($status, $table, $id));
         // Map id for new records:
-        if ($status == 'new') {
+        if ($status === 'new') {
             $id = $pObj->substNEWwithIDs[$id];
             // echo "New fixed<br>";
         }
