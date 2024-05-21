@@ -23,7 +23,6 @@ CREATE TABLE tx_l10nmgr_cfg
     incfcewithdefaultlanguage    tinyint(4) DEFAULT '0',
     filenameprefix               tinytext,
     overrideexistingtranslations tinyint(4) DEFAULT '0',
-    pretranslatecontent          tinyint(4) DEFAULT '0',
     sortexports                  tinyint(4) DEFAULT '0',
     applyExcludeToChildren       tinyint(4) DEFAULT '0',
 

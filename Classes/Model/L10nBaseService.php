@@ -116,11 +116,7 @@ class L10nBaseService implements LoggerAwareInterface
      * @param TranslationData $translationObj
      * @param bool $preTranslate
      */
-    public function saveTranslation(
-        L10nConfiguration $l10ncfgObj,
-        TranslationData $translationObj,
-        bool $preTranslate = true
-    ): void {
+    public function saveTranslation(L10nConfiguration $l10ncfgObj, TranslationData $translationObj): void {
         // Provide a hook for specific manipulations before saving
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'])) {
             foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['savePreProcess'] as $classReference) {
@@ -128,13 +124,7 @@ class L10nBaseService implements LoggerAwareInterface
                 $processingObject->processBeforeSaving($l10ncfgObj, $translationObj, $this);
             }
         }
-        if (!$l10ncfgObj->preTranslateContent()) {
-            $preTranslate = false;
-        }
-        if ($preTranslate) {
-            // make sure to translate all pages and content elements that are available on these pages
-            $this->preTranslateAllContent($translationObj);
-        }
+
         $this->remapInputDataForExistingTranslations($l10ncfgObj, $translationObj);
         $sysLang = $translationObj->getLanguage();
         $previewLanguage = $translationObj->getPreviewLanguage();

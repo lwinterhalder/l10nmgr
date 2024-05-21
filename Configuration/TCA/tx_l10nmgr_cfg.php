@@ -142,14 +142,6 @@ return [
                 'default' => 0,
             ],
         ],
-        'pretranslatecontent' => [
-            'exclude' => 1,
-            'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.pretranslatecontent',
-            'config' => [
-                'type' => 'check',
-                'default' => 0,
-            ],
-        ],
         'overrideexistingtranslations' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.overrideexistingtranslations',

@@ -120,11 +120,6 @@ class L10nConfiguration
         return (bool)$this->getData('overrideexistingtranslations');
     }
 
-    public function preTranslateContent(): bool
-    {
-        return (bool)$this->getData('pretranslatecontent');
-    }
-
     public function getTableList(): string
     {
         return $this->getData('tablelist');
