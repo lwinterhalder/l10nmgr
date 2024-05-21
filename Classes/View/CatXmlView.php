@@ -73,7 +73,7 @@ class CatXmlView extends AbstractExportView
         }
         $accum = $accumObj->getInfoArray($this->modeNoHidden);
         $output = [];
-        $targetIso = '';
+
         if (empty($this->baseUrl)) {
             $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
             $this->baseUrl = (string)$siteFinder->getSiteByPageId($this->l10ncfgObj->getPid())->getRouter()->generateUri(0);
