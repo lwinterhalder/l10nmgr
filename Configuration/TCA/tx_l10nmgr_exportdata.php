@@ -50,21 +50,19 @@ return [
                 'readOnly' => 1,
             ],
         ],
-        'translation_lang' => [
-            'exclude' => 1,
-            'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.translationLang',
-            'config' => [
-                'type' => 'input',
-                'size' => 48,
-                'readOnly' => 1,
-            ],
-        ],
         'source_lang' => [
             'exclude' => 1,
             'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.sourceLang',
             'config' => [
-                'type' => 'input',
-                'size' => 48,
+                'type' => 'language',
+                'readOnly' => 1,
+            ],
+        ],
+        'translation_lang' => [
+            'exclude' => 1,
+            'label' => 'LLL:EXT:l10nmgr/Resources/Private/Language/locallang_db.xlf:tx_l10nmgr_cfg.translationLang',
+            'config' => [
+                'type' => 'language',
                 'readOnly' => 1,
             ],
         ],
@@ -91,7 +89,7 @@ return [
         ],
     ],
     'types' => [
-        '0' => ['showitem' => 'title, crdate, translation_lang, tablelist, source_lang, l10ncfg_id, exportType, filename'],
+        '0' => ['showitem' => 'title, crdate, source_lang, translation_lang, tablelist, l10ncfg_id, exportType, filename'],
     ],
     'palettes' => [
         '1' => ['showitem' => ''],
