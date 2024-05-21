@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Localizationteam\L10nmgr;
 
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -20,8 +21,7 @@ class LanguagesService
     public function getAll(): array
     {
         $allLanguages = [];
-        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
-        foreach ($siteFinder->getAllSites() as $site) {
+        foreach (self::siteFinder()->getAllSites() as $site) {
             foreach ($site->getAllLanguages() as $language) {
                 // @extensionScannerIgnoreLine
                 $languageId = $language->getLanguageId();
@@ -39,5 +39,15 @@ class LanguagesService
         }
 
         return $allLanguages;
+    }
+
+    public function getDefault(int $pageId): SiteLanguage
+    {
+        return self::siteFinder()->getSiteByPageId($pageId)->getDefaultLanguage();
+    }
+
+    public static function siteFinder(): SiteFinder
+    {
+        return GeneralUtility::makeInstance(SiteFinder::class);
     }
 }
