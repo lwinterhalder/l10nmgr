@@ -204,8 +204,15 @@ class L10nAccumulatedInformation
         $this->excludeIndex = array_flip(GeneralUtility::trimExplode(',', $l10ncfg['exclude'] ?? '', true));
         // Init:
         $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $site = $siteFinder->getSiteByPageId($l10ncfg['pid']);
+
         /** @var Tools $t8Tools */
-        $t8Tools = GeneralUtility::makeInstance(Tools::class);
+        $t8Tools = GeneralUtility::makeInstance(
+            Tools::class,
+             GeneralUtility::makeInstance(TranslationConfigurationProvider::class),
+             GeneralUtility::makeInstance(ConnectionPool::class),
+             $site
+        );
         $t8Tools->verbose = false; // Otherwise it will show records which has fields but none editable.
         if (!empty($l10ncfg['incfcewithdefaultlanguage'])) {
             $t8Tools->includeFceWithDefaultLanguage = true;
