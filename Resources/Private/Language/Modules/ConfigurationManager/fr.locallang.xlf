@@ -92,20 +92,9 @@
 				<source>Include:</source>
 				<target>Inclure:</target>
 			</trans-unit>
-			<trans-unit id="general.list.headline.incfcewithdefaultlanguage.title" xml:space="preserve" approved="yes">
-				<source>Default FCE</source>
-				<target></target>
-			</trans-unit>
 			<trans-unit id="general.list.infodetail.displaymode.title" xml:space="preserve" approved="yes">
 				<source>Display mode:</source>
 				<target>Mode d'affichage:</target>
-			</trans-unit>
-			<trans-unit id="general.list.infodetail.incfcewithdefaultlanguage.title" xml:space="preserve" approved="yes">
-				<source>Include FCE width default language:
-			</source>
-				<target>Inclure FCE avec langue par
-				défault:
-			</target>
 			</trans-unit>
         </body>
     </file>

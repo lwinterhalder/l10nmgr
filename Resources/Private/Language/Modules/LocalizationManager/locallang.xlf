@@ -73,9 +73,6 @@
 			<trans-unit id="general.list.headline.include.title" xml:space="preserve">
 				<source>Include</source>
 			</trans-unit>
-			<trans-unit id="general.list.headline.incfcewithdefaultlanguage.title" xml:space="preserve">
-				<source>Default FCE</source>
-			</trans-unit>
 			<trans-unit id="file.settings.downloads.title" xml:space="preserve">
 				<source>Download settings files</source>
 			</trans-unit>

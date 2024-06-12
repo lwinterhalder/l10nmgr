@@ -72,14 +72,8 @@
 			<trans-unit id="general.list.infodetail.include.title" xml:space="preserve">
 				<source>Include:</source>
 			</trans-unit>
-			<trans-unit id="general.list.headline.incfcewithdefaultlanguage.title" xml:space="preserve">
-				<source>Default FCE</source>
-			</trans-unit>
 			<trans-unit id="general.list.infodetail.displaymode.title" xml:space="preserve">
 				<source>Display mode:</source>
-			</trans-unit>
-			<trans-unit id="general.list.infodetail.incfcewithdefaultlanguage.title" xml:space="preserve">
-				<source>Include FCE width default language:</source>
 			</trans-unit>
 			<trans-unit id="general.download" xml:space="preserve">
 				<source>Download</source>

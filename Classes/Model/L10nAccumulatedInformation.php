@@ -214,9 +214,6 @@ class L10nAccumulatedInformation
              $site
         );
         $t8Tools->verbose = false; // Otherwise it will show records which has fields but none editable.
-        if (!empty($l10ncfg['incfcewithdefaultlanguage'])) {
-            $t8Tools->includeFceWithDefaultLanguage = true;
-        }
         // Set preview language (only first one in list is supported):
         if ($this->forcedPreviewLanguage !== 0) {
             $previewLanguage = $this->forcedPreviewLanguage;

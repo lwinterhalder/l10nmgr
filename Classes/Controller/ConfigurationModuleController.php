@@ -224,9 +224,6 @@ class ConfigurationModuleController
         $details .= '</tr><tr class="db_list_normal">';
         $details .= '<td>' . $this->getLanguageService()->getLL('general.list.infodetail.displaymode.title') . '</td>';
         $details .= '<td>' . $configuration['displaymode'] ?? '' . '</td>';
-        $details .= '</tr><tr class="db_list_normal">';
-        $details .= '<td>' . $this->getLanguageService()->getLL('general.list.infodetail.incfcewithdefaultlanguage.title') . '</td>';
-        $details .= '<td>' . $configuration['incfcewithdefaultlanguage'] ?? '' . '</td>';
         $details .= '</tr>';
         $details .= '</table>';
         return $details;

@@ -1282,30 +1282,7 @@ class Tools
         }
         if (isset($tInfo['sys_language_uid'])) {
             if (($row['CType'] ?? '') === 'templavoila_pi1' && !$useOverlay) {
-                if (($this->includeFceWithDefaultLanguage
-                        && (int)$tInfo['sys_language_uid'] === 0) || (int)$tInfo['sys_language_uid'] === -1) {
-                    $dataStructArray = $this->_getFlexFormMetaDataForContentElement($table, 'tx_templavoila_flex', $row);
-                    if (is_array($dataStructArray) && !empty($dataStructArray)) {
-                        if (!empty($dataStructArray['meta']['langDisable'])) {
-                            if (isset($dataStructArray['meta']['langDatabaseOverlay']) && (int)$dataStructArray['meta']['langDatabaseOverlay'] === 1) {
-                                $translationModes[] = 'useOverlay';
-                                $this->detailsOutput['log'][] = 'Mode: "useOverlay" detected because we have FCE with langDatabaseOverlay configured';
-                            } else {
-                                $this->detailsOutput['log'][] = 'Mode: "noTranslation" detected because we have FCE with langDisable';
-                            }
-                        } elseif (!empty($dataStructArray['meta']['langChildren'])) {
-                            $translationModes[] = 'flexformInternalTranslation';
-                            $this->detailsOutput['log'][] = 'Mode: "flexformInternalTranslation" detected because we have FCE with langChildren';
-                        } elseif ($table === 'tt_content' && isset($row['CType']) && $row['CType'] === 'fluidcontent_content') {
-                            $translationModes[] = 'useOverlay';
-                            $this->detailsOutput['log'][] = 'Mode: "useOverlay" detected because we have Fluidcontent content';
-                        }
-                    } else {
-                        $this->detailsOutput['log'][] = 'Mode: "noTranslation" detected because we have corrupt Datastructure!';
-                    }
-                } else {
-                    $this->detailsOutput['log'][] = 'Mode: "noTranslation" detected because we FCE in Default Language and its not cofigured to include FCE in Default language';
-                }
+                $this->detailsOutput['log'][] = 'Mode: "noTranslation" detected because we FCE in Default Language and its not cofigured to include FCE in Default language';
             } elseif ((int)$tInfo['sys_language_uid'] === 0 && !empty($tInfo['translation_table'])) {
                 //no FCE
                 $translationModes[] = 'useOverlay';

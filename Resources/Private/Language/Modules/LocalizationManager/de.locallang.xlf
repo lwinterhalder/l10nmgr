@@ -81,10 +81,6 @@
 				<source>Include</source>
 				<target>Einschließen</target>
 			</trans-unit>
-			<trans-unit id="general.list.headline.incfcewithdefaultlanguage.title" xml:space="preserve" approved="yes">
-				<source>Default FCE</source>
-				<target>Default FCE</target>
-			</trans-unit>
 			<trans-unit id="file.settings.downloads.title" xml:space="preserve" approved="yes">
 				<source>Download settings files</source>
 				<target>Einstellungsdateien herunterladen:</target>
