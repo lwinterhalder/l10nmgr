@@ -178,8 +178,38 @@ class Tools
 
     }
 
-    public function setSiteLanguagesByPid(int $pid = 0):void {
-        $this->sys_languages = GeneralUtility::makeInstance(SiteFinder::class)->getSiteByPageId($pid)->getLanguages();
+    /**
+     * Sets the langauages based on the given page id or throw an exception if the site was not found
+     *
+     * @param int $pid
+     * @return void
+     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     */
+    public function setSiteLanguagesByPid(int $pid = 0): void
+    {
+        $this->sys_languages = GeneralUtility::makeInstance(SiteFinder::class)
+            ->getSiteByPageId($pid)
+            ->getLanguages();
+    }
+
+    /**
+     * Set the system languages
+     * This is a workaround for tables like sys_file_metadata which have no real connection to a site
+     *
+     * This implementation is risky since the ID stored within sys_language_uid must not be unique since it
+     * can be configured for each site individually.
+     *
+     * @return void
+     */
+    public function useSystemLanguages(): void
+    {
+        /*
+         * The method 'getSystemLanguages()' returns an array of arrays
+         * The array contains a key 'uid' which is the id of the language
+         * Important to know ... this id is not unique and could relate to a differet language depending
+         * on the site configuration
+         */
+        $this->sys_languages = $this->t8Tools->getSystemLanguages();
     }
 
     /**

@@ -644,7 +644,7 @@ class L10nBaseService implements LoggerAwareInterface
                                                                 )
                                                             )
                                                             ->executeQuery()
-                                                            ->fetch();
+                                                            ->fetchAssociative();
                                                     }
                                                     if (isset($parent['uid']) && $parent['uid'] > 0) {
                                                         if (isset($this->TCEmain_cmd[$element['tablenames']][$element['uid_foreign']])) {
@@ -870,7 +870,7 @@ class L10nBaseService implements LoggerAwareInterface
                                         )
                                     )
                                     ->executeQuery()
-                                    ->fetch();
+                                    ->fetchAssociative();
 
                                 if (!empty($translatedRecordRaw['uid'])) {
                                     $this->childMappingArray[$table][$TdefRecord] = $translatedRecordRaw['uid'];

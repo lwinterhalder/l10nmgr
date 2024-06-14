@@ -98,8 +98,16 @@ class Tcemain
             $t8Tools = GeneralUtility::makeInstance(Tools::class);
             if ($table === 'pages') {
                 $t8Tools->setSiteLanguagesByPid((int)$liveRecord['uid']);
-            } else {
+            } else if ((int)($liveRecord['pid'] ?? 0) > 0) {
                 $t8Tools->setSiteLanguagesByPid((int)$liveRecord['pid']);
+            } else {
+                /*
+                 * Some tables like sys_file_metadata does not have a proppery connection to any site.
+                 * However the data in these tables can be translated.
+                 * This implementation is a bit risky since the ID of a language it not be unique anymore.
+                 * It can be changed from site configuration to site configuration
+                 */
+                $t8Tools->useSystemLanguages();
             }
             $t8Tools->verbose = false; // Otherwise it will show records which has fields but none editable.
             // debug($t8Tools->indexDetailsRecord($table,$liveRecord['uid']));
@@ -172,7 +180,7 @@ class Tcemain
                 )
             );
         }
-        $records = $queryBuilder->execute()->fetchAll();
+        $records = $queryBuilder->executeQuery()->fetchAllAssociative();
         $flags = [];
         foreach ($records as $r) {
             $flags['new'] += $r['flag_new'];
