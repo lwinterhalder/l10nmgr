@@ -109,6 +109,26 @@ class LanguageRestrictionRegistry implements SingletonInterface
     }
 
     /**
+     * This function is used to add a field dynamically for the event AlterTableDefinitionStatementsEvent
+     * The registration is done within the file ext_localconf.php
+     *
+     * This is required due the chaching mechanism of TYPO3 and using the typo3 console to process the SQL
+     * information.
+     *
+     * @param string $extensionKey
+     * @param string $tableName
+     * @param string $fieldName
+     * @return void
+     */
+    public function registerField(
+        string $extensionKey,
+        string $tableName,
+        string $fieldName = Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME
+    ): void {
+        $this->extensions[$extensionKey][$tableName][$fieldName] = $fieldName;
+    }
+
+    /**
      * Adds a new language restriction configuration to this registry.
      * TCA changes are directly applied
      *
@@ -153,14 +173,7 @@ class LanguageRestrictionRegistry implements SingletonInterface
                 $this->registry[$tableName] = [];
             }
             $this->registry[$tableName][$fieldName] = $options;
-            if (!isset($this->extensions[$extensionKey])) {
-                $this->extensions[$extensionKey] = [];
-            }
-            if (!isset($this->extensions[$extensionKey][$tableName])) {
-                $this->extensions[$extensionKey][$tableName] = [];
-            }
-            $this->extensions[$extensionKey][$tableName][$fieldName] = $fieldName;
-
+            
             if (isset($GLOBALS['TCA'][$tableName]['columns'])) {
                 $this->applyTcaForTableAndField($tableName, $fieldName);
                 $didRegister = true;

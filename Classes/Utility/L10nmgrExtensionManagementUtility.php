@@ -56,7 +56,7 @@ class L10nmgrExtensionManagementUtility
             $override
         );
         if ($result === false) {
-            $message = LanguageRestrictionRegistry::class . ': no category registered for table "%s". Key was already registered.';
+            $message = LanguageRestrictionRegistry::class . ': no language restriction registered for table "%s". Key was already registered.';
             /** @var Logger $logger */
             $logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
             $logger->warning(

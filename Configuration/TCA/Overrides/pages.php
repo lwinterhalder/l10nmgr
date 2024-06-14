@@ -3,6 +3,7 @@
 defined('TYPO3') || die();
 
 use Localizationteam\L10nmgr\Constants;
+use Localizationteam\L10nmgr\Utility\L10nmgrExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 ExtensionManagementUtility::addTCAcolumns('pages', [
@@ -74,7 +75,7 @@ ExtensionManagementUtility::addToAllTCAtypes(
     'after:l18n_cfg'
 );
 
-\Localizationteam\L10nmgr\Utility\L10nmgrExtensionManagementUtility::makeTranslationsRestrictable(
+L10nmgrExtensionManagementUtility::makeTranslationsRestrictable(
     'core',
     'pages'
 );

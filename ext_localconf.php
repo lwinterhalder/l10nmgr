@@ -1,6 +1,7 @@
 <?php
 
 use Localizationteam\L10nmgr\Hooks\Tcemain;
+use Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry;
 use Localizationteam\L10nmgr\Task\L10nmgrAdditionalFieldProvider;
 use Localizationteam\L10nmgr\Task\L10nmgrFileGarbageCollection;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -42,3 +43,12 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][L10nmgrFileGarba
 );
 
 $GLOBALS['TYPO3_CONF_VARS']['FE']['addRootLineFields'] .= ',l10nmgr_configuration,l10nmgr_configuration_next_level';
+
+LanguageRestrictionRegistry::getInstance()->registerField(
+    'core',
+    'pages'
+);
+LanguageRestrictionRegistry::getInstance()->registerField(
+    'core',
+    'tt_content'
+);
