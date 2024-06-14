@@ -86,7 +86,7 @@ class Tcemain
             $liveRecord = BackendUtility::getRecord(
                 $table,
                 $liveRecord[$GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField']],
-                'uid'
+                'uid,pid'
             );
             // echo "Finding root version<br>";
         }
