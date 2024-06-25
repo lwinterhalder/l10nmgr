@@ -124,6 +124,7 @@ class LocalizationModuleController extends BaseModule12
 
         // @extensionScannerIgnoreLine
         $this->id = (int)($request->getQueryParams()['id'] ?? $request->getParsedBody()['id'] ?? 0);
+        $this->srcPID = (int)($request->getQueryParams()['srcPID'] ?? $request->getParsedBody()['srcPID'] ?? 0);
         $this->menuConfig();
     }
 
@@ -252,7 +253,7 @@ class LocalizationModuleController extends BaseModule12
                 // Create and render view to show details for the current L10N Manager configuration
                 $configurationTable = $this->renderConfigurationTable($l10nConfiguration);
 
-                $addParams = sprintf('&srcPID=%d&exportUID=%d', rawurlencode(GeneralUtility::_GET('srcPID')), $l10nConfiguration->getUid());
+                $addParams = sprintf('&srcPID=%d&exportUID=%d', $this->srcPID, $l10nConfiguration->getUid());
                 $functionMenu = $this->makeFunctionMenu($action, $addParams);
 
                 $this->view->assignMultiple([
@@ -963,7 +964,7 @@ class LocalizationModuleController extends BaseModule12
         // Load system languages into menu and check against allowed languages:
         /** @var TranslationConfigurationProvider $t8Tools */
         $t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
-        $sysL = $t8Tools->getSystemLanguages();
+        $sysL = $t8Tools->getSystemLanguages($this->srcPID);
         foreach ($sysL as $sL) {
             if ($sL['uid'] > 0 && $this->getBackendUser()->checkLanguageAccess($sL['uid'])) {
                 if ($this->emConfiguration->isEnableHiddenLanguages()) {

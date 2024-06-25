@@ -39,12 +39,19 @@ class BaseModule12
     public array $MCONF = [];
 
     /**
-     * The integer value of the GET/POST var, 'id'. Used for submodules to the 'Web' module (page id)
+     * The integer value of the GET/POST var, 'id'. Used for submodules to the 'Web' module (configuration id)
      *
      * @see init()
      * @var int
      */
     public int $id;
+
+    /**
+     * The integer value of the GET/POST var, 'srcPID'. Used for submodules to the 'Web' module (page id)
+     *
+     * @see init()
+     */
+    public int $srcPID;
 
     /**
      * The module menu items array. Each key represents a key for which values can range between the items in the array of that key.
