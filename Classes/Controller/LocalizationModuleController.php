@@ -958,10 +958,6 @@ class LocalizationModuleController extends BaseModule12
         ];
 
         $configuration = $this->getL10NConfiguration();
-        $targetLanguages = [];
-        if (!empty($configuration->getTargetLanguages())) {
-            $targetLanguages = array_flip(GeneralUtility::intExplode(',', $configuration->getTargetLanguages(), true));
-        }
 
         // TODO: Migrate to SiteConfiguration
         // Load system languages into menu and check against allowed languages:
@@ -969,12 +965,6 @@ class LocalizationModuleController extends BaseModule12
         $t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
         $sysL = $t8Tools->getSystemLanguages();
         foreach ($sysL as $sL) {
-            if (!empty($targetLanguages) && !isset($targetLanguages[$sL['uid']])) {
-                continue;
-            }
-            if (empty($this->MOD_MENU['lang'])) {
-                $this->MOD_MENU['lang'] = [];
-            }
             if ($sL['uid'] > 0 && $this->getBackendUser()->checkLanguageAccess($sL['uid'])) {
                 if ($this->emConfiguration->isEnableHiddenLanguages()) {
                     $this->MOD_MENU['lang'][$sL['uid']] = $sL['title'];

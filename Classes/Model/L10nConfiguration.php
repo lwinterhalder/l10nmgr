@@ -35,7 +35,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * L10nConfiguration
- * Capsulate a 10ncfg record.
+ * Capsulate a l10ncfg record.
  * Has factory method to get a relevant AccumulatedInformationsObject
  *
  * @author Kasper Skaarhoj <kasperYYYY@typo3.com>
@@ -61,10 +61,10 @@ class L10nConfiguration
      *
      * @param int $id Id of the cfg record
      **/
-    public function load(int $id): void
+    public function load(int $id = 0): void
     {
         if ($this->l10ncfg === []) {
-            $this->l10ncfg = BackendUtility::getRecord('tx_l10nmgr_cfg', $id);
+            $this->l10ncfg = BackendUtility::getRecord('tx_l10nmgr_cfg', $id) ?? [];
         }
     }
 

@@ -13,14 +13,8 @@ use Localizationteam\L10nmgr\Controller\LocalizationModuleController;
 $lll = 'LLL:EXT:l10nmgr/Resources/Private/Language/';
 
 return [
-    'l10nmgr' => [
-        'labels' => $lll . 'Modules/LocalizationManager/locallang_mod.xlf',
-        'iconIdentifier' => 'module-l10nmgr',
-        'position' => ['after' => 'web'],
-        'navigationComponent' => '@typo3/backend/page-tree/page-tree-element',
-    ],
     'l10nmgr_configuration' => [
-        'parent' => 'l10nmgr',
+        'parent' => 'web',
         'access' => 'user', // user, admin or systemMaintainer
         'path' => '/module/l10nmgr/configuration',
         'iconIdentifier' => 'module-configuration',
