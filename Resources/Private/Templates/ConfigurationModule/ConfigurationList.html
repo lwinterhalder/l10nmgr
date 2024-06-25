@@ -15,15 +15,19 @@
 
         <f:variable name="lll" value="LLL:EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf:"/>
         <h1><f:translate key="{lll}general.title"/> - <f:translate key="{lll}general.list.configuration.manager"/></h1>
-        <p><f:translate key="{lll}general.description.message"/></p>
-
-        <f:if condition="{configurations -> f:count()} == 0">
+        <f:if condition="{configurations -> f:count()} == 0 || {srcPID} == 0">
             <f:then>
-                <f:be.infobox state="-1" title="{f:translate(key: 'LLL:EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf:general.no_configurations.title')}">
-                    <p><f:translate key="LLL:EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf:general.no_configurations.message" /></p>
-                </f:be.infobox>
+                <f:if condition="{srcPID} == 0">
+                    <f:then>
+                        <f:be.infobox state="-1" title="{f:translate(key: 'LLL:EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf:general.no_rootpage.title')}"></f:be.infobox>
+                    </f:then>
+                    <f:else>
+                        <f:be.infobox state="-1" title="{f:translate(key: 'LLL:EXT:l10nmgr/Resources/Private/Language/Modules/ConfigurationManager/locallang.xlf:general.no_configurations.title')}"></f:be.infobox>
+                    </f:else>
+                </f:if>
             </f:then>
             <f:else>
+                <p><f:translate key="{lll}general.description.message"/></p>
                 <div>
                     <h2 class="uppercase">
                         <f:translate key="{lll}general.list.configuration.title"/>

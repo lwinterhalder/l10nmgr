@@ -8,7 +8,11 @@
 				<source>L10N Manager</source>
 				<target>L10N Manager</target>
 			</trans-unit>
-			<trans-unit id="general.no_data" xml:space="preserve" approved="yes">
+			<trans-unit id="general.no_rootpage.title" xml:space="preserve">
+				<source>Please select a page first.</source>
+				<target>Bitte zuerst eine Seite auswählen.</target>
+			</trans-unit>
+			<trans-unit id="general.no_configurations.title" xml:space="preserve">
 				<source>No configurations are available.</source>
 				<target>Es wurden noch keine Einstellungen angelegt.</target>
 			</trans-unit>

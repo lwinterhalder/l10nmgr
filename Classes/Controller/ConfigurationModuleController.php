@@ -129,6 +129,7 @@ class ConfigurationModuleController
         }
 
         $this->view->assignMultiple([
+            'srcPID' => $this->id,
             'accessContent' => $accessContent,
             'configurations' => $this->getContent(),
         ]);
