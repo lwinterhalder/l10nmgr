@@ -23,11 +23,13 @@ namespace Localizationteam\L10nmgr\View;
  ***************************************************************/
 
 use Localizationteam\L10nmgr\Model\L10nConfiguration;
+use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Configuration\Richtext;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -214,7 +216,21 @@ class L10nHtmlListView extends AbstractExportView
                                                     $configuration['extraPlugins'] = implode(',', array_flip(array_flip($configuration['extraPlugins'])));
 
                                                     $RTE_Configuration = json_encode($configuration);
-                                                    $cellContent .= '<script type="text/javascript">' . $externalPlugins . 'CKEDITOR.replace(\'' . $id . '\', ' . $RTE_Configuration . ');</script>';
+                                                    if (GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() === 11) {
+                                                        $cellContent .= '<script type="text/javascript">' . $externalPlugins . 'CKEDITOR.replace(\'' . $id . '\', ' . $RTE_Configuration . ');</script>';
+                                                    } else {
+                                                        $ckeditorAttributes = GeneralUtility::implodeAttributes([
+                                                            'id' => $id . 'ckeditor5',
+                                                            'options' => GeneralUtility::jsonEncodeForHtmlAttribute($configuration, false),
+                                                            'form-engine' => GeneralUtility::jsonEncodeForHtmlAttribute([
+                                                                'id' => $id,
+                                                                'name' => $name,
+                                                                'value' => htmlspecialchars_decode($value),
+                                                                'validationRules' => $this->getValidationDataAsJsonString($tData['TCEformsCfg']),
+                                                            ], false),
+                                                        ], true);
+                                                        $cellContent = '<typo3-rte-ckeditor-ckeditor5 ' . $ckeditorAttributes . '></typo3-rte-ckeditor-ckeditor5>';
+                                                    }
                                                 }
                                                 $fieldCells[] = $cellContent;
                                             } else {
@@ -256,9 +272,9 @@ class L10nHtmlListView extends AbstractExportView
                                     'class' => '',
                                     'html' => '<th>Fieldname</th>
                                                 <th style="width: 25%">Default</th>
-                                                <th style="width: 25%">Translation</th>
-                                                <th style="width: 25%">Diff</th>
-                                                ' . (!empty($page['header']['prevLang']) ? '<th style="width: 25%">PrevLang</th>' : ''),
+                                                <th style="min-width: 25%">Translation</th>
+                                                <th style="min-width: 25%">Diff</th>
+                                                ' . (!empty($page['header']['prevLang']) ? '<th style="min-width: 25%">PrevLang</th>' : ''),
                                 ];
 
                                 $tableRows = array_merge($tableRows, $FtableRowsNew);
@@ -272,6 +288,48 @@ class L10nHtmlListView extends AbstractExportView
             }
         }
         return $sections;
+    }
+
+    protected function getValidationDataAsJsonString(array $config): string
+    {
+        $validationRules = [];
+        if (!empty($config['eval'])) {
+            $evalList = GeneralUtility::trimExplode(',', $config['eval'] ?? '', true);
+            foreach ($evalList as $evalType) {
+                $validationRules[] = [
+                    'type' => $evalType,
+                ];
+            }
+        }
+        if (!empty($config['range'])) {
+            $newValidationRule = [
+                'type' => 'range',
+            ];
+            if (!empty($config['range']['lower'])) {
+                $newValidationRule['lower'] = $config['range']['lower'];
+            }
+            if (!empty($config['range']['upper'])) {
+                $newValidationRule['upper'] = $config['range']['upper'];
+            }
+            $validationRules[] = $newValidationRule;
+        }
+        if (!empty($config['maxitems']) || !empty($config['minitems'])) {
+            $minItems = isset($config['minitems']) ? (int)$config['minitems'] : 0;
+            $maxItems = isset($config['maxitems']) ? (int)$config['maxitems'] : 99999;
+            $type = $config['type'] ?: 'range';
+            $validationRules[] = [
+                'type' => $type,
+                'minItems' => $minItems,
+                'maxItems' => $maxItems,
+            ];
+        }
+        if (!empty($config['required'])) {
+            $validationRules[] = ['type' => 'required'];
+        }
+        if (!empty($config['min'])) {
+            $validationRules[] = ['type' => 'min'];
+        }
+        return json_encode($validationRules);
     }
 
     /**

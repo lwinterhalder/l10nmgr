@@ -52,6 +52,7 @@ use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
@@ -264,7 +265,7 @@ class LocalizationModuleController extends BaseModule12
                     'moduleAction' => $action,
                     'moduleContent' => $moduleContent,
                     'configurationTable' => $configurationTable,
-                    'isRteInstalled' => ExtensionManagementUtility::isLoaded('rte_ckeditor'),
+                    'isRteInstalled' => (string)(ExtensionManagementUtility::isLoaded('rte_ckeditor') ? GeneralUtility::makeInstance(Typo3Version::class)->getMajorVersion() : 0),
                 ]);
             }
         }
