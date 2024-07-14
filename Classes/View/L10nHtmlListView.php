@@ -167,7 +167,7 @@ class L10nHtmlListView extends AbstractExportView
                                             if ($tData['fieldType'] === 'text') {
                                                 $id = md5($table . '_' . $elementUid . '_' . $key);
                                                 $value = LF . $value;
-                                                $cellContent = sprintf('<textarea id="%s" name="%s">%s</textarea>', $id, $name, $value);
+                                                $cellContent = sprintf('<textarea class="w-100" id="%s" name="%s">%s</textarea>', $id, $name, $value);
                                                 if (ExtensionManagementUtility::isLoaded('rte_ckeditor') && !empty($tData['isRTE'])) {
                                                     /** @var Richtext $richtextConfigurationProvider */
                                                     $richtextConfigurationProvider = GeneralUtility::makeInstance(Richtext::class);
@@ -219,7 +219,7 @@ class L10nHtmlListView extends AbstractExportView
                                                 $fieldCells[] = $cellContent;
                                             } else {
                                                 $fieldCells[] = sprintf(
-                                                    '<input name="%s" value="%s" />',
+                                                    '<input class="w-100" name="%s" value="%s" />',
                                                     $name,
                                                     $value
                                                 );
