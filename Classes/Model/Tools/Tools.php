@@ -90,7 +90,7 @@ class Tools
      * @var array
      */
     public array $filters = [
-        'fieldTypes' => 'text,input',
+        'fieldTypes' => 'text,input,link',
         'noEmptyValues' => true,
         'noIntegers' => true,
         'l10n_categories' => '', // could be "text,media" for instance.
