@@ -51,6 +51,7 @@ use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\WorkspaceRestriction;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\NullSite;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\Entity\SiteInterface;
@@ -189,9 +190,13 @@ class Tools
      */
     public function setSiteLanguagesByPid(int $pid = 0): void
     {
-        $this->sys_languages = GeneralUtility::makeInstance(SiteFinder::class)
-            ->getSiteByPageId($pid)
-            ->getLanguages();
+        try {
+            $this->sys_languages = GeneralUtility::makeInstance(SiteFinder::class)
+                ->getSiteByPageId($pid)
+                ->getLanguages();
+        } catch (SiteNotFoundException $exception) {
+            $this->useSystemLanguages();
+        }
     }
 
     /**

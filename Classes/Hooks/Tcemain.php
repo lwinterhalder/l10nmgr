@@ -102,7 +102,7 @@ class Tcemain
                 $t8Tools->setSiteLanguagesByPid((int)$liveRecord['pid']);
             } else {
                 /*
-                 * Some tables like sys_file_metadata does not have a proppery connection to any site.
+                 * Some tables like sys_file_metadata haven't got a proper connection to any site.
                  * However the data in these tables can be translated.
                  * This implementation is a bit risky since the ID of a language it not be unique anymore.
                  * It can be changed from site configuration to site configuration
