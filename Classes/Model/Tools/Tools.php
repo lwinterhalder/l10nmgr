@@ -21,6 +21,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
  * GNU General Public License for more details.
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
+
 /**
  * Contains translation tools
  *
@@ -537,6 +538,9 @@ class Tools
      */
     public function translationDetails_flexFormCallBackForOverlay(array $dsArr, string $dataValue, array $PA, string $structurePath, FlexFormTools $pObj): void
     {
+        if (empty($this->_callBackParams_translationXMLArray)) {
+            return;
+        }
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
         $translValue = '';
@@ -1055,6 +1059,11 @@ class Tools
                                         && isset($dataStructArray['meta']['langDatabaseOverlay'])
                                         && (int)$dataStructArray['meta']['langDatabaseOverlay'] === 1
                                     ) {
+                                        if (!empty($translationRecord[$field])) {
+                                            $this->_callBackParams_translationXMLArray = (array)GeneralUtility::xml2array($translationRecord[$field]);
+                                        } else {
+                                            $this->_callBackParams_translationXMLArray = [];
+                                        }
                                         // Create and call iterator object:
                                         /** @var FlexFormTools $flexObj */
                                         $flexObj = GeneralUtility::makeInstance(FlexFormTools::class);
