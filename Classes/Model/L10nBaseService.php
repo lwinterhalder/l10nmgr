@@ -731,7 +731,7 @@ class L10nBaseService implements LoggerAwareInterface
                                     }
                                     // If FlexForm, we set value in special way:
                                     if ($Tpath) {
-                                        if (!is_array($TCEmain_data[$Ttable][$TuidString][$Tfield])) {
+                                        if (!is_array($TCEmain_data[$Ttable][$TuidString][$Tfield] ?? '')) {
                                             $TCEmain_data[$Ttable][$TuidString][$Tfield] = [];
                                         }
                                         //TCEMAINDATA is passed as reference here:
