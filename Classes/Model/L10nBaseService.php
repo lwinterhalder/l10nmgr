@@ -465,7 +465,7 @@ class L10nBaseService implements LoggerAwareInterface
                                             $TCEmain_data[$Ttable][$elementUid][$Tfield] = [];
                                         }
                                         //TCEMAINDATA is passed as reference here:
-                                        ArrayUtility::setValueByPath(
+                                        $TCEmain_data[$Ttable][$elementUid][$Tfield] = ArrayUtility::setValueByPath(
                                             $TCEmain_data[$Ttable][$elementUid][$Tfield],
                                             $Tpath,
                                             $inputArray[$table][$elementUid][$key] ?? ''
@@ -735,7 +735,7 @@ class L10nBaseService implements LoggerAwareInterface
                                             $TCEmain_data[$Ttable][$TuidString][$Tfield] = [];
                                         }
                                         //TCEMAINDATA is passed as reference here:
-                                        ArrayUtility::setValueByPath(
+                                        $TCEmain_data[$Ttable][$TuidString][$Tfield] = ArrayUtility::setValueByPath(
                                             $TCEmain_data[$Ttable][$TuidString][$Tfield],
                                             $Tpath,
                                             $inputArray[$table][$elementUid][$key] ?? ''

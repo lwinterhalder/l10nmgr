@@ -60,6 +60,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Core\Utility\DiffUtility;
+use TYPO3\CMS\Core\Utility\Exception\MissingArrayPathException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -543,9 +544,9 @@ class Tools
      */
     public function translationDetails_flexFormCallBackForOverlay(array $dsArr, string $dataValue, array $PA, string $structurePath, FlexFormTools $pObj): void
     {
-        if (empty($this->_callBackParams_translationXMLArray)) {
-            return;
-        }
+//        if (empty($this->_callBackParams_translationXMLArray)) {
+//            return;
+//        }
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
         $translValue = '';
@@ -1747,7 +1748,7 @@ class Tools
                                                 if (empty($TCEmain_data[$tt][$rUid][$pp[2]])) {
                                                     $TCEmain_data[$tt][$rUid][$pp[2]] = [];
                                                 }
-                                                ArrayUtility::setValueByPath(
+                                                $TCEmain_data[$tt][$rUid][$pp[2]] = ArrayUtility::setValueByPath(
                                                     $TCEmain_data[$tt][$rUid][$pp[2]],
                                                     $pp[3],
                                                     ''
