@@ -71,6 +71,9 @@ class CatXmlView extends AbstractExportView
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
+        if ($this->onlyForcedSourceLanguage) {
+            $accumObj->setOnlyForcedPreviewLanguage();
+        }
         $accum = $accumObj->getInfoArray($this->modeNoHidden);
         $output = [];
 
