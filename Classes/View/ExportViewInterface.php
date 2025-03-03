@@ -39,7 +39,6 @@ interface ExportViewInterface
     /**
      * Saves the information of the export in the database table 'tx_l10nmgr_sava_data'
      *
-     * @return bool
      * @throws Exception
      */
     public function saveExportInformation(): bool;
@@ -47,7 +46,6 @@ interface ExportViewInterface
     /**
      * Render the simple XML export
      *
-     * @return string
      * @throws SiteNotFoundException
      */
     public function render(): string;
@@ -55,7 +53,6 @@ interface ExportViewInterface
     /**
      * Checks if an export exists
      *
-     * @return bool
      * @throws \Doctrine\DBAL\DBALException
      * @throws \Doctrine\DBAL\Driver\Exception
      */
@@ -64,7 +61,6 @@ interface ExportViewInterface
     /**
      * Renders a list of saved exports as text.
      *
-     * @return string
      * @throws DBALException
      */
     public function renderExportsCli(): string;
@@ -72,7 +68,6 @@ interface ExportViewInterface
     /**
      * Get filename
      *
-     * @return string
      * @throws Exception
      */
     public function getFileName(): string;

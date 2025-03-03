@@ -25,12 +25,14 @@ namespace Localizationteam\L10nmgr\Model;
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Constants;
 use Localizationteam\L10nmgr\Event\L10nAccumulatedInformationIsProcessed;
+use Localizationteam\L10nmgr\LanguageRestriction\Collection\LanguageRestrictionCollection;
 use Localizationteam\L10nmgr\Model\Dto\EmConfiguration;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use PDO;
+use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
 use TYPO3\CMS\Backend\Tree\View\PageTreeView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\EventDispatcher\EventDispatcher;
@@ -57,9 +59,6 @@ class L10nAccumulatedInformation
      */
     protected string $objectStatus = 'new';
 
-    /**
-     * @var PageTreeView
-     */
     protected PageTreeView $tree;
 
     /**
@@ -82,14 +81,6 @@ class L10nAccumulatedInformation
      */
     protected int $forcedPreviewLanguage = 0;
 
-    /**
-     * @var bool forced source language only
-     */
-    protected bool $onlyForcedPreviewLanguage = false;
-
-    /**
-     * @var bool
-     */
     protected bool $noHidden;
 
     /**
@@ -117,17 +108,10 @@ class L10nAccumulatedInformation
      */
     protected array $includeIndex = [];
 
-    /**
-     * @var EmConfiguration
-     */
     protected EmConfiguration $emConfiguration;
 
     /**
      * Check for deprecated configuration throws false positive in extension scanner.
-     *
-     * @param PageTreeView $tree
-     * @param array $l10ncfg
-     * @param int $sysLang
      */
     public function __construct(PageTreeView $tree, array $l10ncfg, int $sysLang)
     {
@@ -138,17 +122,9 @@ class L10nAccumulatedInformation
         $this->sysLang = $sysLang;
     }
 
-    /**
-     * @param int $prevLangId
-     */
     public function setForcedPreviewLanguage(int $prevLangId): void
     {
         $this->forcedPreviewLanguage = $prevLangId;
-    }
-
-    public function setOnlyForcedPreviewLanguage(): void
-    {
-        $this->onlyForcedPreviewLanguage = true;
     }
 
     /**
@@ -156,7 +132,6 @@ class L10nAccumulatedInformation
      * This way client classes have access to the accumulated array directly.
      * And can read this array in order to create some output...
      *
-     * @param bool $noHidden
      * @return array Complete Information array
      */
     public function getInfoArray(bool $noHidden = false): array
@@ -226,7 +201,7 @@ class L10nAccumulatedInformation
             );
         }
         if ($previewLanguage) {
-            if (!empty($l10ncfg['onlyForcedSourceLanguage']) || $this->onlyForcedPreviewLanguage) {
+            if (!empty($l10ncfg['onlyForcedSourceLanguage'])) {
                 $t8Tools->onlyForcedSourceLanguage = true;
             }
             $t8Tools->previewLanguages = [$previewLanguage];
@@ -262,7 +237,15 @@ class L10nAccumulatedInformation
                 }
             }
             if (!empty($treeElement['row'][Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                if (GeneralUtility::inList($treeElement['row'][Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
+                /** @var LanguageRestrictionCollection $languageIsRestricted */
+                $languageIsRestricted = LanguageRestrictionCollection::load(
+                    $sysLang,
+                    true,
+                    'pages',
+                    $pageId,
+                );
+
+                if ($languageIsRestricted->hasItem((int)$pageId)) {
                     $this->excludeIndex['pages:' . $pageId] = 1;
                     continue;
                 }
@@ -312,7 +295,14 @@ class L10nAccumulatedInformation
                                 continue;
                             }
                             if (!empty($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                                if (GeneralUtility::inList($row[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
+                                /** @var LanguageRestrictionCollection $languageIsRestricted */
+                                $languageIsRestricted = LanguageRestrictionCollection::load(
+                                    $sysLang,
+                                    true,
+                                    $table,
+                                    $rowUid,
+                                );
+                                if ($languageIsRestricted->hasItem($rowUid)) {
                                     $this->excludeIndex[$table . ':' . $rowUid] = 1;
                                     continue;
                                 }
@@ -320,40 +310,6 @@ class L10nAccumulatedInformation
                             BackendUtility::workspaceOL($table, $row);
                             if (empty($row)) {
                                 continue;
-                            }
-
-                            // Restrictions are only defined on default lang
-                            if ((int)$l10ncfg['applyExcludeToChildren'] === 1 && $t8Tools->isParentItemExcluded($table, $row, $sysLang)) {
-                                continue;
-                            }
-
-                            // Check parent state of inline Elements and sys_file_references using the row or the rowPrevLang variable
-                            if ((int)$l10ncfg['applyExcludeToChildren'] === 1 && $this->noHidden) {
-                                // Check hidden state in default language
-                                if ($t8Tools->isParentItemHidden($table, $row, $sysLang)) {
-                                    continue;
-                                }
-
-                                // Get translation overlay record to check for hidden parents in forced source language
-                                $prevLangInfo = $t8Tools->translationInfo(
-                                    $table,
-                                    $row['uid'],
-                                    $previewLanguage,
-                                    null,
-                                    '',
-                                    $previewLanguage
-                                );
-                                if (!empty($prevLangInfo) && $prevLangInfo['translations'][$previewLanguage]) {
-                                    $rowPrevLang = BackendUtility::getRecordWSOL(
-                                        $prevLangInfo['translation_table'],
-                                        $prevLangInfo['translations'][$previewLanguage]['uid']
-                                    );
-
-                                    // Hidden state for
-                                    if (!empty($rowPrevLang) && $t8Tools->isParentItemHidden($table, $rowPrevLang, $sysLang)) {
-                                        continue;
-                                    }
-                                }
                             }
 
                             $accum[$pageId]['items'][$table][$rowUid] = $t8Tools->translationDetails(
@@ -438,9 +394,6 @@ class L10nAccumulatedInformation
         return array_column($metaData, 'uid');
     }
 
-    /**
-     * @param array $fieldsArray
-     */
     protected function _increaseInternalCounters(array $fieldsArray): void
     {
         if (is_array($fieldsArray)) {
@@ -454,8 +407,6 @@ class L10nAccumulatedInformation
     }
 
     /**
-     * @param string $indexList
-     * @param string $excludeList
      * @throws DBALException
      */
     protected function addPagesMarkedAsIncluded(string $indexList, string $excludeList): void
@@ -472,7 +423,7 @@ class L10nAccumulatedInformation
             ->where(
                 $queryBuilder->expr()->eq(
                     'l10nmgr_configuration',
-                    $queryBuilder->createNamedParameter(Constants::L10NMGR_CONFIGURATION_INCLUDE, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(Constants::L10NMGR_CONFIGURATION_INCLUDE, Connection::PARAM_INT)
                 )
             )
             ->orderBy('uid')
@@ -497,7 +448,7 @@ class L10nAccumulatedInformation
             ->where(
                 $queryBuilder->expr()->eq(
                     'l10nmgr_configuration_next_level',
-                    $queryBuilder->createNamedParameter(Constants::L10NMGR_CONFIGURATION_INCLUDE, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(Constants::L10NMGR_CONFIGURATION_INCLUDE, Connection::PARAM_INT)
                 )
             )
             ->orderBy('uid')
@@ -514,8 +465,6 @@ class L10nAccumulatedInformation
     /**
      * Walks through a tree branch and checks if pages are to be included
      * Will ignore pages with explicit l10nmgr_configuration settings but still walk through their subpages
-     * @param int $uid
-     * @param int $level
      * @throws DBALException
      */
     protected function addSubPagesRecursively(int $uid, int $level = 0): void
@@ -529,7 +478,7 @@ class L10nAccumulatedInformation
                 ->where(
                     $queryBuilder->expr()->eq(
                         'pid',
-                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                     )
                 )
                 ->orderBy('uid')
@@ -554,25 +503,16 @@ class L10nAccumulatedInformation
         }
     }
 
-    /**
-     * @return EmConfiguration
-     */
     public function getExtensionConfiguration(): EmConfiguration
     {
         return $this->emConfiguration;
     }
 
-    /**
-     * @return int
-     */
     public function getFieldCount(): int
     {
         return $this->_fieldCount;
     }
 
-    /**
-     * @return int
-     */
     public function getWordCount(): int
     {
         return $this->_wordCount;

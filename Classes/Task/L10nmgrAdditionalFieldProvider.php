@@ -136,8 +136,6 @@ class L10nmgrAdditionalFieldProvider extends AbstractAdditionalFieldProvider
      * Saves given integer value in task object
      *
      * @param array $submittedData Contains data submitted by the user
-     *
-     * @param AbstractTask $task
      */
     public function saveAdditionalFields(array $submittedData, AbstractTask $task): void
     {

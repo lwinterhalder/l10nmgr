@@ -34,7 +34,6 @@ class BaseModule12
      * Loaded with the global array $MCONF which holds some module configuration from the conf.php file of backend modules.
      *
      * @see init()
-     * @var array
      */
     public array $MCONF = [];
 
@@ -42,7 +41,6 @@ class BaseModule12
      * The integer value of the GET/POST var, 'id'. Used for submodules to the 'Web' module (configuration id)
      *
      * @see init()
-     * @var int
      */
     public int $id;
 
@@ -57,7 +55,6 @@ class BaseModule12
      * The module menu items array. Each key represents a key for which values can range between the items in the array of that key.
      *
      * @see init()
-     * @var array
      */
     public array $MOD_MENU = [
         'function' => [],
@@ -67,7 +64,6 @@ class BaseModule12
      * Current settings for the keys of the MOD_MENU array
      *
      * @see $MOD_MENU
-     * @var array
      */
     public array $MOD_SETTINGS = [];
 
@@ -75,7 +71,6 @@ class BaseModule12
      * Module TSconfig based on PAGE TSconfig / USER TSconfig
      *
      * @see menuConfig()
-     * @var array
      */
     public array $modTSconfig;
 
@@ -84,7 +79,6 @@ class BaseModule12
      * Can be set from extension classes of this class before the init() function is called.
      *
      * @see menuConfig(), \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData()
-     * @var string
      */
     public string $modMenu_type = '';
 
@@ -93,7 +87,6 @@ class BaseModule12
      * Can be set from extension classes of this class before the init() function is called.
      *
      * @see menuConfig(), \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData()
-     * @var string
      */
     public string $modMenu_dontValidateList = '';
 
@@ -102,14 +95,11 @@ class BaseModule12
      * Can be set from extension classes of this class before the init() function is called.
      *
      * @see menuConfig(), \TYPO3\CMS\Backend\Utility\BackendUtility::getModuleData()
-     * @var string
      */
     public string $modMenu_setDefaultList = '';
 
     /**
      * Generally used for accumulating the output content of backend modules
-     *
-     * @var string
      */
     public string $content = '';
 
@@ -117,7 +107,6 @@ class BaseModule12
      * May contain an instance of a 'Function menu module' which connects to this backend module.
      *
      * @see checkExtObj()
-     * @var object
      */
     public object $extObj;
 

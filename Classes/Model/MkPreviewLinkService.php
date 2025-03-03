@@ -37,24 +37,12 @@ class MkPreviewLinkService
 {
     use BackendUserTrait;
 
-    /**
-     * @var array
-     */
     protected array $_errorMsg = [];
 
-    /**
-     * @var int
-     */
     protected int $sysLang;
 
-    /**
-     * @var array
-     */
     protected array $pageIds;
 
-    /**
-     * @var int
-     */
     protected int $workspaceId;
 
     public function __construct(int $t3_workspaceId, int $t3_sysLang, array $pageIds)
@@ -66,10 +54,6 @@ class MkPreviewLinkService
 
     /**
      * Generate single source preview link for service
-     *
-     * @param string $baseUrl
-     * @param int $srcLang
-     * @return string
      */
     public function mkSingleSrcPreviewLink(string $baseUrl, int $srcLang): string
     {
@@ -126,10 +110,6 @@ class MkPreviewLinkService
 
     /**
      * Generate list of preview links for backend or email
-     *
-     * @param string $baseUrl
-     * @param string $serverlink
-     * @return string
      */
     public function mkSinglePreviewLink(string $baseUrl, string $serverlink): string
     {
@@ -147,9 +127,6 @@ class MkPreviewLinkService
         );
     }
 
-    /**
-     * @return array
-     */
     public function mkPreviewLinks(): array
     {
         if (empty($this->pageIds) || empty($this->getBackendUser()->user['uid'])) {
@@ -169,10 +146,6 @@ class MkPreviewLinkService
         return $previewUrls;
     }
 
-    /**
-     * @param array $previewLinks
-     * @return string
-     */
     public function renderPreviewLinks(array $previewLinks): string
     {
         $out = '<ol>';

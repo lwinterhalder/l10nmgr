@@ -83,7 +83,7 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 class LocalizationModuleController extends BaseModule12
 {
     /** @var int Default language to export */
-    protected int $targetLanguage = 0; // Internal
+    protected int $sysLanguage = 0; // Internal
 
     /** @var int Forced source language to export */
     public int $previewLanguage = 0;
@@ -133,8 +133,6 @@ class LocalizationModuleController extends BaseModule12
      * Injects the request object for the current request or subrequest
      * Then checks for module functions that have hooked in, and renders menu etc.
      *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface the response with the content
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      * @throws \Doctrine\DBAL\Driver\Exception
@@ -171,7 +169,7 @@ class LocalizationModuleController extends BaseModule12
         $selectMenus[] = self::getFuncMenu(
             $this->id,
             'SET[lang]',
-            (string)$this->targetLanguage,
+            (string)$this->sysLanguage,
             $this->MOD_MENU['lang'] ?? [],
             '',
             $addParams,
@@ -219,7 +217,7 @@ class LocalizationModuleController extends BaseModule12
         $backendUser = $this->getBackendUser();
 
         // Get language to export/import
-        $this->targetLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
+        $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
         $this->view
             ->setTitle('L10N Manager')
@@ -282,9 +280,7 @@ class LocalizationModuleController extends BaseModule12
      * @param array $menuItems An array with the menu items for the selector box
      * @param string $script The script to send the &id to, if empty it's automatically found
      * @param string $addParams Additional parameters to pass to the script.
-     * @param string $label
      *
-     * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
@@ -365,8 +361,6 @@ class LocalizationModuleController extends BaseModule12
      * @param string $script The script to send the &id to, if empty it's automatically found
      * @param string $addParams Additional parameters to pass to the script.
      * @param string $tagParams Additional attributes for the checkbox input tag
-     * @param string $label
-     * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      * @see getFuncMenu()
@@ -395,8 +389,6 @@ class LocalizationModuleController extends BaseModule12
     /**
      * Creating module content
      *
-     * @param L10nConfiguration $l10NConfiguration
-     * @return array
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \TYPO3\CMS\Core\Exception
      */
@@ -426,7 +418,7 @@ class LocalizationModuleController extends BaseModule12
         /** @var TranslationData $translationData */
         $translationData = GeneralUtility::makeInstance(TranslationData::class);
         $translationData->setTranslationData((array)GeneralUtility::_POST('translation'));
-        $translationData->setLanguage($this->targetLanguage);
+        $translationData->setLanguage($this->sysLanguage);
         $translationData->setPreviewLanguage($this->previewLanguage);
         // See, if incoming translation is available, if so, submit it
         if (GeneralUtility::_POST('saveInline')) {
@@ -441,30 +433,24 @@ class LocalizationModuleController extends BaseModule12
         return $info;
     }
 
-    protected function makePreviewLanguageMenu(int $forcedSourceLanguage, bool $onlyForcedSourceLanguage): array
+    protected function makePreviewLanguageMenu(): array
     {
         $selectOptions = ['0' => '-default-'];
         $selectOptions += $this->MOD_MENU['lang'];
 
         // @extensionScannerIgnoreLine
-        $previewLanguageMenu =self::getFuncMenu(
-                $this->id,
-                'export_xml_forcepreviewlanguage',
-                (string)($forcedSourceLanguage ?: $this->previewLanguage),
-                $selectOptions,
-                '',
-                '',
-                $this->getLanguageService()->getLL('export.xml.source-language.title')
+        return self::getFuncMenu(
+            $this->id,
+            'export_xml_forcepreviewlanguage',
+            (string)$this->previewLanguage,
+            $selectOptions,
+            '',
+            '',
+            $this->getLanguageService()->getLL('export.xml.source-language.title')
         );
-        if ($forcedSourceLanguage) {
-            $previewLanguageMenu['forcedSourceLanguage'] = $forcedSourceLanguage;
-        }
-        $previewLanguageMenu['onlyForcedSourceLanguage'] = $onlyForcedSourceLanguage;
-        return $previewLanguageMenu;
     }
 
     /**
-     * @param L10nConfiguration $l10nConfiguration
      * @return array[]
      * @throws \Doctrine\DBAL\Driver\Exception
      * @throws \TYPO3\CMS\Core\Exception
@@ -496,7 +482,7 @@ class LocalizationModuleController extends BaseModule12
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
             // TODO: catch exception
             $translationData = $factory->getTranslationDataFromExcelXMLFile($uploadedTempFile);
-            $translationData->setLanguage($this->targetLanguage);
+            $translationData->setLanguage($this->sysLanguage);
             $translationData->setPreviewLanguage($this->previewLanguage);
             GeneralUtility::unlink_tempfile($uploadedTempFile);
             $this->l10nBaseService->saveTranslation($l10nConfiguration, $translationData);
@@ -519,7 +505,7 @@ class LocalizationModuleController extends BaseModule12
         if ($exportExcel) {
             // Render the XML
             /** @var ExcelXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->targetLanguage);
+            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
             $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -592,10 +578,7 @@ class LocalizationModuleController extends BaseModule12
             'existingExportsOverview' => $existingExportsOverview,
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
-                'previewLanguageMenu' => $this->makePreviewLanguageMenu(
-                        $l10nConfiguration->getForcedSourceLanguage(),
-                        $l10nConfiguration->getOnlyForcedSourceLanguage()
-                ),
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
         ];
@@ -646,7 +629,7 @@ class LocalizationModuleController extends BaseModule12
             $importManager = GeneralUtility::makeInstance(
                 CatXmlImportManager::class,
                 $uploadedTempFile,
-                $this->targetLanguage,
+                $this->sysLanguage,
                 $xmlString = ''
             );
             if ($importManager->parseAndCheckXMLFile() === false) {
@@ -697,10 +680,10 @@ class LocalizationModuleController extends BaseModule12
                 }
                 if (!empty($importManager->headerData['t3_sourceLang']) && !empty($importManager->headerData['t3_targetLang'])
                     && $importManager->headerData['t3_sourceLang'] === $importManager->headerData['t3_targetLang']) {
-                    $this->previewLanguage = $this->targetLanguage;
+                    $this->previewLanguage = $this->sysLanguage;
                 }
                 $translationData = $factory->getTranslationDataFromCATXMLNodes($importManager->getXMLNodes());
-                $translationData->setLanguage($this->targetLanguage);
+                $translationData->setLanguage($this->sysLanguage);
                 $translationData->setPreviewLanguage($this->previewLanguage);
 
                 unset($importManager);
@@ -726,7 +709,7 @@ class LocalizationModuleController extends BaseModule12
         if ($exportXml) {
             // Render the XML
             /** @var CatXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->targetLanguage);
+            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->sysLanguage);
             $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -761,7 +744,7 @@ class LocalizationModuleController extends BaseModule12
 
                         /** @var NotificationService $notificationService */
                         $notificationService = GeneralUtility::makeInstance(NotificationService::class);
-                        $notificationService->sendMail($filename, $l10nConfiguration, $this->targetLanguage, $this->emConfiguration);
+                        $notificationService->sendMail($filename, $l10nConfiguration, $this->sysLanguage, $this->emConfiguration);
 
                         // Prepare a success message for display
                         $status = AbstractMessage::OK;
@@ -840,10 +823,7 @@ class LocalizationModuleController extends BaseModule12
             'existingExportsOverview' => $existingExportsOverview,
             'flashMessages' => $flashMessages,
             'internalFlashMessage' => $internalFlashMessage,
-                'previewLanguageMenu' => $this->makePreviewLanguageMenu(
-                        $l10nConfiguration->getForcedSourceLanguage(),
-                        $l10nConfiguration->getOnlyForcedSourceLanguage()
-                ),
+            'previewLanguageMenu' => $this->makePreviewLanguageMenu(),
             'workspacesLoaded' => ExtensionManagementUtility::isLoaded('workspaces')
         ];
     }
@@ -996,7 +976,7 @@ class LocalizationModuleController extends BaseModule12
         $htmlListView = GeneralUtility::makeInstance(
             L10nHtmlListView::class,
             $l10NConfiguration,
-            $this->targetLanguage,
+            $this->sysLanguage,
             $this->view,
         );
         $action = $this->MOD_SETTINGS['action'] ?? '';

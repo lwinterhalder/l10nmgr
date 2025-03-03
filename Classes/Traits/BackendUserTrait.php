@@ -9,9 +9,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 trait BackendUserTrait
 {
-    /**
-     * @return BackendUserAuthentication
-     */
     protected function getBackendUser(): BackendUserAuthentication
     {
         return $GLOBALS['BE_USER'] ?? GeneralUtility::makeInstance(BackendUserAuthentication::class);

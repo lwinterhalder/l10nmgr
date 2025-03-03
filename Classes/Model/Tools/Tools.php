@@ -30,9 +30,7 @@ namespace Localizationteam\L10nmgr\Model\Tools;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Constants;
-use Localizationteam\L10nmgr\LanguageRestriction\LanguageRestrictionRegistry;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use PDO;
 use TYPO3\CMS\Backend\Configuration\TranslationConfigurationProvider;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -75,98 +73,42 @@ class Tools
     use BackendUserTrait;
 
     // External:
-    /**
-     * @var array
-     */
     public static array $systemLanguages = [];
 
     /**
      * Cache the TCA configuration of tables with their types during runtime
      *
-     * @var array
      * @see self::getTCAtypes()
      */
     protected static array $tcaTableTypeConfigurationCache = [];
 
-    // Array of sys_language_uids, eg. array(1,2)
-    /**
-     * @var array
-     */
     public array $filters = [
         'fieldTypes' => 'text,input,link',
         'noEmptyValues' => true,
         'noIntegers' => true,
-        'l10n_categories' => '', // could be "text,media" for instance.
-    ]; // If TRUE, when fields are not included there will be shown a detailed explanation.
-
-    /**
-     * @var array
-     */
+        'l10n_categories' => '', // could be "text,media" for instance. If TRUE, when fields are not included there will be shown a detailed explanation.
+    ];
     public array $previewLanguages = []; // If TRUE, do not call filter function
-
-    /**
-     * @var bool
-     */
     public bool $onlyForcedSourceLanguage = false; //if set to true only records that exist also in the forced source language will be exported
-
-    /**
-     * @var bool
-     */
     public bool $verbose = true; //if set to true also FCE with language setting default will be included (not only All)
-
-    /**
-     * @var bool
-     */
     public bool $bypassFilter = false; // Object to t3lib_transl8tools, set in constructor
-
-    /**
-     * @var bool
-     */
-    public bool $includeFceWithDefaultLanguage = false; // Output for translation details
-
-    /**
-     * @var array
-     */
     protected array $detailsOutput = []; // System languages initialized
-
-    /**
-     * @var array
-     */
     protected array $sysLanguages = []; // FlexForm diff data
-
-    /**
-     * @var array
-     */
     protected array $flexFormDiff = []; // System languages records, loaded by constructor
 
-    /**
-     * @var array
-     */
+    /** @var SiteLanguage[]|null */
+    protected ?array $sys_languages = [];
+
     protected array $indexFilterObjects = [];
 
-    /**
-     * @var array
-     */
     protected array $_callBackParams_translationDiffsourceXMLArray = [];
 
-    /**
-     * @var array
-     */
     protected array $_callBackParams_translationXMLArray = [];
 
-    /**
-     * @var array
-     */
     protected array $_callBackParams_previewLanguageXMLArrays = [];
 
-    /**
-     * @var string
-     */
     protected string $_callBackParams_keyForTranslationDetails = '';
 
-    /**
-     * @var array
-     */
     protected array $_callBackParams_currentRow = [];
 
     /**
@@ -175,11 +117,25 @@ class Tools
      * @throws DBALException
      */
     public function __construct(
-        protected TranslationConfigurationProvider $t8Tools,
-        protected ConnectionPool $connectionPool,
-    )
-    {
+        protected readonly TranslationConfigurationProvider $t8Tools,
+        protected readonly ConnectionPool $connectionPool,
+        protected readonly SiteInterface $site = new NullSite(),
+    ) {
+        /** @var QueryBuilder $queryBuilder */
+        $sysLanguageTableExists = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getConnectionForTable(Constants::TABLE_SYS_LANGUAGE)
+            ->createSchemaManager()
+            ->tablesExist([Constants::TABLE_SYS_LANGUAGE]);
 
+        if ($sysLanguageTableExists) {
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_language');
+            $this->sys_languages = $queryBuilder->select('*')->from('sys_language')->executeQuery()->fetchAllAssociative();
+        } else {
+            $this->sys_languages = [];
+            if ($this->site instanceof Site) {
+                $this->sys_languages = $this->site->getLanguages();
+            }
+        }
     }
 
     /**
@@ -237,13 +193,14 @@ class Tools
             // So, find translated value:
             $baseStructPath = substr($structurePath, 0, -3);
             $structurePath = $baseStructPath . ($this->detailsOutput['ISOcode'] ?? '');
-            $translValue = (string)$pObj->getArrayValueByPath($structurePath, $pObj->traverseFlexFormXMLData_Data);
+            $translValue = (string)$this->getArrayValueByPath($pObj->traverseFlexFormXMLData_Data, $structurePath);
             // Generate preview values:
             $previewLanguageValues = [];
             foreach ($this->previewLanguages as $prevSysUid) {
-                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
-                    $baseStructPath,
-                    $pObj->traverseFlexFormXMLData_Data
+                $sysLanguages = $this->sysLanguages[$prevSysUid] ?? [];
+                $previewLanguageValues[$prevSysUid] = $this->getArrayValueByPath(
+                    $pObj->traverseFlexFormXMLData_Data,
+                    $baseStructPath . ($sysLanguages['ISOcode'] ?? '')
                 );
             }
             $table = $PA['table'] ?? '';
@@ -263,9 +220,9 @@ class Tools
             }
             // Look for diff-value inside the XML (new way):
             if (!empty($GLOBALS['TYPO3_CONF_VARS']['BE']['flexFormXMLincludeDiffBase'])) {
-                $diffDefaultValue = (string)$pObj->getArrayValueByPath(
-                    $structurePath . '.vDEFbase',
-                    $pObj->traverseFlexFormXMLData_Data
+                $diffDefaultValue = (string)$this->getArrayValueByPath(
+                    $pObj->traverseFlexFormXMLData_Data,
+                    $structurePath . '.vDEFbase'
                 );
             } else {
                 // Set diff-value from l10n-cfg record (deprecated)
@@ -423,7 +380,6 @@ class Tools
      * @param string $key Key is a combination of table, uid, field and structure path, identifying the field
      * @param array $TCEformsCfg TCA configuration for field
      * @param array $contentRow The table row being handled
-     * @return bool
      */
     protected function _isRTEField(string $key, array $TCEformsCfg, array $contentRow): bool
     {
@@ -453,7 +409,6 @@ class Tools
      * @param string $table Table name (present in TCA)
      * @param array $rec Record from $table
      * @param bool $useFieldNameAsKey If $useFieldNameAsKey is set, then the fieldname is associative keys in the return array, otherwise just numeric keys.
-     * @return array|null
      */
     public static function getTCAtypes(string $table, array $rec, bool $useFieldNameAsKey = false): ?array
     {
@@ -549,23 +504,17 @@ class Tools
 //        }
         $dsArr = $this->patchTceformsWrapper($dsArr);
         //echo $dataValue.'<hr>';
-        $translValue = '';
-        if (!empty($this->_callBackParams_translationXMLArray)) {
-            $translValue = (string)$pObj->getArrayValueByPath($structurePath, $this->_callBackParams_translationXMLArray);
-        }
-        $diffDefaultValue = '';
-        if (!empty($this->_callBackParams_translationDiffsourceXMLArray)) {
-            $diffDefaultValue = (string)$pObj->getArrayValueByPath(
-                $structurePath,
-                $this->_callBackParams_translationDiffsourceXMLArray
-            );
-        }
+        $translValue = (string)$this->getArrayValueByPath($this->_callBackParams_translationXMLArray, $structurePath);
+        $diffDefaultValue = (string)$this->getArrayValueByPath(
+            $this->_callBackParams_translationDiffsourceXMLArray,
+            $structurePath
+        );
         $previewLanguageValues = [];
         foreach ($this->previewLanguages as $prevSysUid) {
             if (!empty($this->_callBackParams_previewLanguageXMLArrays[$prevSysUid])) {
-                $previewLanguageValues[$prevSysUid] = $pObj->getArrayValueByPath(
-                    $structurePath,
-                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid]
+                $previewLanguageValues[$prevSysUid] = $this->getArrayValueByPath(
+                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid],
+                    $structurePath
                 );
             }
         }
@@ -586,12 +535,8 @@ class Tools
      * Performs a duplication in data source, applying a wrapper
      * around field configurations which require it for correct
      * rendering in flex form containers.
-     *
-     * @param array $dataStructure
-     * @param string|null $parentIndex
-     * @return array
      */
-    protected function patchTceformsWrapper(array $dataStructure, $parentIndex = null)
+    protected function patchTceformsWrapper(array $dataStructure, mixed $parentIndex = null): array
     {
         foreach ($dataStructure as $index => $subStructure) {
             if (is_array($subStructure)) {
@@ -609,7 +554,6 @@ class Tools
      *
      * @param string $table Table name
      * @param int $uid UID
-     * @return string
      */
     public function updateIndexForRecord(string $table, int $uid): string
     {
@@ -639,7 +583,6 @@ class Tools
      * Creating localization index for all records on a page
      *
      * @param int $pageId Page ID
-     * @param int $previewLanguage
      * @return array Array of the traversed items
      */
     public function indexDetailsPage(int $pageId, int $previewLanguage = 0): array
@@ -672,6 +615,9 @@ class Tools
     /**
      * Creating localization index for a single record (which must be default/international language and an online version!)
      *
+     * @todo In case of reactivation of the ClickMenu, this needs to be refactored as well. The table `sys_language` does not
+     * @todo anymore and the languages has to be taken from the SiteConfiguration.
+     *
      * @param string $table Table name
      * @param int $uid Record UID
      * @param int $languageID Language ID of the record
@@ -688,9 +634,14 @@ class Tools
             if ($this->bypassFilter || $this->filterIndex($table, $uid, $pid)) {
                 BackendUtility::workspaceOL($table, $rec);
                 $items = [];
-                foreach ($this->getSystemLanguages($pid) as $r) {
-                    if (is_null($languageID) || !empty($r['uid']) && $r['uid'] === $languageID) {
-                        $items['fullDetails'][$r['uid']] = $this->translationDetails(
+                foreach ($this->sys_languages as $r) {
+                    if ($r instanceof SiteLanguage) {
+                        $uid = $r->getLanguageId();
+                    } else {
+                        $uid = $r['uid'];
+                    }
+                    if (is_null($languageID) || !empty($uid) && $uid === $languageID) {
+                        $items['fullDetails'][$uid] = $this->translationDetails(
                             $table,
                             $rec,
                             $uid,
@@ -715,7 +666,6 @@ class Tools
      *
      * @param string $table Table name
      * @param int $uid Record uid
-     * @param int $previewLanguage
      * @return mixed Record array if found, otherwise FALSE
      * @throws DBALException
      * @throws NoSuchCacheException
@@ -750,13 +700,13 @@ class Tools
             $constraints = [];
             $constraints[] = $queryBuilder->expr()->eq(
                 $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? '',
-                $queryBuilder->createNamedParameter($previewLanguage, PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($previewLanguage, Connection::PARAM_INT)
             );
 
             if (isset($GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'])) {
                 $constraints[] = $queryBuilder->expr()->eq(
                     $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'],
-                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                 );
             }
 
@@ -764,12 +714,12 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
-                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->or(
                         $queryBuilder->expr()->lte(
                             $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                            $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                            $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                         ),
                         $queryBuilder->expr()->and(...$constraints)
                     )
@@ -780,11 +730,11 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'uid',
-                        $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->lte(
                         $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                        $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                     )
                 )
             );
@@ -799,8 +749,8 @@ class Tools
      * Fetches allowed fields for the current Backend user. This function is public to allow using it from
      * other classes and hooks.
      *
-     * @param string $table
-     * @return string[]
+     * @return array<int, string>
+     * @throws DBALException
      * @throws NoSuchCacheException
      */
     public function getAllowedFieldsForTable(string $table): array
@@ -851,9 +801,6 @@ class Tools
      * Checks if the user can edit the record. This function is public to allow using it from
      * hooks or other classes.
      *
-     * @param string $tableName
-     * @param array $record
-     * @return bool
      * @throws NoSuchCacheException
      */
     public function canUserEditRecord(string $tableName, array $record): bool
@@ -907,11 +854,6 @@ class Tools
 
     /**
      * Returns true if the record can be included in index.
-     *
-     * @param string $table
-     * @param int $uid
-     * @param int $pageId
-     * @return bool
      */
     protected function filterIndex(string $table, int $uid, int $pageId): bool
     {
@@ -964,7 +906,7 @@ class Tools
         if (is_array($tInfo)) {
             // Initialize some more:
             $this->detailsOutput['translationInfo'] = $tInfo;
-            $this->sysLanguages = $this->getSystemLanguages((int)$row['pid']);
+            $this->sysLanguages = $this->getSystemLanguages();
             $this->detailsOutput['ISOcode'] = $this->sysLanguages[$sysLang]['ISOcode'] ?? '';
             // decide how translations are stored:
             // there are three ways: flexformInternalTranslation (for FCE with langChildren)
@@ -995,7 +937,8 @@ class Tools
                         }
                         if ($translationRecord !== [] && !empty($GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField'])) {
                             $diffArray = json_decode(
-                                $translationRecord[$GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField']] ?? '', true
+                                $translationRecord[$GLOBALS['TCA'][$tInfo['translation_table']]['ctrl']['transOrigDiffSourceField']] ?? '',
+                                true
                             );
                         } else {
                             $diffArray = [];
@@ -1052,7 +995,10 @@ class Tools
                                 && $transOrigPointerField !== $field
                                 && $transOrigDiffSourceField !== $field
                             ) {
-                                $key = $translationTable . ':' . BackendUtility::wsMapId($translationTable,$translationUID) . ':' . $field;
+                                $key = $translationTable . ':' . BackendUtility::wsMapId(
+                                    $translationTable,
+                                    $translationUID
+                                ) . ':' . $field;
                                 if (!empty($cfg['config']['type']) && $cfg['config']['type'] === 'flex') {
                                     $dataStructArray = $this->_getFlexFormMetaDataForContentElement(
                                         $table,
@@ -1074,28 +1020,19 @@ class Tools
                                         /** @var FlexFormTools $flexObj */
                                         $flexObj = GeneralUtility::makeInstance(FlexFormTools::class);
                                         $this->_callBackParams_keyForTranslationDetails = $key;
-                                        if (!empty($translationRecord[$field])) {
-                                            $xmlArray = GeneralUtility::xml2array($translationRecord[$field]);
-                                            if (is_array($xmlArray)) {
-                                                $this->_callBackParams_translationXMLArray = $xmlArray;
-                                            }
-                                        }
                                         if (is_array($translationRecord)) {
-                                            $diffsource = json_decode($translationRecord['l18n_diffsource'] ?? '', true);
-                                            if (!empty($diffsource[$field])) {
-                                                $xmlArray = GeneralUtility::xml2array($diffsource[$field]);
-                                                if (is_array($xmlArray)) {
-                                                    $this->_callBackParams_translationDiffsourceXMLArray = $xmlArray;
-                                                }
-                                            }
+                                            $diffsource = json_decode(
+                                                $translationRecord[$transOrigDiffSourceField] ?? '',
+                                                true
+                                            );
+                                            $this->_callBackParams_translationDiffsourceXMLArray = (array)GeneralUtility::xml2array(
+                                                $diffsource[$field] ?? ''
+                                            );
                                         }
                                         foreach ($this->previewLanguages as $prevSysUid) {
-                                            if (!empty($prevLangRec[$prevSysUid][$field])) {
-                                                $xmlArray = GeneralUtility::xml2array($prevLangRec[$prevSysUid][$field]);
-                                                if (is_array($xmlArray)) {
-                                                    $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid] = $xmlArray;
-                                                }
-                                            }
+                                            $this->_callBackParams_previewLanguageXMLArrays[$prevSysUid] = GeneralUtility::xml2array(
+                                                $prevLangRec[$prevSysUid][$field] ?? ''
+                                            );
                                         }
                                         $this->_callBackParams_currentRow = $row;
                                         $flexObj->traverseFlexFormXMLData(
@@ -1146,8 +1083,7 @@ class Tools
      * @param int $sys_language_uid Language uid. If zero, then all languages are selected.
      * @param array|null $row The record to be translated
      * @param string $selFieldList Select fields for the query which fetches the translations of the current record
-     * @param int $previewLanguage
-     * @return mixed Array with information. Errors will return string with message.
+     * @return array|string Array with information. Errors will return string with message.
      * @throws DBALException
      * @todo Define visibility
      */
@@ -1158,7 +1094,7 @@ class Tools
         ?array $row = null,
         string $selFieldList = '',
         int $previewLanguage = 0
-    ) {
+    ): array|string {
         if (empty($GLOBALS['TCA'][$table]) || !$uid) {
             return 'No table "' . $table . '" or no UID value';
         }
@@ -1209,24 +1145,24 @@ class Tools
         if ($parentField) {
             $constraintsA[] = $queryBuilder->expr()->eq(
                 $parentField,
-                $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
             );
         }
         $constraintsA[] = $queryBuilder->expr()->eq(
             'pid',
-            $queryBuilder->createNamedParameter((int)$row['pid'], PDO::PARAM_INT)
+            $queryBuilder->createNamedParameter((int)$row['pid'], Connection::PARAM_INT)
         );
 
         if ($languageField) {
             if ($sys_language_uid === 0) {
                 $constraintsA[] = $queryBuilder->expr()->gt(
                     $languageField,
-                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                 );
             } else {
                 $constraintsA[] = $queryBuilder->expr()->eq(
                     $languageField,
-                    $queryBuilder->createNamedParameter($sys_language_uid, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($sys_language_uid, Connection::PARAM_INT)
                 );
             }
         }
@@ -1234,22 +1170,22 @@ class Tools
         if ($previewLanguage > 0) {
             $constraintsB[] = $queryBuilder->expr()->eq(
                 'pid',
-                $queryBuilder->createNamedParameter((int)$row['pid'], PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter((int)$row['pid'], Connection::PARAM_INT)
             );
             $constraintsB[] = $queryBuilder->expr()->eq(
                 'uid',
-                $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($uid, Connection::PARAM_INT)
             );
             if ($parentField) {
                 $constraintsB[] = $queryBuilder->expr()->eq(
                     $parentField,
-                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                 );
             }
             if ($languageField) {
                 $constraintsB[] = $queryBuilder->expr()->eq(
                     $languageField,
-                    $queryBuilder->createNamedParameter($previewLanguage, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($previewLanguage, Connection::PARAM_INT)
                 );
             }
 
@@ -1295,14 +1231,10 @@ class Tools
         return $infoResult;
     }
 
-    /**
-     * @param int $pid
-     * @return array
-     */
-    public function getSystemLanguages(int $pid = 0): array
+    protected function getSystemLanguages(): array
     {
         if (empty(self::$systemLanguages)) {
-            self::$systemLanguages = $this->t8Tools->getSystemLanguages($pid);
+            self::$systemLanguages = $this->t8Tools->getSystemLanguages();
         }
         return self::$systemLanguages;
     }
@@ -1313,7 +1245,6 @@ class Tools
      * @param array $tInfo Translation info
      * @param string $table Table name
      * @param array $row Table row
-     * @return array
      */
     protected function _detectTranslationModes(array $tInfo, string $table, array $row): array
     {
@@ -1525,11 +1456,6 @@ class Tools
     /**
      * Selecting records from a table from a page which are candidates to be translated.
      *
-     * @param string $table Table name
-     * @param int $pageId Page id
-     * @param int $previewLanguage
-     * @param bool $sortexports
-     * @param bool $noHidden
      * @return array Array of records from table (with all fields selected)
      * @throws DBALException
      * @throws NoSuchCacheException
@@ -1537,7 +1463,7 @@ class Tools
     public function getRecordsToTranslateFromTable(
         string $table,
         int $pageId,
-        int $previewLanguage = 0,
+        int $previewLanguageId = 0,
         bool $sortexports = false,
         bool $noHidden = false
     ): array {
@@ -1564,17 +1490,17 @@ class Tools
         $queryBuilder->select('*')
             ->from($table);
 
-        if ($previewLanguage > 0) {
+        if ($previewLanguageId > 0) {
             $constraints = [];
             $constraints[] = $queryBuilder->expr()->eq(
                 $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                $queryBuilder->createNamedParameter($previewLanguage, PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($previewLanguageId, Connection::PARAM_INT)
             );
 
             if (isset($GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'])) {
                 $constraints[] = $queryBuilder->expr()->eq(
                     $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'],
-                    $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                 );
             }
 
@@ -1582,12 +1508,12 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'pid',
-                        $queryBuilder->createNamedParameter($pageId, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->or(
                         $queryBuilder->expr()->lte(
                             $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                            $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                            $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                         ),
                         $queryBuilder->expr()->and(...$constraints)
                     )
@@ -1598,11 +1524,11 @@ class Tools
                 $queryBuilder->expr()->and(
                     $queryBuilder->expr()->eq(
                         'pid',
-                        $queryBuilder->createNamedParameter($pageId, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($pageId, Connection::PARAM_INT)
                     ),
                     $queryBuilder->expr()->lte(
                         $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                        $queryBuilder->createNamedParameter(0, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter(0, Connection::PARAM_INT)
                     )
                 )
             );
@@ -1698,7 +1624,7 @@ class Tools
             ->where(
                 $queryBuilder->expr()->eq(
                     'workspace',
-                    $queryBuilder->createNamedParameter($ws, PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter($ws, Connection::PARAM_INT)
                 )
             )
             ->executeStatement();
@@ -1708,7 +1634,6 @@ class Tools
      * @param string $table Table name
      * @param int $uid UID
      * @param bool $exec Execution flag
-     * @return array
      */
     public function flushTranslations(string $table, int $uid, bool $exec = false): array
     {
@@ -1790,75 +1715,13 @@ class Tools
         return [$remove, $TCEmain_cmd, $TCEmain_data, $errorLog];
     }
 
-    private function getParentTables(string $table, array $row): array
+    protected function getArrayValueByPath(array $array, array|string $path): mixed
     {
-        $isInlineTable = (
-            is_array($inlineTablesConfig = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['inlineTablesConfig'])
-            && array_key_exists(
-                $table,
-                $inlineTablesConfig
-            ));
-
-        if ($isInlineTable) {
-            // Parent fields:
-            return ['tt_content', $inlineTablesConfig[$table]['parentField']];
+        try {
+            $value = ArrayUtility::getValueByPath($array, $path);
+        } catch (MissingArrayPathException) {
+            $value = null;
         }
-
-        if ($table === 'sys_file_reference') {
-            return [$row['tablenames'], 'uid_foreign'];
-        }
-
-        return [null, null];
-    }
-
-    public function isParentItemHidden(string $table, array $row, int $sysLang): bool
-    {
-        [$parentTable, $parentField] = $this->getParentTables($table, $row);
-
-        if (!empty($parentTable) && !empty($parentField)) {
-            if ($parentTable === 'pages') {
-                return false;
-            }
-
-            $parent = BackendUtility::getRecordWSOL($parentTable, (int)$row[$parentField]);
-
-            if ($parent['hidden']) {
-                return true;
-            }
-
-            // Exclude item if parent is missing
-            if (!$parent) {
-                return true;
-            }
-
-            // Recursive call for nested inline elements and sys_file_references
-            return $this->isParentItemHidden($parentTable, $parent, $sysLang);
-        }
-
-        return false;
-    }
-
-    public function isParentItemExcluded(string $table, array $row, int $sysLang): bool
-    {
-        [$parentTable, $parentField] = $this->getParentTables($table, $row);
-
-        if (!empty($parentTable) && !empty($parentField)) {
-            $parent = BackendUtility::getRecordWSOL($parentTable, (int)$row[$parentField]);
-            if (!empty($parent[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME])) {
-                if (GeneralUtility::inList($parent[Constants::L10NMGR_LANGUAGE_RESTRICTION_FIELDNAME], $sysLang)) {
-                    return true;
-                }
-            }
-
-            // Exclude item if parent is missing
-            if (!$parent) {
-                return true;
-            }
-
-            // Recursive call for nested inline elements and sys_file_references
-            return $this->isParentItemExcluded($parentTable, $parent, $sysLang);
-        }
-
-        return false;
+        return $value;
     }
 }

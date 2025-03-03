@@ -24,9 +24,9 @@ namespace Localizationteam\L10nmgr\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use PDO;
 use TYPO3\CMS\Backend\Tree\View\PageTreeView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Imaging\Icon;
@@ -46,14 +46,8 @@ class L10nConfiguration
 {
     use BackendUserTrait;
 
-    /**
-     * @var array
-     */
     public array $l10ncfg = [];
 
-    /**
-     * @var int
-     */
     protected int $sourcePid = 0;
 
     /**
@@ -77,32 +71,14 @@ class L10nConfiguration
         return is_array($this->l10ncfg) && ($this->l10ncfg !== []);
     }
 
-    /**
-     * get uid field
-     *
-     * @return int
-     **/
     public function getUid(): int
     {
         return (int)$this->getData('uid');
     }
 
-    /**
-     * @return int
-     */
     public function getPid(): int
     {
         return (int)$this->getData('pid');
-    }
-
-    /**
-     * @todo There is no field `targetLanguage` in the database. Can we remove this?
-     *
-     * @return string
-     */
-    public function getTargetLanguages(): string
-    {
-        return $this->getData('targetLanguages');
     }
 
     public function getForcedSourceLanguage(): int
@@ -167,7 +143,7 @@ class L10nConfiguration
      *
      * @return string Value of the field
      **/
-    public function getData(string $key): string
+    private function getData(string $key): string
     {
         return $key === 'pid' && !empty($this->l10ncfg['depth']) && (int)$this->l10ncfg['depth'] === -1 && $this->sourcePid
             ? (string)$this->sourcePid
@@ -240,8 +216,6 @@ class L10nConfiguration
      * @throws \Doctrine\DBAL\DBALException
      */
     /**
-     * @param int $sysLang
-     * @param array $flexFormDiffArray
      * @throws DBALException
      */
     public function updateFlexFormDiff(int $sysLang, array $flexFormDiffArray): void
@@ -271,15 +245,12 @@ class L10nConfiguration
             ->where(
                 $queryBuilder->expr()->eq(
                     'uid',
-                    $queryBuilder->createNamedParameter((int)$l10ncfg['uid'], PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter((int)$l10ncfg['uid'], Connection::PARAM_INT)
                 )
             )
             ->executeStatement();
     }
 
-    /**
-     * @param int $id
-     */
     public function setSourcePid(int $id): void
     {
         $this->sourcePid = $id;

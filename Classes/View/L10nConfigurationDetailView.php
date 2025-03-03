@@ -39,9 +39,6 @@ class L10nConfigurationDetailView
     use BackendUserTrait;
     use LanguageServiceTrait;
 
-    /**
-     * @var L10nConfiguration
-     */
     protected L10nConfiguration $l10ncfgObj;
 
     public function __construct(L10nConfiguration $l10ncfgObj)
@@ -49,9 +46,6 @@ class L10nConfigurationDetailView
         $this->l10ncfgObj = $l10ncfgObj;
     }
 
-    /**
-     * @return array
-     */
     public function render(): array
     {
         if (!$this->hasValidConfig()) {
@@ -72,9 +66,6 @@ class L10nConfigurationDetailView
         return str_replace(',', ', ', $configurationSettings);
     }
 
-    /**
-     * @return bool
-     */
     protected function hasValidConfig(): bool
     {
         return is_object($this->l10ncfgObj) && $this->l10ncfgObj->isLoaded();

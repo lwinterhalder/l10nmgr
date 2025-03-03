@@ -23,36 +23,26 @@ class Zip
 {
     /**
      * Array to store compressed data
-     *
-     * @var array $datasec
      */
     protected array $datasec = [];
 
     /**
      * Central directory
-     *
-     * @var array $ctrl_dir
      */
     protected array $ctrl_dir = [];
 
     /**
      * End of central directory record
-     *
-     * @var string $eof_ctrl_dir
      */
     protected string $eof_ctrl_dir = "\x50\x4b\x05\x06\x00\x00\x00\x00";
 
     /**
      * Last offset position
-     *
-     * @var int $old_offset
      */
     protected int $old_offset = 0;
 
     /**
      * Unzip Application
-     *
-     * @var string $unzipAppCmd
      */
     protected string $unzipAppCmd = '/usr/bin/unzip -qq ###ARCHIVENAME### -d ###DIRECTORY###'; // Unzip Application (don't set to blank!) ** MODIFIED RL, 15.08.03
 
@@ -166,7 +156,6 @@ class Zip
      * This takes the ZIP file, unzips it, reads all documents, store them in database for next retrieval.
      * The file is libunzipped in Environment::getPublicPath() . 'typo3temp/' + a randomly named folder.
      *
-     * @param string $file
      * @return mixed
      */
     public function extractFile(string $file)
@@ -195,8 +184,6 @@ class Zip
 
     /**
      * Returns an array with all files and folders in $extPath
-     * @param array $fileArr
-     * @param string $extPath
      *
      * @return array Array with files and folders
      */
@@ -219,8 +206,6 @@ class Zip
     /**
      * Removes directory with all files from the path $tempDir.
      * $tempDir must be a subfolder to typo3temp/
-     *
-     * @param string $tempDir
      */
     public function removeDir(string $tempDir): void
     {
