@@ -52,11 +52,6 @@ class ClickMenu
     /**
      * Main function
      *
-     * @param mixed $backRef
-     * @param array $menuItems
-     * @param string $table
-     * @param int $uid
-     * @return array
      * @throws RouteNotFoundException
      */
     public function main(mixed $backRef, array $menuItems, string $table, int $uid): array

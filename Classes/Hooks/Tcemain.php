@@ -33,8 +33,8 @@ use Doctrine\DBAL\Exception as DBALException;
 use Localizationteam\L10nmgr\Model\L10nBaseService;
 use Localizationteam\L10nmgr\Model\Tools\Tools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
-use PDO;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -53,12 +53,6 @@ class Tcemain
 
     /**
      * Hook for updating translation index when records are edited (hooks into TCEmain)
-     *
-     * @param string $status
-     * @param string $table
-     * @param string $id
-     * @param array $fieldArray
-     * @param DataHandler $pObj
      */
     public function processDatamap_afterDatabaseOperations(string $status, string $table, string $id, array $fieldArray, DataHandler $pObj): void
     {
@@ -121,12 +115,8 @@ class Tcemain
 
     /**
      * Hook for displaying small icon in page tree, web>List and page module.
-     *
-     * @param array $p
-     * @param mixed $pObj
-     * @return string
      */
-    public function stat(array $p, mixed $pObj): string
+    public function stat(array $p, DataHandler $pObj): string
     {
         if (!empty($this->getBackendUser()->groupData['allowed_languages'])
             && strcmp($this->getBackendUser()->groupData['allowed_languages'], '')) {
@@ -139,10 +129,6 @@ class Tcemain
     }
 
     /**
-     * @param array $p
-     * @param array $languageList
-     * @param bool $noLink
-     * @return string
      * @throws DBALException
      */
     public function calcStat(array $p, array $languageList, bool $noLink = false): string
@@ -158,7 +144,7 @@ class Tcemain
             ),
             $queryBuilder->expr()->eq(
                 'workspace',
-                $queryBuilder->createNamedParameter($this->getBackendUser()->workspace, PDO::PARAM_INT)
+                $queryBuilder->createNamedParameter($this->getBackendUser()->workspace, Connection::PARAM_INT)
             )
         );
         if (!empty($p[0]) && $p[0] !== 'pages') {
@@ -169,14 +155,14 @@ class Tcemain
                 ),
                 $queryBuilder->expr()->eq(
                     'recuid',
-                    $queryBuilder->createNamedParameter((int)($p[1] ?? 0), PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter((int)($p[1] ?? 0), Connection::PARAM_INT)
                 )
             );
         } else {
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->eq(
                     'recpid',
-                    $queryBuilder->createNamedParameter((int)($p[1] ?? 0), PDO::PARAM_INT)
+                    $queryBuilder->createNamedParameter((int)($p[1] ?? 0), Connection::PARAM_INT)
                 )
             );
         }
@@ -243,8 +229,6 @@ class Tcemain
     /**
      * Returns the relative path to the extension as measured from the public web path
      *
-     * @param string $extensionKey
-     * @return string
      * @internal
      */
     protected function siteRelPath(string $extensionKey): string

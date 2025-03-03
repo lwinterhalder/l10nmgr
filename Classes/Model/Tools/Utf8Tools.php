@@ -26,7 +26,6 @@ class Utf8Tools
      * @see http://hsivonen.iki.fi/php-utf8/
      * @see utf8_is_valid
      */
-
     /**
      * Locates the first bad byte in a UTF-8 string returning it's
      * byte index in the string
@@ -36,7 +35,6 @@ class Utf8Tools
      *
      * @see http://www.w3.org/International/questions/qa-forms-utf-8
      *
-     * @param string $str
      * @return mixed integer byte index or FALSE if no bad found
      */
     public static function utf8_bad_find(string $str)
@@ -71,7 +69,6 @@ class Utf8Tools
      *
      * @see http://www.w3.org/International/questions/qa-forms-utf-8
      *
-     * @param string $str
      * @return mixed array of integers or FALSE if no bad found
      */
     public static function utf8_bad_findall(string $str)
@@ -108,9 +105,6 @@ class Utf8Tools
      * Note: modified to include full ASCII range including control chars
      *
      * @see http://www.w3.org/International/questions/qa-forms-utf-8
-     *
-     * @param string $str
-     * @return string
      */
     public static function utf8_bad_strip(string $str): string
     {
@@ -146,7 +140,6 @@ class Utf8Tools
      *
      * @param string $str String to search
      * @param string $replace String to replace bad bytes with (defaults to '?') - use ASCII
-     * @return string
      */
     public static function utf8_bad_replace(string $str, string $replace = '?'): string
     {

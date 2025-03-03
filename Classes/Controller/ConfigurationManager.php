@@ -251,9 +251,6 @@ class ConfigurationManager extends BaseModule
         return $record;
     }
 
-    /**
-     * @return StandaloneView
-     */
     protected function getFluidTemplateObject(): StandaloneView
     {
         $view = GeneralUtility::makeInstance(StandaloneView::class);

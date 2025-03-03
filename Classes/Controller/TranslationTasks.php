@@ -46,19 +46,10 @@ use TYPO3\CMS\Core\Utility\PathUtility;
 
 class TranslationTasks extends BaseModule
 {
-    /**
-     * @var ModuleTemplate
-     */
     protected ModuleTemplate $module;
 
-    /**
-     * @var Tools
-     */
     protected Tools $l10nMgrTools;
 
-    /**
-     * @var array
-     */
     protected array $sysLanguages = [];
 
     public function __construct()
@@ -154,11 +145,6 @@ class TranslationTasks extends BaseModule
         $this->content .= '<div><h2 class="uppercase">Priority list:</h2>' . $content . '</div>';
     }
 
-    /**
-     * @param string $languageList
-     * @param string $elementList
-     * @return string
-     */
     protected function languageRows(string $languageList, string $elementList): string
     {
         // Initialization:
@@ -169,7 +155,7 @@ class TranslationTasks extends BaseModule
         $this->l10nMgrTools = GeneralUtility::makeInstance(Tools::class);
         $this->l10nMgrTools->verbose = false; // Otherwise it will show records which has fields but none editable.
         $inputRecord = BackendUtility::getRecord($firstEl[0], $firstEl[1], 'pid');
-        $this->sysLanguages = $this->l10nMgrTools->getSystemLanguages($firstEl[0] == 'pages' ? $firstEl[1] : $inputRecord['pid']);
+        $this->sysLanguages = $this->l10nMgrTools->t8Tools->getSystemLanguages($firstEl[0] == 'pages' ? $firstEl[1] : $inputRecord['pid']);
         $languages = $this->getLanguages($languageList, $this->sysLanguages);
         if (count($languages)) {
             $tRows = [];
@@ -227,10 +213,6 @@ class TranslationTasks extends BaseModule
         return '';
     }
 
-    /**
-     * @param string $elementList
-     * @return array
-     */
     protected function explodeElement(string $elementList): array
     {
         $elements = GeneralUtility::trimExplode(',', $elementList);
@@ -240,11 +222,6 @@ class TranslationTasks extends BaseModule
         return $elements;
     }
 
-    /**
-     * @param string $limitLanguageList
-     * @param array $sysLanguages
-     * @return array
-     */
     protected function getLanguages(string $limitLanguageList, array $sysLanguages): array
     {
         $languageListArray = explode(
@@ -264,8 +241,6 @@ class TranslationTasks extends BaseModule
 
     /**
      * Prints out the module HTML
-     *
-     * @return string
      */
     protected function getContent(): string
     {

@@ -177,7 +177,6 @@ class XmlTools implements LoggerAwareInterface
      *
      * @param string $content HTML String which should be transformed
      *
-     * @param int $withStripBadUTF8
      * @return mixed false if transformation failed, string with XML if all fine
      */
     public function RTE2XML(string $content, int $withStripBadUTF8 = 0)
@@ -213,19 +212,11 @@ class XmlTools implements LoggerAwareInterface
         return false;
     }
 
-    /**
-     * @param string $xmlString
-     * @return bool
-     */
     public function isValidXMLString(string $xmlString): bool
     {
         return $this->isValidXML('<!DOCTYPE dummy [ <!ENTITY nbsp " "> ]><dummy>' . $xmlString . '</dummy>');
     }
 
-    /**
-     * @param string $xml
-     * @return bool
-     */
     protected function isValidXML(string $xml): bool
     {
         $parser = xml_parser_create();

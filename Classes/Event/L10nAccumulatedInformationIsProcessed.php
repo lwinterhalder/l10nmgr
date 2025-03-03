@@ -16,25 +16,16 @@ class L10nAccumulatedInformationIsProcessed
         $this->l10nConfiguration = $l10nConfiguration;
     }
 
-    /**
-     * @return array
-     */
     public function getAccumulatedInformation(): array
     {
         return $this->accumulatedInformation;
     }
 
-    /**
-     * @param array $accumulatedInformation
-     */
     public function setAccumulatedInformation(array $accumulatedInformation): void
     {
         $this->accumulatedInformation = $accumulatedInformation;
     }
 
-    /**
-     * @return array
-     */
     public function getL10nConfiguration(): array
     {
         return $this->l10nConfiguration;

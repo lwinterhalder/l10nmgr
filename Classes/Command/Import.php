@@ -69,7 +69,7 @@ class Import extends L10nCommand
     /**
      * Configure the command by defining the name, options and arguments
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Import the translations as file')
             ->setHelp('With this command you can import translation')
@@ -100,12 +100,8 @@ class Import extends L10nCommand
 
     /**
      * Executes the command for straigthening content elements
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $start = microtime(true);
 
@@ -154,8 +150,6 @@ class Import extends L10nCommand
      * This method reads the command-line arguments and prepares a list of call parameters
      * It takes care of backwards-compatibility with the old way of calling the import script
      *
-     * @param InputInterface $input
-     * @return array
      * @throws Exception
      */
     protected function initializeCallParameters(InputInterface $input): array
@@ -214,8 +208,6 @@ class Import extends L10nCommand
     /**
      * Imports a CATXML string
      *
-     * @param array $callParameters
-     * @return string
      * @throws Exception
      */
     protected function importCATXML(array $callParameters): string
@@ -298,8 +290,6 @@ class Import extends L10nCommand
     /**
      * Previews the source to import
      *
-     * @param string $stringParameter
-     * @return string Result output
      * @throws Exception
      */
     protected function previewSource(string $stringParameter): string
@@ -341,10 +331,9 @@ class Import extends L10nCommand
      * Imports data from one or more XML files
      * Several files may be contained in a ZIP archive
      *
-     * @param array $callParameters
      * @throws Exception
      */
-    protected function importXMLFile(array $callParameters)
+    protected function importXMLFile(array $callParameters): void
     {
         $out = '';
         $xmlFilesArr = $this->gatherAllFiles((string)$callParameters['file']);
@@ -459,8 +448,6 @@ class Import extends L10nCommand
     /**
      * Gather all the files to be imported, depending on the call parameters
      *
-     * @param string $file
-     * @return array
      * @throws Exception
      */
     protected function gatherAllFiles(string $file): array
@@ -601,7 +588,6 @@ class Import extends L10nCommand
      *
      * @param string $filepath Path to the file
      *
-     * @return array
      * @throws Exception
      */
     protected function getXMLFileHead(string $filepath): array

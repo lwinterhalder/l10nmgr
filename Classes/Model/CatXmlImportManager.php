@@ -27,7 +27,7 @@ use Localizationteam\L10nmgr\Event\XmlImportFileIsParsed;
 use Localizationteam\L10nmgr\Model\Tools\XmlTools;
 use Localizationteam\L10nmgr\Traits\BackendUserTrait;
 use Localizationteam\L10nmgr\Traits\LanguageServiceTrait;
-use PDO;
+use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
@@ -86,9 +86,6 @@ class CatXmlImportManager
         }
     }
 
-    /**
-     * @return bool
-     */
     public function parseAndCheckXMLFile(): bool
     {
         $fileContent = GeneralUtility::getUrl($this->file);
@@ -129,14 +126,8 @@ class CatXmlImportManager
         return true;
     }
 
-    /**
-     * @param array $headerInformationNodes
-     */
     protected function _setHeaderData(array $headerInformationNodes): void
     {
-        if (empty($headerInformationNodes)) {
-            return;
-        }
         foreach ($headerInformationNodes as $k => $v) {
             $this->headerData[$k] = '';
             if (is_array($v) && is_array($v[0]) && is_array($v[0]['values'] ?? null)) {
@@ -145,9 +136,6 @@ class CatXmlImportManager
         }
     }
 
-    /**
-     * @return bool
-     */
     protected function _isIncorrectXMLFile(): bool
     {
         $error = [];
@@ -180,9 +168,6 @@ class CatXmlImportManager
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function parseAndCheckXMLString(): bool
     {
         $catXmlString = $this->xmlString;
@@ -206,9 +191,6 @@ class CatXmlImportManager
         return true;
     }
 
-    /**
-     * @return bool
-     */
     protected function _isIncorrectXMLString(): bool
     {
         $error = [];
@@ -227,6 +209,7 @@ class CatXmlImportManager
             );
         }
         if (!isset($this->headerData['t3_sysLang'])) {
+            //if (!isset($this->headerData['t3_sysLang']) || $this->headerData['t3_sysLang'] != $this->sysLang) {
             $error[] = sprintf(
                 $this->getLanguageService()->getLL('import.manager.error.language.message'),
                 $this->sysLang,
@@ -240,17 +223,11 @@ class CatXmlImportManager
         return false;
     }
 
-    /**
-     * @return string
-     */
     public function getErrorMessages(): string
     {
         return implode('<br />', $this->_errorMsg);
     }
 
-    /**
-     * @return array
-     */
     public function &getXMLNodes(): array
     {
         return $this->xmlNodes;
@@ -331,7 +308,7 @@ class CatXmlImportManager
                 ->where(
                     $queryBuilder->expr()->eq(
                         $GLOBALS['TCA'][$table]['ctrl']['languageField'] ?? 'sys_language_uid',
-                        $queryBuilder->createNamedParameter($this->headerData['t3_sysLang'] ?? 0, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($this->headerData['t3_sysLang'] ?? 0, Connection::PARAM_INT)
                     )
                 );
 
@@ -339,7 +316,7 @@ class CatXmlImportManager
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->eq(
                         $GLOBALS['TCA'][$table]['ctrl']['transOrigPointerField'],
-                        $queryBuilder->createNamedParameter($elementUid, PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($elementUid, Connection::PARAM_INT)
                     )
                 );
             }
@@ -348,7 +325,7 @@ class CatXmlImportManager
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->eq(
                         't3ver_wsid',
-                        $queryBuilder->createNamedParameter($this->headerData['t3_workspaceId'], PDO::PARAM_INT)
+                        $queryBuilder->createNamedParameter($this->headerData['t3_workspaceId'], Connection::PARAM_INT)
                     )
                 );
             }

@@ -51,36 +51,19 @@ class L10nHtmlListView extends AbstractExportView
 
     public const DISPLAY_MODE_RENDER_OVERVIEW_WITH_NO_DETAILS = 2;
 
-    /**
-     * @var L10nConfiguration
-     */
     protected L10nConfiguration $l10ncfgObj;
 
-    /**
-     * @var array
-     */
     protected array $l10ncfg = [];
 
-    /**
-     * @var int
-     */
     protected int $sysLang;
 
     //internal flags:
-    /**
-     * @var bool
-     */
     protected bool $modeWithInlineEdit = false;
 
-    /**
-     * @var bool
-     */
     protected bool $modeShowEditLinks = false;
 
     /**
      * ModuleTemplate Container
-     *
-     * @var ModuleTemplate
      */
     protected ModuleTemplate $moduleTemplate;
 
@@ -360,10 +343,6 @@ class L10nHtmlListView extends AbstractExportView
      * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
      */
     /**
-     * @param array $data
-     * @param int $sysLang
-     * @param string $table
-     * @return string
      * @throws RouteNotFoundException
      */
     protected function getEditLink(array $data, int $sysLang, string $table): string
@@ -408,8 +387,6 @@ class L10nHtmlListView extends AbstractExportView
      * Compiles the configuration set from the outside
      * to have it easily injected into the CKEditor.
      *
-     * @param array $richtextConfiguration
-     * @param string $languageIsoCode
      * @return array the configuration
      */
     protected function prepareConfigurationForEditor(array $richtextConfiguration, string $languageIsoCode): array
@@ -450,9 +427,6 @@ class L10nHtmlListView extends AbstractExportView
     /**
      * Get configuration of external/additional plugins
      *
-     * @param array $externalPlugins
-     * @param array $urlParameters
-     * @return array
      * @throws RouteNotFoundException
      */
     protected function getExtraPlugins(array $externalPlugins, array $urlParameters): array
@@ -479,9 +453,7 @@ class L10nHtmlListView extends AbstractExportView
 
     /**
      * Add configuration to replace LLL: references with the translated value
-     * @param array $configuration
      *
-     * @return array
      */
     protected function replaceLanguageFileReferences(array $configuration): array
     {
@@ -497,9 +469,7 @@ class L10nHtmlListView extends AbstractExportView
 
     /**
      * Add configuration to replace absolute EXT: paths with relative ones
-     * @param array $configuration
      *
-     * @return array
      */
     protected function replaceAbsolutePathsToRelativeResourcesPath(array $configuration): array
     {
@@ -515,9 +485,6 @@ class L10nHtmlListView extends AbstractExportView
 
     /**
      * Resolves an EXT: syntax file to an absolute web URL
-     *
-     * @param string $value
-     * @return string
      */
     protected function resolveUrlPath(string $value): string
     {

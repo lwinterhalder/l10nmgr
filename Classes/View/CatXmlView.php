@@ -42,23 +42,18 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class CatXmlView extends AbstractExportView
 {
     /**
-     * @var int
+     * @var int $forcedSourceLanguage Overwrite the default language uid with the desired language to export
      */
+    protected int $forcedSourceLanguage = 0;
+
+    protected bool $onlyForcedSourceLanguage = false;
+
     protected int $exportType = 1;
 
-    /**
-     * @var string
-     */
     protected string $baseUrl = '';
 
-    /**
-     * @var array
-     */
     protected array $params = [];
 
-    /**
-     * @var array
-     */
     protected array $overrideParams = [];
 
     /**
@@ -66,8 +61,8 @@ class CatXmlView extends AbstractExportView
      */
     public function render(): string
     {
-        $targetLanguage = $this->targetLanguage;
-        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($targetLanguage);
+        $sysLang = $this->sysLang;
+        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
@@ -147,9 +142,10 @@ class CatXmlView extends AbstractExportView
         $XML .= '<!DOCTYPE TYPO3L10N [ <!ENTITY nbsp " "> ]>' . "\n" . '<TYPO3L10N>' . "\n";
         $XML .= "\t" . '<head>' . "\n";
         $XML .= "\t\t" . '<t3_l10ncfg translate="no">' . $this->l10ncfgObj->getUid() . '</t3_l10ncfg>' . "\n";
+        $XML .= "\t\t" . '<t3_sysLang translate="no">' . $sysLang . '</t3_sysLang>' . "\n";
 
         $sourceLang = '';
-        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->forcedSourceLanguage] ?? null;
+        $sourceLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[0] ?? null;
 
         if ($sourceLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
@@ -158,9 +154,8 @@ class CatXmlView extends AbstractExportView
                 $sourceLang = $sourceLanguageConfiguration->getLocale()->getName() ?: $sourceLanguageConfiguration->getLocale()->getLanguageCode();
             }
         }
-
         $targetLang = '';
-        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->targetLanguage] ?? null;
+        $targetLanguageConfiguration = $this->site->getAvailableLanguages($this->getBackendUser())[$this->sysLang] ?? null;
         if ($targetLanguageConfiguration instanceof SiteLanguage) {
             if ($this->typo3Version->getMajorVersion() < 12) {
                 $targetLang = $targetLanguageConfiguration->getLocale() ?: $targetLanguageConfiguration->getTwoLetterIsoCode();
@@ -168,8 +163,6 @@ class CatXmlView extends AbstractExportView
                 $targetLang = $targetLanguageConfiguration->getLocale()->getName() ?: $targetLanguageConfiguration->getLocale()->getLanguageCode();
             }
         }
-
-        $XML .= "\t\t" . '<t3_sysLang translate="no">' . $this->targetLanguage . '</t3_sysLang>' . "\n";
         $XML .= "\t\t" . '<t3_sourceLang translate="no">' . $sourceLang . '</t3_sourceLang>' . "\n";
         $XML .= "\t\t" . '<t3_targetLang translate="no">' . $targetLang . '</t3_targetLang>' . "\n";
         $XML .= "\t\t" . '<t3_baseURL translate="no">' . $this->baseUrl . '</t3_baseURL>' . "\n";
@@ -197,11 +190,6 @@ class CatXmlView extends AbstractExportView
         return $this->saveExportFile($XML);
     }
 
-    /**
-     * @param array $tData
-     * @param string $key
-     * @return string|null
-     */
     protected function getValueForXml(array $tData, string $key): ?string
     {
         if ($this->forcedSourceLanguage) {
@@ -313,18 +301,12 @@ class CatXmlView extends AbstractExportView
         return $additionalHeaderData;
     }
 
-    /**
-     * @param string $baseUrl
-     */
-    public function setBaseUrl(string $baseUrl)
+    public function setBaseUrl(string $baseUrl): void
     {
         $this->baseUrl = $baseUrl;
     }
 
-    /**
-     * @param array $overrideParams
-     */
-    public function setOverrideParams(array $overrideParams)
+    public function setOverrideParams(array $overrideParams): void
     {
         $this->overrideParams = $overrideParams;
     }

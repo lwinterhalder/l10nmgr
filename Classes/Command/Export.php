@@ -40,7 +40,7 @@ class Export extends L10nCommand
     /**
      * Configure the command by defining the name, options and arguments
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setDescription('Export the translations as file')
             ->setHelp('With this command you can Export translation')
@@ -120,12 +120,8 @@ class Export extends L10nCommand
 
     /**
      * Executes the command for straightening content elements
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $error = false;
         $time_start = microtime(true);
@@ -210,22 +206,16 @@ class Export extends L10nCommand
     /**
      * exportCATXML which is called over cli
      *
-     * @param int $l10ncfg ID of the configuration to load
-     * @param int $targetLanguageId ID of the language to translate to
-     * @param string $format
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return string An error message in case of failure
      * @throws Exception
      */
-    protected function exportXML(int $l10ncfg, int $targetLanguageId, string $format, InputInterface $input, OutputInterface $output): string
+    protected function exportXML(int $l10nConfigurationId, int $targetLanguageId, string $format, InputInterface $input, OutputInterface $output): string
     {
         $error = '';
         // Load the configuration
         /** @var L10nConfiguration $l10nmgrCfgObj */
         $l10nmgrCfgObj = GeneralUtility::makeInstance(L10nConfiguration::class);
-        $l10nmgrCfgObj->load($l10ncfg);
+        $l10nmgrCfgObj->load($l10nConfigurationId);
         $sourcePid = $input->getOption('srcPID') ?? 0;
         $l10nmgrCfgObj->setSourcePid($sourcePid);
         if ($l10nmgrCfgObj->isLoaded()) {
@@ -248,15 +238,7 @@ class Export extends L10nCommand
             } else {
                 throw new Exception("Wrong format. Use 'CATXML' or 'EXCEL'");
             }
-            // Check if forcedSourceLanguage is set in configuration and set setForcedSourceLanguage to this value
-            if ($l10nmgrCfgObj->getData('forcedSourceLanguage')) {
-                $l10nmgrGetXML->setForcedSourceLanguage((int)$l10nmgrCfgObj->getData('forcedSourceLanguage'));
-            } elseif ($l10nmgrCfgObj->getData('sourceLangStaticId') && ExtensionManagementUtility::isLoaded('static_info_tables')) {
-                // Check if sourceLangStaticId is set in configuration and set setForcedSourceLanguage to this value
-                $forceLanguage = $this->getStaticLangUid((int)$l10nmgrCfgObj->getData('sourceLangStaticId'));
-                $l10nmgrGetXML->setForcedSourceLanguage($forceLanguage);
-            }
-            // Check if forcedSourceLanguage is overriden manually
+
             $forceLanguage = $input->getOption('forcedSourceLanguage');
             if (is_string($forceLanguage)) {
                 $l10nmgrGetXML->setForcedSourceLanguage((int)$forceLanguage);

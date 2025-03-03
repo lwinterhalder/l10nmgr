@@ -84,7 +84,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class LocalizationManager extends BaseModule
 {
     /** @var int Default language to export */
-    protected int $targetLanguage = 0; // Internal
+    protected int $sysLanguage = 0; // Internal
 
     /** @var int Forced source language to export */
     public int $previewLanguage = 0;
@@ -162,7 +162,7 @@ class LocalizationManager extends BaseModule
         $backendUser = $this->getBackendUser();
 
         // Get language to export/import
-        $this->targetLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
+        $this->sysLanguage = (int)($this->MOD_SETTINGS['lang'] ?? 0);
 
         // Javascript
         $this->moduleTemplate->addJavaScriptCode(
@@ -215,7 +215,7 @@ return false;
                 $selectMenus[] = self::getFuncMenu(
                     $this->id,
                     'SET[lang]',
-                    (string)$this->targetLanguage,
+                    (string)$this->sysLanguage,
                     $this->MOD_MENU['lang'] ?? [],
                     '',
                     $addParams,
@@ -283,9 +283,7 @@ return false;
      * @param array $menuItems An array with the menu items for the selector box
      * @param string $script The script to send the &id to, if empty it's automatically found
      * @param string $addParams Additional parameters to pass to the script.
-     * @param string $label
      *
-     * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
@@ -369,8 +367,6 @@ return false;
      * @param string $script The script to send the &id to, if empty it's automatically found
      * @param string $addParams Additional parameters to pass to the script.
      * @param string $tagParams Additional attributes for the checkbox input tag
-     * @param string $label
-     * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      * @see getFuncMenu()
@@ -422,17 +418,13 @@ return false;
         return $subcontent;
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @return array
-     */
     protected function inlineEditAction(L10nConfiguration $l10NConfiguration): array
     {
         // simple init of translation object:
         /** @var TranslationData $translationData */
         $translationData = GeneralUtility::makeInstance(TranslationData::class);
         $translationData->setTranslationData((array)GeneralUtility::_POST('translation'));
-        $translationData->setLanguage($this->targetLanguage);
+        $translationData->setLanguage($this->sysLanguage);
         $translationData->setPreviewLanguage($this->previewLanguage);
         // See, if incoming translation is available, if so, submit it
         if (GeneralUtility::_POST('saveInline')) {
@@ -472,8 +464,6 @@ return false;
     }
 
     /**
-     * @param L10nConfiguration $l10nConfiguration
-     * @return array
      * @throws ResourceNotFoundException
      * @throws RouteNotFoundException
      */
@@ -504,7 +494,7 @@ return false;
             $factory = GeneralUtility::makeInstance(TranslationDataFactory::class);
             // TODO: catch exception
             $translationData = $factory->getTranslationDataFromExcelXMLFile($uploadedTempFile);
-            $translationData->setLanguage($this->targetLanguage);
+            $translationData->setLanguage($this->sysLanguage);
             $translationData->setPreviewLanguage($this->previewLanguage);
             GeneralUtility::unlink_tempfile($uploadedTempFile);
             $this->l10nBaseService->saveTranslation($l10nConfiguration, $translationData);
@@ -528,8 +518,12 @@ return false;
         if ($exportExcel) {
             // Render the XML
             /** @var ExcelXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->targetLanguage);
-            $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            $viewClass = GeneralUtility::makeInstance(ExcelXmlView::class, $l10nConfiguration, $this->sysLanguage);
+            if (1 == 1) {
+                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            } else {
+                $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
+            }
 
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
@@ -604,49 +598,12 @@ return false;
             'isImport' => $isImport,
             'importSuccess' => $importSuccess,
             'previewLanguageMenu' => $this->makePreviewLanguageMenu(
-            $l10nConfiguration->getForcedSourceLanguage(),
-            $l10nConfiguration->getOnlyForcedSourceLanguage()
+                $l10nConfiguration->getForcedSourceLanguage(),
+                $l10nConfiguration->getOnlyForcedSourceLanguage()
             ),
             'flashMessageHtml' => $flashMessageHtml,
             'internalFlashMessage' => $internalFlashMessage,
         ];
-    }
-
-    /**
-     * @param string $elementName
-     * @param string $currentValue
-     * @param array $menuItems
-     * @return string
-     */
-    protected function _getSelectField(string $elementName, string $currentValue, array $menuItems): string
-    {
-        $options = [];
-        $return = '';
-        foreach ($menuItems as $value => $label) {
-            $options[] = '<option value="' . htmlspecialchars((string)$value) . '"' . (!strcmp(
-                $currentValue,
-                (string)$value
-            ) ? ' selected="selected"' : '') . '>' . htmlspecialchars(
-                (string)$label,
-                ENT_COMPAT,
-                'UTF-8',
-                false
-            ) . '</option>';
-        }
-        if (count($options) > 0) {
-            $return = '
-	<select class="form-control" name="' . $elementName . '" ' . ($currentValue ? 'disabled="disabled"' : '') . '>
-	' . implode('
-	', $options) . '
-	</select>
-	';
-        }
-
-        if ($currentValue) {
-            $return .= '<input type="hidden" name="' . $elementName . '" value="' . $currentValue . '" />';
-        }
-
-        return $return;
     }
 
     /**
@@ -665,8 +622,6 @@ return false;
     }
 
     /**
-     * @param L10nConfiguration $l10nConfiguration
-     * @return array
      * @throws RouteNotFoundException
      * @throws DBALException
      * @throws \Doctrine\DBAL\Driver\Exception
@@ -680,7 +635,6 @@ return false;
         $flashMessageRenderer = GeneralUtility::makeInstance(FlashMessageRendererResolver::class);
         $existingExportsOverview = '';
         $flashMessages = [];
-        $actionInfo = '';
 
         $importXml = GeneralUtility::_POST('import_xml');
         $exportXml = GeneralUtility::_POST('export_xml');
@@ -705,7 +659,7 @@ return false;
             $importManager = GeneralUtility::makeInstance(
                 CatXmlImportManager::class,
                 $uploadedTempFile,
-                $this->targetLanguage,
+                $this->sysLanguage,
                 $xmlString = ''
             );
 
@@ -757,10 +711,10 @@ return false;
                 }
                 if (!empty($importManager->headerData['t3_sourceLang']) && !empty($importManager->headerData['t3_targetLang'])
                     && $importManager->headerData['t3_sourceLang'] === $importManager->headerData['t3_targetLang']) {
-                    $this->previewLanguage = $this->targetLanguage;
+                    $this->previewLanguage = $this->sysLanguage;
                 }
                 $translationData = $factory->getTranslationDataFromCATXMLNodes($importManager->getXMLNodes());
-                $translationData->setLanguage($this->targetLanguage);
+                $translationData->setLanguage($this->sysLanguage);
                 $translationData->setPreviewLanguage($this->previewLanguage);
 
                 unset($importManager);
@@ -787,16 +741,13 @@ return false;
         if ($exportXml) {
             // Render the XML
             /** @var CatXmlView $viewClass */
-            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->targetLanguage);
+            $viewClass = GeneralUtility::makeInstance(CatXmlView::class, $l10nConfiguration, $this->sysLanguage);
             $export_xml_forcepreviewlanguage = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage');
 
             if ($export_xml_forcepreviewlanguage > 0) {
                 $viewClass->setForcedSourceLanguage($export_xml_forcepreviewlanguage);
             }
-            $export_xml_forcepreviewlanguage_only = (int)GeneralUtility::_POST('export_xml_forcepreviewlanguage_only');
-            if ($export_xml_forcepreviewlanguage_only > 0) {
-                $viewClass->setOnlyForcedSourceLanguage();
-            }
+
             if ($this->MOD_SETTINGS['onlyChangedContent'] ?? false) {
                 $viewClass->setModeOnlyChanged();
             }
@@ -829,7 +780,7 @@ return false;
                         // Send a mail notification
                         /** @var NotificationService $notificationService */
                         $notificationService = GeneralUtility::makeInstance(NotificationService::class);
-                        $notificationService->sendMail($filename, $l10nConfiguration, $this->targetLanguage, $this->emConfiguration);
+                        $notificationService->sendMail($filename, $l10nConfiguration, $this->sysLanguage, $this->emConfiguration);
 
                         // Prepare a success message for display
                         $status = AbstractMessage::OK;
@@ -941,10 +892,6 @@ return false;
         return $files;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function downloadSetting(ServerRequestInterface $request): ResponseInterface
     {
         $settingId = $request->getQueryParams()['setting'];
@@ -959,10 +906,6 @@ return false;
             ->withBody($body);
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     protected function getSetting(string $key): string
     {
         return $this->settings[$key] ?? '';
@@ -1049,7 +992,7 @@ return false;
         // Load system languages into menu and check against allowed languages:
         /** @var TranslationConfigurationProvider $t8Tools */
         $t8Tools = GeneralUtility::makeInstance(TranslationConfigurationProvider::class);
-        $systemLanguages = $t8Tools->getSystemLanguages((int)$configuration['pid']);
+        $systemLanguages = $t8Tools->getSystemLanguages();
         foreach ($systemLanguages as $systemLanguage) {
             if (!empty($targetLanguages) && !isset($targetLanguages[$systemLanguage['uid']])) {
                 continue;
@@ -1068,9 +1011,6 @@ return false;
         parent::menuConfig();
     }
 
-    /**
-     * @return StandaloneView
-     */
     protected function getFluidTemplateObject(): StandaloneView
     {
         $view = GeneralUtility::makeInstance(StandaloneView::class);
@@ -1085,9 +1025,6 @@ return false;
         return $view;
     }
 
-    /**
-     * @return L10nConfiguration
-     */
     protected function getL10NConfiguration(): L10nConfiguration
     {
         /** @var L10nConfiguration $l10nConfiguration */
@@ -1097,11 +1034,6 @@ return false;
         return $l10nConfiguration;
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @param array $result
-     * @return array
-     */
     protected function linkOverviewAndOnlineTranslationAction(
         L10nConfiguration $l10NConfiguration,
         array $result
@@ -1110,7 +1042,7 @@ return false;
         $htmlListView = GeneralUtility::makeInstance(
             L10nHtmlListView::class,
             $l10NConfiguration,
-            $this->targetLanguage,
+            $this->sysLanguage,
             $this->moduleTemplate,
         );
         $action = $this->MOD_SETTINGS['action'] ?? '';
@@ -1136,10 +1068,6 @@ return false;
         ];
     }
 
-    /**
-     * @param L10nConfiguration $l10NConfiguration
-     * @return array
-     */
     protected function exportImportXmlAction(L10nConfiguration $l10NConfiguration): array
     {
         $prefs['utf8'] = GeneralUtility::_POST('check_utf8');
@@ -1150,10 +1078,6 @@ return false;
         return $this->catXMLExportImportAction($l10NConfiguration);
     }
 
-    /**
-     * @param L10nConfiguration $l10nConfiguration
-     * @return array
-     */
     protected function renderConfigurationTable(L10nConfiguration $l10nConfiguration): array
     {
         /** @var L10nConfigurationDetailView $l10nmgrconfigurationView */

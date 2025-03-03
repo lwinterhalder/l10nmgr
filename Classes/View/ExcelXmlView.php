@@ -22,8 +22,6 @@ namespace Localizationteam\L10nmgr\View;
  * This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use Localizationteam\L10nmgr\Model\L10nConfiguration;
-use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,34 +33,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class ExcelXmlView extends AbstractExportView
 {
     //internal flags:
-    /**
-     * @var bool
-     */
     protected bool $modeOnlyChanged = false;
 
-    /**
-     * @var int
-     */
     protected int $exportType = 0;
 
     /**
-     * ExcelXmlView constructor.
-     * @param L10nConfiguration $l10ncfgObj
-     * @param int $targetLanguage
-     * @throws SiteNotFoundException
+     * @var int $forcedSourceLanguage Overwrite the default language uid with the desired language to export
      */
-    public function __construct(L10nConfiguration $l10ncfgObj, int $targetLanguage)
-    {
-        parent::__construct($l10ncfgObj, $targetLanguage);
-    }
+    protected int $forcedSourceLanguage = 0;
 
     /**
      * @inheritdoc
      */
     public function render(): string
     {
-        $targetLanguage = $this->targetLanguage;
-        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($targetLanguage);
+        $sysLang = $this->sysLang;
+        $accumObj = $this->l10ncfgObj->getL10nAccumulatedInformationsObjectForLanguage($sysLang);
         if ($this->forcedSourceLanguage) {
             $accumObj->setForcedPreviewLanguage($this->forcedSourceLanguage);
         }
@@ -240,5 +226,4 @@ class ExcelXmlView extends AbstractExportView
         }
         return $messages;
     }
-
 }

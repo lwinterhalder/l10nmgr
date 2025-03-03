@@ -8,10 +8,6 @@ use TYPO3\CMS\Core\Localization\LanguageService;
 
 trait LanguageServiceTrait
 {
-    /**
-     * Returns the Language Service
-     * @return LanguageService
-     */
     protected function getLanguageService(): LanguageService
     {
         return $GLOBALS['LANG'];

@@ -41,15 +41,12 @@ class Module2
     /**
      * @static
      * @internal
-     * @var int
      */
     protected int $defaultWidth = 300; // Default width of the navigation frame. Can be overridden from $TBE_STYLES['dims']['navFrameWidth'] (alternative default value) AND from User TSconfig
-
     /**
      * Content accumulation.
      * @dynamic
      * @internal
-     * @var string
      */
     protected string $content;
 
