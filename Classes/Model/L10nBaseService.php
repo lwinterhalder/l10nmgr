@@ -555,13 +555,15 @@ class L10nBaseService implements LoggerAwareInterface
                                             /*
                                              * Special handling for 1:n relations
                                              *
-                                             * Example: Inline elements (1:n) with tt_content as parent
+                                             * Example: Inline elements (1:n) with pages as parentTable
++                                            * parentTable is optional with standard value 'tt_content'
                                              *
                                              * Config example:
                                              * $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['l10nmgr']['inlineTablesConfig'] = [
                                              *    'tx_myext_myelement' => [
                                              *       'parentField' => 'content',
                                              *       'childrenField' => 'myelements',
+                                             *       'parentTable' => 'pages',
                                              *   ]];
                                              */
                                             if (isset($this->TCEmain_cmd[$table][$elementUid])) {
@@ -575,7 +577,8 @@ class L10nBaseService implements LoggerAwareInterface
                                                     $element,
                                                     (int)$Tlang,
                                                     $inlineTablesConfig[$table]['parentField'] ?? '',
-                                                    $inlineTablesConfig[$table]['childrenField'] ?? ''
+                                                    $inlineTablesConfig[$table]['childrenField'] ?? '',
++                                                   $inlineTablesConfig[$table]['parentTable'] ?? 'tt_content',
                                                 );
                                             }
                                         } elseif ($table === 'sys_file_reference') {
@@ -908,7 +911,7 @@ class L10nBaseService implements LoggerAwareInterface
     /**
      * @throws DBALException
      */
-    protected function recursivelyCheckForRelationParents(array $element, int $Tlang, string $parentField, string $childrenField): void
+    protected function recursivelyCheckForRelationParents(array $element, int $Tlang, string $parentField, string $childrenField, string $parentTable = 'tt_content'): void
     {
         $this->depthCounter++;
         if ($this->depthCounter < 100 && !isset($this->checkedParentRecords[$parentField][$element['uid']])) {
@@ -916,16 +919,16 @@ class L10nBaseService implements LoggerAwareInterface
             $translatedParent = [];
             if (isset($element[$parentField]) && $element[$parentField] > 0) {
                 /** @var QueryBuilder $queryBuilder */
-                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
+                $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($parentTable);
                 $queryBuilder->getRestrictions()->removeAll()->add(GeneralUtility::makeInstance(DeletedRestriction::class));
 
                 $translatedParent = $queryBuilder
                     ->select('*')
-                    ->from('tt_content')
+                    ->from($parentTable)
                     ->where(
-                        !empty($GLOBALS['TCA']['tt_content']['ctrl']['transOrigPointerField']) ?
+                        !empty($GLOBALS['TCA'][$parentTable]['ctrl']['transOrigPointerField']) ?
                             $queryBuilder->expr()->eq(
-                                $GLOBALS['TCA']['tt_content']['ctrl']['transOrigPointerField'],
+                                $GLOBALS['TCA'][$parentTable]['ctrl']['transOrigPointerField'],
                                 $queryBuilder->createNamedParameter((int)$element[$parentField], Connection::PARAM_INT)
                             )
                         : null,
@@ -939,8 +942,8 @@ class L10nBaseService implements LoggerAwareInterface
             }
             if (isset($translatedParent['uid']) && $translatedParent['uid'] > 0) {
                 // Save for localization
-                if (empty($this->TCEmain_cmd['tt_content'][$translatedParent['uid']]['inlineLocalizeSynchronize']['ids'])) {
-                    $this->TCEmain_cmd['tt_content'][$translatedParent['uid']]['inlineLocalizeSynchronize'] = [
+                if (empty($this->TCEmain_cmd[$parentTable][$translatedParent['uid']]['inlineLocalizeSynchronize']['ids'])) {
+                    $this->TCEmain_cmd[$parentTable][$translatedParent['uid']]['inlineLocalizeSynchronize'] = [
                         'field' => $childrenField,
                         'language' => $Tlang,
                         'action' => 'localize',
@@ -948,15 +951,15 @@ class L10nBaseService implements LoggerAwareInterface
                     ];
                 } else {
                     // Add element to existing localization array
-                    $this->TCEmain_cmd['tt_content'][$translatedParent['uid']]['inlineLocalizeSynchronize']['ids'][] = $element['uid'] ?? 0;
+                    $this->TCEmain_cmd[$parentTable][$translatedParent['uid']]['inlineLocalizeSynchronize']['ids'][] = $element['uid'] ?? 0;
                 }
             } else {
                 if (isset($element[$parentField]) && $element[$parentField] > 0) {
-                    $parent = $this->getRawRecord('tt_content', (int)$element[$parentField]);
-                    $this->recursivelyCheckForRelationParents($parent, $Tlang, $parentField, $childrenField);
+                    $parent = $this->getRawRecord($parentTable, (int)$element[$parentField]);
+                    $this->recursivelyCheckForRelationParents($parent, $Tlang, $parentField, $childrenField, $parentTable);
                 } else {
                     if (isset($element['uid'])) {
-                        $this->TCEmain_cmd['tt_content'][$element['uid']]['localize'] = $Tlang;
+                        $this->TCEmain_cmd[$parentTable][$element['uid']]['localize'] = $Tlang;
                     }
                 }
             }
